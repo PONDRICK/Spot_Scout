@@ -33,11 +33,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name}"
     
     def tokens(self):
-        pass
+        refresh = RefreshToken.for_user(self)
+        return {
+             'refresh' : str(refresh),
+             'access' : str(refresh.access_token)
+        }
+
+
     
 class OneTimePassword(models.Model):
         user = models.OneToOneField(User, on_delete= models.CASCADE)
-        code=models.CharField(max_length=6,unique=True)
+        code = models.CharField(max_length=6,unique=True)
         
         def __str__(self):
             return f"{self.user.first_name}--passcode"
