@@ -155,10 +155,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '6015d3d827c521'
-EMAIL_HOST_PASSWORD = '6ad28bdf833e51'
-DEFAULT_FROM_EMAIL = 'spotscout@outlook.com'
-EMAIL_PORT = '2525'
-EMAIL_USE_TLS=True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'spotscout.verify@gmail.com'
+EMAIL_HOST_PASSWORD = 'sopmnxsclpjbibwy'
+DEFAULT_FROM_EMAIL = 'spotscout.verify@gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
