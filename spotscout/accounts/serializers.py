@@ -10,10 +10,11 @@ from django.utils.encoding import smart_bytes, force_str
 from django.urls import reverse
 from .utils import send_normal_email
 from rest_framework_simplejwt.tokens import RefreshToken, Token
+from django.contrib.auth.password_validation import validate_password
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length =6, write_only = True)
+    password = serializers.CharField(max_length=68, min_length =6, write_only = True ,validators=[validate_password])
     password2 = serializers.CharField(max_length=68, min_length =6, write_only = True)
     
     class Meta:
@@ -128,7 +129,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     
 class SetNewPasswordSerializer(serializers.Serializer):
-    password=serializers.CharField(max_length=100, min_length=6, write_only=True)
+    password=serializers.CharField(max_length=100, min_length=6, write_only=True,validators=[validate_password])
     confirm_password=serializers.CharField(max_length=100, min_length=6, write_only=True)
     uidb64=serializers.CharField(min_length=1, write_only=True)
     token=serializers.CharField(min_length=3, write_only=True)

@@ -4,11 +4,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .managers import UserManager
+from .validators import validate_email_address
 # Create your models here.
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
-        max_length=255, verbose_name=_("Email Address"), unique=True
+        max_length=255, verbose_name=_("Email Address"), unique=True,
+        validators=[validate_email_address]
     )
     first_name = models.CharField(max_length=100, verbose_name=_("First Name"))
     last_name = models.CharField(max_length=100, verbose_name=_("Last Name"))
