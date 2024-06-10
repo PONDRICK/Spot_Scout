@@ -23,6 +23,7 @@ export class RegisterComponent {
   constructor(private apiService: ApiService) {}
 
   register() {
+    console.log(this.user)
     this.apiService.registerUser(this.user).subscribe(
       (response) => {
         console.log('Registration successful', response);
