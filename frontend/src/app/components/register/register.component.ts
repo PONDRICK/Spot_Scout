@@ -14,10 +14,10 @@ import { HttpClientModule } from '@angular/common/http';
 export class RegisterComponent {
   user = {
     email: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     password: '',
-    confirmPassword: '',
+    password2: '',
   };
 
   constructor(private apiService: ApiService) {}
