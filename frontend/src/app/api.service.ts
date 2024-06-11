@@ -21,4 +21,12 @@ export class ApiService {
   resetPassword(email: any): Observable<any> {
     return this.http.post(`${this.baseUrl}password-reset/`, email);
   }
+
+  verifyOTP(otpData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}verify-email/`, otpData);
+  }
+
+  resendOTP(email: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}resend-otp/`, email);
+  }
 }

@@ -51,9 +51,7 @@
       />
     </div>
     <div class="mb-4">
-      <label
-        for="password2"
-        class="block text-sm font-medium text-gray-700"
+      <label for="password2" class="block text-sm font-medium text-gray-700"
         >Confirm Password</label
       >
       <input
@@ -68,4 +66,9 @@
       Register
     </button>
   </form>
+  <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
+  <p class="mt-4">
+    Already have an account?
+    <a routerLink="/login" class="text-blue-500">Login here</a>
+  </p>
 </div>

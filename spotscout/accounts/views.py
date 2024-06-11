@@ -9,7 +9,7 @@ from .models import OneTimePassword, User
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import smart_str , DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-
+from django.http import HttpResponse
 # Create your views here.
 
 class RegisterUserView(GenericAPIView):
@@ -96,7 +96,7 @@ class SetNewPassword(GenericAPIView):
     def patch(self, request):
         serializer=self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response({'success':True, 'message':"password reset is succesful"}, status=status.HTTP_200_OK)
+        return Response({'success':True, 'message':"password reset is successful"}, status=status.HTTP_200_OK)
     
 class LogoutUserView(GenericAPIView):
     serializer_class=LogoutUserSerializer
@@ -107,3 +107,42 @@ class LogoutUserView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+from .models import User, OneTimePassword
+from .utils import send_code_to_user
+
+class ResendOTPView(GenericAPIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            # ลบ OTP เก่าของผู้ใช้
+            OneTimePassword.objects.filter(user=user).delete()
+            # สร้าง OTP ใหม่
+            send_code_to_user(email)
+            return Response({'message': 'OTP has been resent'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+def index(request):
+    if 'authenticated' in request.session:
+        authenticated = request.session['authenticated']
+    else:
+        authenticated = False
+
+    if authenticated:
+        return HttpResponse("Welcome back! You are already logged in.")
+
+    return render(request, 'index.html')
+
+def login(request):
+    request.session['authenticated'] = True
+    return HttpResponse("Login successful. Cookie set.")
+
+def logout(request):
+    if 'authenticated' in request.session:
+        del request.session['authenticated']
+    return HttpResponse("Logged out. Cookie deleted.")

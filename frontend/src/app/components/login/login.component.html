@@ -30,4 +30,11 @@
       Login
     </button>
   </form>
+  <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
+  <p class="mt-4">
+    <a routerLink="/register" class="text-blue-500">Register here</a>
+  </p>
+  <p class="mt-4">
+    <a routerLink="/reset-password" class="text-blue-500">Forgot Password?</a>
+  </p>
 </div>

@@ -1,0 +1,29 @@
+<!-- src/app/components/otp-verification/otp-verification.component.html -->
+<div class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6">Verify OTP</h2>
+  <form (ngSubmit)="verifyOTP()">
+    <div class="mb-4">
+      <label for="otp" class="block text-sm font-medium text-gray-700"
+        >OTP Code</label
+      >
+      <input
+        [(ngModel)]="otp"
+        name="otp"
+        type="text"
+        class="mt-1 p-2 border rounded-md w-full"
+        required
+      />
+    </div>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">
+      Verify
+    </button>
+  </form>
+  <button
+    (click)="resendOTP()"
+    class="bg-gray-500 text-white px-4 py-2 rounded-md mt-4"
+  >
+    Resend OTP
+  </button>
+  <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="text-green-500 mt-4">{{ successMessage }}</p>
+</div>
