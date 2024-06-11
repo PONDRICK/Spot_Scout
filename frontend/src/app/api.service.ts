@@ -36,10 +36,6 @@ export class ApiService {
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       'Content-Type': 'application/json',
     });
-    return this.http.post(
-      `${this.baseUrl}logout/`,
-      { refresh_token: refreshToken },
-      { headers: headers }
-    );
+    return this.http.post(`${this.baseUrl}logout/`,{ refresh_token: refreshToken },{ headers: headers });
   }
 }
