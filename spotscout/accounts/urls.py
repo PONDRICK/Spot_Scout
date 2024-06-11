@@ -12,6 +12,4 @@ urlpatterns = [
     path('logout/', LogoutUserView.as_view(), name='logout'),
     path('resend-otp/', ResendOTPView.as_view(), name='resend-otp'),
 
-
-
 ]

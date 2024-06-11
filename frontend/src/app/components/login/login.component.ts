@@ -1,3 +1,4 @@
+// frontend/src/app/components/login/login.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../api.service';
@@ -30,6 +31,8 @@ export class LoginComponent {
     this.apiService.loginUser(this.credentials).subscribe(
       (response) => {
         console.log('Login successful', response);
+        localStorage.setItem('access_token', response.access_token);
+        localStorage.setItem('refresh_token', response.refresh_token);
         this.router.navigate(['/dashboard']);
       },
       (error) => {

@@ -1,5 +1,6 @@
+// frontend/src/app/api.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -28,5 +29,17 @@ export class ApiService {
 
   resendOTP(email: any): Observable<any> {
     return this.http.post(`${this.baseUrl}resend-otp/`, email);
+  }
+
+  logoutUser(refreshToken: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.post(
+      `${this.baseUrl}logout/`,
+      { refresh_token: refreshToken },
+      { headers: headers }
+    );
   }
 }
