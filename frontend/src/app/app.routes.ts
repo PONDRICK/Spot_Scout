@@ -4,6 +4,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { OTPVerificationComponent } from './components/otp-verification/otp-verification.component';
+import { AuthGuard } from './auth.guard'; // Import AuthGuard
 
 export const routes: Routes = [
   {
@@ -21,6 +22,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [AuthGuard], // Add AuthGuard to canActivate property
   },
   {
     path: 'verify-otp',
