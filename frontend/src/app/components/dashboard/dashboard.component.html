@@ -1,8 +1,15 @@
-<!-- frontend/src/app/components/dashboard/dashboard.component.html -->
-<div class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
-  <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-  <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md">
-    Logout
-  </button>
-  <!-- Add more content for the dashboard here -->
-</div>
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <span class="navbar-title">Dashboard</span>
+    </div>
+    <div class="navbar-right">
+      <input type="text" placeholder="Latitude" #latInput>
+      <input type="text" placeholder="Longitude" #lonInput>
+      <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md">
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+<div id="map" style="height: calc(100vh - 56px); width: 100%;"></div>

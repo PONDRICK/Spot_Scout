@@ -1,0 +1,43 @@
+.navbar {
+    height: 56px;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  #map {
+    height: calc(100vh - 56px);
+    width: 100%;
+  }
+
+  input {
+    color: black; 
+  }
+  

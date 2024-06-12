@@ -31,8 +31,7 @@ export class LoginComponent {
     this.apiService.loginUser(this.credentials).subscribe(
       (response) => {
         console.log('Login successful', response);
-        localStorage.setItem('access_token', response.access_token);
-        localStorage.setItem('refresh_token', response.refresh_token);
+        this.apiService.setToken(response.access_token, response.refresh_token);
         this.router.navigate(['/dashboard']);
       },
       (error) => {
