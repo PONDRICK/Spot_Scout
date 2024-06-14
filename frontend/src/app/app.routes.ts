@@ -5,6 +5,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { OTPVerificationComponent } from './components/otp-verification/otp-verification.component';
+import { SetNewPasswordComponent } from './components/set-new-password/set-new-password.component';
 import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -28,6 +29,10 @@ export const routes: Routes = [
   {
     path: 'verify-otp',
     component: OTPVerificationComponent,
+  },
+  {
+    path: 'reset-password-confirm/:uidb64/:token',
+    component: SetNewPasswordComponent,
   },
   {
     path: '',
