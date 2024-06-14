@@ -44,6 +44,10 @@ export class ApiService {
     );
   }
 
+  setNewPassword(data: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}set-new-password/`, data);
+  }
+
   setToken(access_token: string, refresh_token: string) {
     this.cookieService.set('access_token', access_token);
     this.cookieService.set('refresh_token', refresh_token);
