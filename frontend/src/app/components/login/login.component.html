@@ -1,5 +1,8 @@
 <!-- src/app/components/login/login.component.html -->
-<div class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
+<div
+  *ngIf="!isLoggedIn()"
+  class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md"
+>
   <h2 class="text-2xl font-bold mb-6">Login</h2>
   <form (ngSubmit)="login()">
     <div class="mb-4">
