@@ -4,6 +4,7 @@ import { ApiService } from '../../api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-otp-verification',
@@ -28,7 +29,13 @@ export class OTPVerificationComponent implements OnInit {
     this.apiService.verifyOTP({ otp: this.otp }).subscribe(
       (response) => {
         console.log('OTP verification successful', response);
-        this.router.navigate(['/login']);
+        Swal.fire({
+          icon: 'success',
+          title: 'OTP Verification Successful',
+          text: 'Your OTP has been successfully verified.',
+        }).then(() => {
+          this.router.navigate(['/login']);
+        });
       },
       (error) => {
         console.error('OTP verification failed', error);
