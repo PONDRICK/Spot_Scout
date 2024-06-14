@@ -25,6 +25,7 @@
     "leaflet": "^1.9.4",
     "ngx-cookie-service": "^18.0.0",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.11.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },

@@ -15,43 +15,52 @@ import { HttpClientModule } from '@angular/common/http';
 export class SetNewPasswordComponent {
   password = '';
   confirmPassword = '';
+  passwordLengthValid = false;
+  passwordUppercaseValid = false;
+  passwordLowercaseValid = false;
+  passwordDigitValid = false;
+  passwordSpecialCharValid = false;
+  confirmPasswordError = true;
   errorMessage = '';
   successMessage = '';
 
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private apiService: ApiService, private router: Router, private route: ActivatedRoute) {}
+
+  validatePassword() {
+    this.passwordLengthValid = this.password.length >= 8;
+    this.passwordUppercaseValid = /[A-Z]/.test(this.password);
+    this.passwordLowercaseValid = /[a-z]/.test(this.password);
+    this.passwordDigitValid = /\d/.test(this.password);
+    this.passwordSpecialCharValid = /[\W_]/.test(this.password);
+  }
+
+  validateConfirmPassword() {
+    this.confirmPasswordError = this.password !== this.confirmPassword;
+  }
 
   setNewPassword() {
-    const uidb64 = this.route.snapshot.paramMap.get('uidb64');
-    const token = this.route.snapshot.paramMap.get('token');
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage = "Passwords don't match";
+    this.validatePassword();
+    this.validateConfirmPassword();
+
+    if (!this.passwordLengthValid || !this.passwordUppercaseValid || !this.passwordLowercaseValid || !this.passwordDigitValid || !this.passwordSpecialCharValid || this.confirmPasswordError) {
+      this.errorMessage = 'Please correct the errors above.';
       return;
     }
-    this.apiService
-      .setNewPassword({
-        password: this.password,
-        confirm_password: this.confirmPassword,
-        uidb64,
-        token,
-      })
-      .subscribe(
-        (response) => {
-          console.log('Password reset successful', response);
-          this.successMessage =
-            'Password has been reset successfully. You can now login with your new password.';
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 3000);
-        },
-        (error) => {
-          console.error('Password reset failed', error);
-          this.errorMessage =
-            'Password reset failed. The link might have expired or is invalid.';
-        }
-      );
+
+    const uidb64 = this.route.snapshot.paramMap.get('uidb64');
+    const token = this.route.snapshot.paramMap.get('token');
+    this.apiService.setNewPassword({ password: this.password, confirm_password: this.confirmPassword, uidb64, token }).subscribe(
+      (response) => {
+        console.log('Password reset successful', response);
+        this.successMessage = 'Password has been reset successfully. You can now login with your new password.';
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 3000);
+      },
+      (error) => {
+        console.error('Password reset failed', error);
+        this.errorMessage = 'Password reset failed. The link might have expired or is invalid.';
+      }
+    );
   }
 }

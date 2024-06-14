@@ -5,6 +5,8 @@ import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -34,8 +36,14 @@ export class RegisterComponent {
     this.apiService.registerUser(this.user).subscribe(
       (response) => {
         console.log('Registration successful', response);
-        this.router.navigate(['/verify-otp'], {
-          state: { email: this.user.email },
+        Swal.fire({
+          icon: 'success',
+          title: 'OTP Sent',
+          text: 'An OTP has been sent to your email address.',
+        }).then(() => {
+          this.router.navigate(['/verify-otp'], {
+            state: { email: this.user.email },
+          });
         });
       },
       (error) => {
