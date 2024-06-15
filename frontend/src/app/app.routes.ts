@@ -33,6 +33,7 @@ export const routes: Routes = [
   {
     path: 'verify-otp',
     component: OTPVerificationComponent,
+    canActivate: [GuestGuard],
   },
   {
     path: 'reset-password-confirm/:uidb64/:token',
