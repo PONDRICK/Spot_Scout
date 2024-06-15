@@ -70,10 +70,13 @@ class TestAuthenticationView(GenericAPIView):
 
 class PasswordResetRequestView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
+    
     def post(self, request):
-        serializer=self.serializer_class(data=request.data, context = {'request':request})
-        serializer.is_valid(raise_exception=True)
-        return Response({'message':'a link has been sent to your email to rest your password'}, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'A link has been sent to your email to reset your password'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class PasswordResetConfirm(GenericAPIView):

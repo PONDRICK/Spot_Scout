@@ -32,7 +32,37 @@ export class RegisterComponent {
 
   constructor(private apiService: ApiService, private router: Router) {}
 
+  validatePassword(password: string): string | null {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long.';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one uppercase letter.';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Password must contain at least one lowercase letter.';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number.';
+    }
+    if (!/[\W_]/.test(password)) {
+      return 'Password must contain at least one special character.';
+    }
+    return null;
+  }
+
   register() {
+    if (this.user.password !== this.user.password2) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
+
+    const passwordError = this.validatePassword(this.user.password);
+    if (passwordError) {
+      this.errorMessage = passwordError;
+      return;
+    }
+
     this.apiService.registerUser(this.user).subscribe(
       (response) => {
         console.log('Registration successful', response);
@@ -48,8 +78,11 @@ export class RegisterComponent {
       },
       (error) => {
         console.error('Registration failed', error);
-        this.errorMessage =
-          'Registration failed. Please check the entered details.';
+        if (error.error.email) {
+          this.errorMessage = 'Invalid email address.';
+        } else {
+          this.errorMessage = 'Registration failed. Please check the entered details.';
+        }
       }
     );
   }

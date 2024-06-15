@@ -1,74 +1,30 @@
-<!-- src/app/components/register/register.component.html -->
 <div class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
   <h2 class="text-2xl font-bold mb-6">Register</h2>
   <form (ngSubmit)="register()">
     <div class="mb-4">
-      <label for="email" class="block text-sm font-medium text-gray-700"
-        >Email</label
-      >
-      <input
-        [(ngModel)]="user.email"
-        name="email"
-        type="email"
-        class="mt-1 p-2 border rounded-md w-full"
-        required
-      />
+      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+      <input [(ngModel)]="user.email" name="email" type="email" class="mt-1 p-2 border rounded-md w-full" required>
     </div>
     <div class="mb-4">
-      <label for="first_name" class="block text-sm font-medium text-gray-700"
-        >First Name</label
-      >
-      <input
-        [(ngModel)]="user.first_name"
-        name="first_name"
-        type="text"
-        class="mt-1 p-2 border rounded-md w-full"
-        required
-      />
+      <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+      <input [(ngModel)]="user.first_name" name="first_name" type="text" class="mt-1 p-2 border rounded-md w-full" required>
     </div>
     <div class="mb-4">
-      <label for="last_name" class="block text-sm font-medium text-gray-700"
-        >Last Name</label
-      >
-      <input
-        [(ngModel)]="user.last_name"
-        name="last_name"
-        type="text"
-        class="mt-1 p-2 border rounded-md w-full"
-        required
-      />
+      <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+      <input [(ngModel)]="user.last_name" name="last_name" type="text" class="mt-1 p-2 border rounded-md w-full" required>
     </div>
     <div class="mb-4">
-      <label for="password" class="block text-sm font-medium text-gray-700"
-        >Password</label
-      >
-      <input
-        [(ngModel)]="user.password"
-        name="password"
-        type="password"
-        class="mt-1 p-2 border rounded-md w-full"
-        required
-      />
+      <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+      <input [(ngModel)]="user.password" name="password" type="password" class="mt-1 p-2 border rounded-md w-full" required>
     </div>
     <div class="mb-4">
-      <label for="password2" class="block text-sm font-medium text-gray-700"
-        >Confirm Password</label
-      >
-      <input
-        [(ngModel)]="user.password2"
-        name="password2"
-        type="password"
-        class="mt-1 p-2 border rounded-md w-full"
-        required
-      />
+      <label for="password2" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+      <input [(ngModel)]="user.password2" name="password2" type="password" class="mt-1 p-2 border rounded-md w-full" required>
     </div>
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">
-      Register
-    </button>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Register</button>
   </form>
   <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
   <p class="mt-4">
-    Already have an account?
-    <a routerLink="/login" class="text-blue-500">Login here</a>
+    Already have an account? <a routerLink="/login" class="text-blue-500">Login here</a>
   </p>
 </div>
