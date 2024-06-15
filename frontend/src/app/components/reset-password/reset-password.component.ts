@@ -4,6 +4,7 @@ import { ApiService } from '../../api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-reset-password',
@@ -23,12 +24,21 @@ export class ResetPasswordComponent {
     this.apiService.resetPassword({ email: this.email }).subscribe(
       (response) => {
         console.log('Reset password email sent', response);
-        this.successMessage =
-          'A link to reset your password has been sent to your email.';
+        Swal.fire({
+          icon: 'success',
+          title: 'Email Sent',
+          text: 'A link to reset your password has been sent to your email.',
+        }).then(() => {
+          this.router.navigate(['/login']);
+        });
       },
       (error) => {
         console.error('Reset password failed', error);
-        this.errorMessage = 'Reset password failed. Please check your email.';
+        if (error.error.email) {
+          this.errorMessage = 'This email address is not registered.';
+        } else {
+          this.errorMessage = 'Reset password failed. Please check your email.';
+        }
       }
     );
   }

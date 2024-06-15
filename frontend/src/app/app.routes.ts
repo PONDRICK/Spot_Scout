@@ -7,19 +7,23 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { OTPVerificationComponent } from './components/otp-verification/otp-verification.component';
 import { SetNewPasswordComponent } from './components/set-new-password/set-new-password.component';
 import { AuthGuard } from './auth.guard';
+import { GuestGuard } from './guest.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
+    canActivate: [GuestGuard],
   },
   {
     path: 'register',
     component: RegisterComponent,
+    canActivate: [GuestGuard],
   },
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
+    canActivate: [GuestGuard],
   },
   {
     path: 'dashboard',
@@ -29,6 +33,7 @@ export const routes: Routes = [
   {
     path: 'verify-otp',
     component: OTPVerificationComponent,
+    canActivate: [GuestGuard],
   },
   {
     path: 'reset-password-confirm/:uidb64/:token',

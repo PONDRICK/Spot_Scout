@@ -79,22 +79,25 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         email = attrs.get('email')
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            request = self.context.get('request')
-            current_site = get_current_site(request).domain
-            frontend_link = f"http://localhost:4200/reset-password-confirm/{uidb64}/{token}"
-            email_body = f"Hi {user.first_name}, use the link below to reset your password {frontend_link}"
-            data = {
-                'email_body': email_body,
-                'email_subject': "Reset your Password",
-                'to_email': user.email
-            }
-            send_normal_email(data)
-        return super().validate(attrs)
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("This email address is not registered.")
+        return attrs
 
+    def save(self):
+        email = self.validated_data['email']
+        user = User.objects.get(email=email)
+        uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+        token = PasswordResetTokenGenerator().make_token(user)
+        request = self.context.get('request')
+        current_site = get_current_site(request).domain
+        frontend_link = f"http://localhost:4200/reset-password-confirm/{uidb64}/{token}"
+        email_body = f"Hi {user.first_name}, use the link below to reset your password {frontend_link}"
+        data = {
+            'email_body': email_body,
+            'email_subject': "Reset your Password",
+            'to_email': user.email
+        }
+        send_normal_email(data)
 
     
 class SetNewPasswordSerializer(serializers.Serializer):
@@ -146,3 +149,4 @@ class LogoutUserSerializer(serializers.Serializer):
             token.blacklist()
         except TokenError :           
             return self.fail('bad_token')
+        
