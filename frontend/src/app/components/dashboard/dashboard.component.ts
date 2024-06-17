@@ -37,6 +37,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
+    if (this.map) {
+      this.map.off(); // Remove all event listeners
+      this.map.remove(); // Completely remove the map instance
+    }
   }
 
   ngAfterViewInit(): void {
@@ -49,6 +53,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private initMap(L: any): void {
+    // Check if the map container already has a map instance
+    const mapContainer = document.getElementById('map');
+    if (mapContainer && (mapContainer as any)._leaflet_id) {
+      (mapContainer as any)._leaflet_id = null; // Clear the previous map instance
+    }
+
     const bounds = [
       [5.0, 97.0],  // Southwest coordinates of Thailand
       [21.0, 106.0] // Northeast coordinates of Thailand
@@ -59,7 +69,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       zoom: 6,
       maxBounds: bounds,
       maxBoundsViscosity: 1.0,
-      dragging: false 
+      dragging: false // ปิดการลากแผนที่เมื่อเริ่มต้น
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -67,10 +77,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
-    // start zoom
+    // จำกัดการซูมเข้าไปเท่ากับขนาดตอนเริ่มต้น
     this.map.setMinZoom(6);
 
-    // when zoomin will unlock dragging 
+    // เมื่อทำการซูมเข้า ให้เปิดใช้งานการลากแผนที่
     this.map.on('zoomend', () => {
       if (this.map.getZoom() > 6) {
         this.map.dragging.enable();
@@ -79,7 +89,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
 
-    
+    // เมื่อคลิกที่แผนที่
     this.map.on('click', (e: any) => {
       const lat = e.latlng.lat.toFixed(4);
       const lon = e.latlng.lng.toFixed(4);
@@ -119,7 +129,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 150000); // Check every 2.5 minutes
+    }, 5000); // Check every 2.5 minutes
   }
 
   private showSessionExpiredAlert() {
