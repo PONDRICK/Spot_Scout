@@ -129,7 +129,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 5000); // Check every 2.5 minutes
+    }, 150000); // Check every 2.5 minutes
   }
 
   private showSessionExpiredAlert() {
@@ -144,6 +144,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   logout() {
+    // Clear the token check interval
+    if (this.tokenCheckInterval) {
+      clearInterval(this.tokenCheckInterval);
+    }
+
     const refreshToken = this.apiService.getCookie('refresh_token');
     if (refreshToken) {
       this.apiService.logoutUser(refreshToken).subscribe(
