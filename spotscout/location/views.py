@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserLocation
-from .utils import calculate_nearest_place, count_amenities_within_500m, get_province, get_population
+from .utils import calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population
 from rest_framework.permissions import IsAuthenticated
 
 class AddUserLocationView(APIView):
@@ -12,8 +12,7 @@ class AddUserLocationView(APIView):
         user = request.user
         lat = request.data.get('lat')
         lon = request.data.get('lon')
-        province = get_province(lat, lon)
-        ISO3166_2 = "ISO code"  # Replace with your method to get ISO code
+        province, ISO3166_2 = get_province_and_iso(lat, lon)
 
         # Calculate distances and counts
         distance_nearest_bank, _ = calculate_nearest_place(lat, lon, 'bank')

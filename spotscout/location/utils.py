@@ -35,7 +35,7 @@ def count_amenities_within_500m(latitude, longitude, amenity):
             count += 1
     return count
 
-def get_province(lat, lon):
+def get_province_and_iso(lat, lon):
     overpass_url = "http://overpass-api.de/api/interpreter"
     overpass_query = f"""
     [out:json];
@@ -58,14 +58,19 @@ def get_province(lat, lon):
     response = requests.get(overpass_url, params={'data': area_query})
     area_data = response.json()
 
-    # Extracting the province name
+    # Extracting the province name and ISO3166-2 code
     province_name = None
+    iso_code = None
     for element in area_data['elements']:
-        if 'tags' in element and 'name' in element['tags']:
-            province_name = element['tags']['name']
-            break
+        if 'tags' in element:
+            if 'name' in element['tags']:
+                province_name = element['tags']['name']
+            if 'ISO3166-2' in element['tags']:
+                iso_code = element['tags']['ISO3166-2']
+            if province_name and iso_code:
+                break
 
-    return province_name
+    return province_name, iso_code
 
 def get_population(lat, lon, distance):
     try:
