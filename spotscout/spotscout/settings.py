@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-SESSION_COOKIE_AGE = 259200
+SESSION_COOKIE_AGE = 86400
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
@@ -119,9 +119,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-     "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 

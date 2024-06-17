@@ -1,8 +1,11 @@
-import { Component, Inject, PLATFORM_ID, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, AfterViewInit, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from '../../auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,16 +14,34 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
-export class DashboardComponent implements AfterViewInit {
+export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
+  private tokenCheckInterval: any;
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private apiService: ApiService,
+    private authService: AuthService,
     private router: Router,
+    private cookieService: CookieService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+
+  ngOnInit() {
+    this.checkSession();
+    this.startTokenCheck();
+  }
+
+  ngOnDestroy() {
+    if (this.tokenCheckInterval) {
+      clearInterval(this.tokenCheckInterval);
+    }
+    if (this.map) {
+      this.map.off(); // Remove all event listeners
+      this.map.remove(); // Completely remove the map instance
+    }
+  }
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -32,6 +53,12 @@ export class DashboardComponent implements AfterViewInit {
   }
 
   private initMap(L: any): void {
+    // Check if the map container already has a map instance
+    const mapContainer = document.getElementById('map');
+    if (mapContainer && (mapContainer as any)._leaflet_id) {
+      (mapContainer as any)._leaflet_id = null; // Clear the previous map instance
+    }
+
     const bounds = [
       [5.0, 97.0],  // Southwest coordinates of Thailand
       [21.0, 106.0] // Northeast coordinates of Thailand
@@ -71,6 +98,51 @@ export class DashboardComponent implements AfterViewInit {
     });
   }
 
+  private checkSession() {
+    const accessToken = this.cookieService.get('access_token');
+    const refreshToken = this.cookieService.get('refresh_token');
+    if (!accessToken && refreshToken) {
+      // Attempt to refresh token if access token is missing but refresh token exists
+      this.apiService.refreshToken().subscribe({
+        next: () => {},
+        error: () => {
+          this.router.navigate(['/login']);
+        }
+      });
+    } else if (!accessToken && !refreshToken) {
+      // Both tokens are missing, redirect to login
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private startTokenCheck() {
+    this.tokenCheckInterval = setInterval(() => {
+      if (this.authService.isAccessTokenExpired()) {
+        this.apiService.refreshToken().subscribe({
+          next: () => {},
+          error: () => {
+            if (this.authService.isRefreshTokenExpired()) {
+              this.showSessionExpiredAlert();
+            }
+          }
+        });
+      } else if (this.authService.isRefreshTokenExpired()) {
+        this.showSessionExpiredAlert();
+      }
+    }, 5000); // Check every 2.5 minutes
+  }
+
+  private showSessionExpiredAlert() {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Session Expired',
+      text: 'Your session has expired. Please log in again.',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      this.authService.logout();
+    });
+  }
+
   logout() {
     const refreshToken = this.apiService.getCookie('refresh_token');
     if (refreshToken) {
@@ -82,6 +154,8 @@ export class DashboardComponent implements AfterViewInit {
         },
         (error) => {
           console.error('Logout failed', error);
+          this.apiService.clearToken();
+          this.router.navigate(['/login']);
         }
       );
     }

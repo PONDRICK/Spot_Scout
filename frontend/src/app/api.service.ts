@@ -61,4 +61,10 @@ export class ApiService {
   getCookie(name: string): string {
     return this.cookieService.get(name);
   }
+
+  refreshToken(): Observable<any> {
+    const refreshToken = this.cookieService.get('refresh_token');
+    return this.http.post(`${this.baseUrl}token/refresh/`, { refresh: refreshToken });
+  }
+  
 }
