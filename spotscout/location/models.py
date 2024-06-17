@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 class Location(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -98,3 +98,47 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserLocation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    lat = models.FloatField()
+    lon = models.FloatField()
+    province = models.CharField(max_length=255, blank=True, null=True)
+    ISO3166_2 = models.CharField(max_length=10, blank=True, null=True)
+    distance_nearest_bank = models.FloatField(blank=True, null=True)
+    distance_nearest_fuel = models.FloatField(blank=True, null=True)
+    distance_nearest_office = models.FloatField(blank=True, null=True)
+    distance_nearest_police = models.FloatField(blank=True, null=True)
+    distance_nearest_townhall = models.FloatField(blank=True, null=True)
+    distance_nearest_bus_station = models.FloatField(blank=True, null=True)
+    distance_nearest_bus_stop = models.FloatField(blank=True, null=True)
+    distance_nearest_convenience = models.FloatField(blank=True, null=True)
+    distance_nearest_mall = models.FloatField(blank=True, null=True)
+    distance_nearest_supermarket = models.FloatField(blank=True, null=True)
+    distance_nearest_books = models.FloatField(blank=True, null=True)
+    distance_nearest_coffee = models.FloatField(blank=True, null=True)
+    distance_nearest_department_store = models.FloatField(blank=True, null=True)
+    distance_nearest_clothes = models.FloatField(blank=True, null=True)
+    distance_nearest_bakery = models.FloatField(blank=True, null=True)
+    distance_nearest_cafe = models.FloatField(blank=True, null=True)
+    count_bank_within_500m = models.IntegerField(blank=True, null=True)
+    count_fuel_within_500m = models.IntegerField(blank=True, null=True)
+    count_office_within_500m = models.IntegerField(blank=True, null=True)
+    count_police_within_500m = models.IntegerField(blank=True, null=True)
+    count_townhall_within_500m = models.IntegerField(blank=True, null=True)
+    count_bus_station_within_500m = models.IntegerField(blank=True, null=True)
+    count_bus_stop_within_500m = models.IntegerField(blank=True, null=True)
+    count_convenience_within_500m = models.IntegerField(blank=True, null=True)
+    count_mall_within_500m = models.IntegerField(blank=True, null=True)
+    count_supermarket_within_500m = models.IntegerField(blank=True, null=True)
+    count_books_within_500m = models.IntegerField(blank=True, null=True)
+    count_coffee_within_500m = models.IntegerField(blank=True, null=True)
+    count_department_store_within_500m = models.IntegerField(blank=True, null=True)
+    count_clothes_within_500m = models.IntegerField(blank=True, null=True)
+    count_bakery_within_500m = models.IntegerField(blank=True, null=True)
+    count_cafe_within_500m = models.IntegerField(blank=True, null=True)
+    population = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.lat}, {self.lon}"
