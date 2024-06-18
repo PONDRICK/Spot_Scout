@@ -44,6 +44,7 @@ export class AuthService {
   logout(): void {
     this.cookieService.delete('access_token', '/');
     this.cookieService.delete('refresh_token', '/');
+    console.log("logout success (cookie)")
     this.router.navigate(['/login']);
   }
 

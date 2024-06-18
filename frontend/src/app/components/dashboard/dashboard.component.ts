@@ -1,11 +1,12 @@
 import { Component, Inject, PLATFORM_ID, AfterViewInit, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../auth.service';
 import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +18,7 @@ import Swal from 'sweetalert2';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private tokenCheckInterval: any;
+  private navigationSubscription: Subscription | undefined;
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
 
@@ -31,15 +33,19 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     this.checkSession();
     this.startTokenCheck();
+    // Subscribe to router events to handle navigation changes
+    this.navigationSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.initOrReinitMap(); // Reinitialize the map and event listeners on navigation changes
+      }
+    });
   }
 
   ngOnDestroy() {
-    if (this.tokenCheckInterval) {
-      clearInterval(this.tokenCheckInterval);
-    }
-    if (this.map) {
-      this.map.off(); // Remove all event listeners
-      this.map.remove(); // Completely remove the map instance
+    this.cleanup();
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+      console.log("destroy")
     }
   }
 
@@ -52,11 +58,22 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
+  private initOrReinitMap() {
+    if (isPlatformBrowser(this.platformId)) {
+      import('leaflet').then(L => {
+        if (!this.map) { // Check if the map instance already exists
+          this.initMap(L);
+        }
+      });
+    }
+  }
+
   private initMap(L: any): void {
     // Check if the map container already has a map instance
     const mapContainer = document.getElementById('map');
-    if (mapContainer && (mapContainer as any)._leaflet_id) {
-      (mapContainer as any)._leaflet_id = null; // Clear the previous map instance
+    if (!mapContainer || (mapContainer && (mapContainer as any)._leaflet_id)) {
+      console.log("Map instance already exists");
+      return;
     }
 
     const bounds = [
@@ -69,7 +86,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       zoom: 6,
       maxBounds: bounds,
       maxBoundsViscosity: 1.0,
-      dragging: false // ปิดการลากแผนที่เมื่อเริ่มต้น
+      dragging: false // Disable dragging initially
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -77,10 +94,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
-    // จำกัดการซูมเข้าไปเท่ากับขนาดตอนเริ่มต้น
+    // Limit zoom to the initial size
     this.map.setMinZoom(6);
 
-    // เมื่อทำการซูมเข้า ให้เปิดใช้งานการลากแผนที่
+    // Enable dragging when zooming in
     this.map.on('zoomend', () => {
       if (this.map.getZoom() > 6) {
         this.map.dragging.enable();
@@ -89,13 +106,29 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
 
-    // เมื่อคลิกที่แผนที่
+    // Handle map click events
     this.map.on('click', (e: any) => {
       const lat = e.latlng.lat.toFixed(4);
       const lon = e.latlng.lng.toFixed(4);
       this.latInput.nativeElement.value = lat;
       this.lonInput.nativeElement.value = lon;
     });
+  }
+
+  private cleanupMap() {
+    if (this.map) {
+      this.map.off(); // Remove all event listeners
+      this.map.remove(); // Completely remove the map instance
+      this.map = null; // Set map instance to null
+      console.log("clean up Map")
+    }
+  }
+
+  private cleanup() {
+    if (this.tokenCheckInterval) {
+      clearInterval(this.tokenCheckInterval);
+    }
+    this.cleanupMap();
   }
 
   private checkSession() {
@@ -129,7 +162,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 150000); // Check every 2.5 minutes
+    }, 5000); // Check every 2.5 minutes
   }
 
   private showSessionExpiredAlert() {
@@ -155,11 +188,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         (response) => {
           console.log('Logout successful', response);
           this.apiService.clearToken();
+          this.cleanup(); // Ensure map is destroyed
           this.router.navigate(['/login']);
         },
         (error) => {
           console.error('Logout failed', error);
           this.apiService.clearToken();
+          this.cleanup(); // Ensure map is destroyed
           this.router.navigate(['/login']);
         }
       );
