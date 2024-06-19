@@ -294,4 +294,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 //pond
 //jom
 //sorrawit
+<<<<<<< HEAD
+//sssssss
+=======
 //pakin
+>>>>>>> 51db62fc3a171b2ea3859a3103c7ff3b16e5a712
