@@ -166,14 +166,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private showSessionExpiredAlert() {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Session Expired',
-      text: 'Your session has expired. Please log in again.',
-      confirmButtonText: 'OK'
-    }).then(() => {
+    // Swal.fire({
+    //   icon: 'warning',
+    //   title: 'Session Expired',
+    //   text: 'Your session has expired. Please log in again.',
+    //   confirmButtonText: 'OK'
+    // }).then(() => {
       this.authService.logout();
-    });
+    // });
   }
 
   logout() {
