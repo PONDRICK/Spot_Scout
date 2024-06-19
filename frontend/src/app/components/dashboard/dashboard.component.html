@@ -1,3 +1,79 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0b5a1de2e2df25a0adaf062d784673caa775b4773b91c72fb0b4003faeef3c3e
-size 2479
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <span class="navbar-title">Dashboard</span>
+    </div>
+    <div class="navbar-right">
+      <input type="text" placeholder="Latitude" #latInput />
+      <input type="text" placeholder="Longitude" #lonInput />
+      <button
+        (click)="toggleSidebar()"
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Select
+      </button>
+      <button
+        (click)="logout()"
+        class="bg-red-500 text-white px-4 py-2 rounded-md"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+<div id="map" style="height: calc(100vh - 56px); width: 100%"></div>
+<div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
+  <div class="sidebar-content">
+    <button (click)="toggleSidebar()" class="close-button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+    <label for="amenity">Select Amenity:</label>
+    <select id="amenity" [(ngModel)]="selectedAmenity">
+      <option value="restaurant">Restaurant</option>
+      <option value="cafe">Cafe</option>
+      <option value="convenience">Convenience</option>
+      <option value="hotel">Hotel</option>
+      <option value="hospital">Hospital</option>
+    </select>
+    <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
+    <div *ngIf="nearestPlace" class="nearest-place-info">
+      <h3>Nearest {{ nearestPlace.amenity }}:</h3>
+      <p>Distance: {{ nearestPlace.distance }} meters</p>
+      <p>Province: {{ nearestPlace.province }}</p>
+    </div>
+  </div>
+</div>
+<div class="search-container">
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search location"
+      (input)="onSearchInput($event)"
+      #searchInput
+    />
+    <ul class="suggestions" *ngIf="suggestions.length">
+      <li
+        *ngFor="let suggestion of suggestions"
+        (click)="selectSuggestion(suggestion)"
+      >
+        <span class="icon">📍</span>
+        <!-- Placeholder for the location icon -->
+        {{ suggestion.display_name }}
+      </li>
+    </ul>
+  </div>
+</div>
+<div id="map"></div>
