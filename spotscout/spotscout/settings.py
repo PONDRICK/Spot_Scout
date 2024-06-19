@@ -68,6 +68,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 SESSION_COOKIE_AGE = 86400
 
+
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = 'spotscout.urls'
@@ -119,7 +121,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),  
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
