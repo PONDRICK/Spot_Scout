@@ -57,5 +57,3 @@ export class LoginComponent implements OnInit {
     return !!this.cookieService.get('access_token');
   }
 }
-
-//Jom
