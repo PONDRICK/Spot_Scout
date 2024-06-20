@@ -1,4 +1,4 @@
-// frontend/src/app.routes.ts
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -41,11 +41,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {
     path: '**',
-    redirectTo: '/login',
+    redirectTo: 'login',
   },
 ];

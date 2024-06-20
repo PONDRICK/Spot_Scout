@@ -222,16 +222,21 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           console.log('Logout successful', response);
           this.apiService.clearToken();
           this.cleanup(); // Ensure map is destroyed
-          this.router.navigate(['/login']);
+          this.navigateAfterLogout();
         },
         (error) => {
           console.error('Logout failed', error);
           this.apiService.clearToken();
           this.cleanup(); // Ensure map is destroyed
-          this.router.navigate(['/login']);
+          this.navigateAfterLogout();
         }
       );
     }
+  }
+
+  private navigateAfterLogout() {
+    // Use replaceState to remove any trailing slashes and navigate to login
+    window.location.replace('/login');
   }
 
   toggleSidebar() {
