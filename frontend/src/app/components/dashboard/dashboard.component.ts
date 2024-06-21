@@ -28,6 +28,7 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private marker: any; // Marker to be added on map click
+  private polyline: any; // Polyline to be added to the map
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -157,6 +158,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.map
           );
         }
+
+        // Remove existing polyline if it exists
+        if (this.polyline) {
+          this.polyline.remove();
+        }
       }
     });
   }
@@ -216,7 +222,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       icon: 'warning',
       title: 'Session Expired',
       text: 'Your session has expired. Please log in again.',
-      confirmButtonText: 'OK'
+      confirmButtonText: 'OK',
     }).then(() => {
       this.authService.logout();
       this.navigateAfterLogout();
@@ -255,10 +261,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
-    if (!this.isSidebarOpen && this.marker) {
-      this.marker.remove();
-      this.marker = null;
-    }
+    // Do not remove the marker when closing the sidebar
+    // if (!this.isSidebarOpen && this.marker) {
+    //   this.marker.remove();
+    //   this.marker = null;
+    // }
   }
 
   confirmSelection() {
@@ -280,29 +287,54 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.map.setView([lat, lon], this.map.getZoom());
 
     if (this.selectedFunction === 'nearest') {
-      this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
-        next: (response) => {
-          this.nearestPlace = response;
-          this.amenityCount = null;
-          this.amenities = [];
-          console.log(response);
-        },
-        error: (error) => {
-          console.error('Error fetching nearest place:', error);
-        },
-      });
+      this.apiService
+        .getNearestPlace(lat, lon, this.selectedAmenity)
+        .subscribe({
+          next: (response) => {
+            this.nearestPlace = response;
+            this.amenityCount = null;
+            this.amenities = [];
+            console.log(response);
+
+            // Remove existing polyline if it exists
+            if (this.polyline) {
+              this.polyline.remove();
+            }
+
+            // Draw polyline from selected location to the nearest place
+            import('leaflet').then((L) => {
+              this.polyline = L.polyline(
+                [
+                  [lat, lon],
+                  [response.lat, response.lon],
+                ],
+                { color: 'black' }
+              ).addTo(this.map);
+            });
+          },
+          error: (error) => {
+            console.error('Error fetching nearest place:', error);
+          },
+        });
     } else if (this.selectedFunction === 'count') {
-      this.apiService.countAmenities(lat, lon, this.selectedAmenity, this.distance).subscribe({
-        next: (response) => {
-          this.amenityCount = response.count;
-          this.nearestPlace = null;
-          this.amenities = response.locations;
-          console.log(response);
-        },
-        error: (error) => {
-          console.error('Error counting amenities:', error);
-        },
-      });
+      this.apiService
+        .countAmenities(lat, lon, this.selectedAmenity, this.distance)
+        .subscribe({
+          next: (response) => {
+            this.amenityCount = response.count;
+            this.nearestPlace = null;
+            this.amenities = response.locations;
+            console.log(response);
+
+            // Remove existing polyline if it exists
+            if (this.polyline) {
+              this.polyline.remove();
+            }
+          },
+          error: (error) => {
+            console.error('Error counting amenities:', error);
+          },
+        });
     }
   }
 
@@ -339,6 +371,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.map
         );
       });
+    }
+
+    // Remove existing polyline if it exists
+    if (this.polyline) {
+      this.polyline.remove();
     }
 
     this.suggestions = [];
