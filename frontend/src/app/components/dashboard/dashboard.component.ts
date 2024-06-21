@@ -44,6 +44,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   amenities: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any; // Custom red icon
+  isMarkerLocked = false; // Property to track if the marker is locked
 
   constructor(
     private apiService: ApiService,
@@ -144,7 +145,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // Handle map click events
     this.map.on('click', (e: any) => {
-      if (this.isSidebarOpen) {
+      if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
         const lon = e.latlng.lng.toFixed(4);
         this.latInput.nativeElement.value = lat;
