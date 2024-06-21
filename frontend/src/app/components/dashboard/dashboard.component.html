@@ -4,13 +4,11 @@
       <span class="navbar-title">Spotscout</span>
     </div>
     <div class="navbar-right">
-      <input type="text" placeholder="Latitude" #latInput />
-      <input type="text" placeholder="Longitude" #lonInput />
       <button
         (click)="toggleSidebar()"
         class="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
-        Select
+        Select Location
       </button>
       <button
         (click)="logout()"
@@ -40,6 +38,8 @@
         />
       </svg>
     </button>
+    <input type="text" placeholder="Latitude" #latInput />
+    <input type="text" placeholder="Longitude" #lonInput />
     <label for="amenity">Select Amenity:</label>
     <select id="amenity" [(ngModel)]="selectedAmenity">
       <option value="restaurant">Restaurant</option>
