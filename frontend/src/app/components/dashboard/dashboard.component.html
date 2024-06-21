@@ -40,6 +40,10 @@
     </button>
     <input type="text" placeholder="Latitude" #latInput />
     <input type="text" placeholder="Longitude" #lonInput />
+    <div class="checkbox-container">
+      <input type="checkbox" id="lockMarker" [(ngModel)]="isMarkerLocked" />
+      <label for="lockMarker">Lock Location Marker</label>
+    </div>
     <label for="function">Select Function:</label>
     <select id="function" [(ngModel)]="selectedFunction">
       <option value="nearest">Nearest Place</option>
