@@ -36,8 +36,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   isSidebarOpen = false;
+  selectedFunction = 'nearest';
   selectedAmenity = 'restaurant';
   nearestPlace: any = null;
+  amenityCount: number | null = null;
+  amenities: any[] = [];
+  distance = 1000; // Default distance
   private redIcon: any; // Custom red icon
 
   constructor(
@@ -139,20 +143,20 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // Handle map click events
     this.map.on('click', (e: any) => {
-      if (!this.isSidebarOpen) return; // Do nothing if sidebar is not open
+      if (this.isSidebarOpen) {
+        const lat = e.latlng.lat.toFixed(4);
+        const lon = e.latlng.lng.toFixed(4);
+        this.latInput.nativeElement.value = lat;
+        this.lonInput.nativeElement.value = lon;
 
-      const lat = e.latlng.lat.toFixed(4);
-      const lon = e.latlng.lng.toFixed(4);
-      this.latInput.nativeElement.value = lat;
-      this.lonInput.nativeElement.value = lon;
-
-      // Add or move marker to the clicked location with custom icon
-      if (this.marker) {
-        this.marker.setLatLng(e.latlng);
-      } else {
-        this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
-          this.map
-        );
+        // Add or move marker to the clicked location with custom icon
+        if (this.marker) {
+          this.marker.setLatLng(e.latlng);
+        } else {
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
+            this.map
+          );
+        }
       }
     });
   }
@@ -251,21 +255,55 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
-    // Remove marker code removed here
+    if (!this.isSidebarOpen && this.marker) {
+      this.marker.remove();
+      this.marker = null;
+    }
   }
 
   confirmSelection() {
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
-    this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
-      next: (response) => {
-        this.nearestPlace = response;
-        console.log(response);
-      },
-      error: (error) => {
-        console.error('Error fetching nearest place:', error);
-      },
-    });
+
+    // Move marker to the specified lat lon in text field
+    if (this.marker) {
+      this.marker.setLatLng([lat, lon]);
+    } else {
+      import('leaflet').then((L) => {
+        this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
+          this.map
+        );
+      });
+    }
+
+    // Center map to the marker's location
+    this.map.setView([lat, lon], this.map.getZoom());
+
+    if (this.selectedFunction === 'nearest') {
+      this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
+        next: (response) => {
+          this.nearestPlace = response;
+          this.amenityCount = null;
+          this.amenities = [];
+          console.log(response);
+        },
+        error: (error) => {
+          console.error('Error fetching nearest place:', error);
+        },
+      });
+    } else if (this.selectedFunction === 'count') {
+      this.apiService.countAmenities(lat, lon, this.selectedAmenity, this.distance).subscribe({
+        next: (response) => {
+          this.amenityCount = response.count;
+          this.nearestPlace = null;
+          this.amenities = response.locations;
+          console.log(response);
+        },
+        error: (error) => {
+          console.error('Error counting amenities:', error);
+        },
+      });
+    }
   }
 
   onSearchInput(event: any) {

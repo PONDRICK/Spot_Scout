@@ -8,7 +8,7 @@
         (click)="toggleSidebar()"
         class="bg-blue-500 text-white px-4 py-2 rounded-md"
       >
-        Select Location
+        Select
       </button>
       <button
         (click)="logout()"
@@ -40,6 +40,11 @@
     </button>
     <input type="text" placeholder="Latitude" #latInput />
     <input type="text" placeholder="Longitude" #lonInput />
+    <label for="function">Select Function:</label>
+    <select id="function" [(ngModel)]="selectedFunction">
+      <option value="nearest">Nearest Place</option>
+      <option value="count">Count Amenities</option>
+    </select>
     <label for="amenity">Select Amenity:</label>
     <select id="amenity" [(ngModel)]="selectedAmenity">
       <option value="restaurant">Restaurant</option>
@@ -48,11 +53,32 @@
       <option value="hotel">Hotel</option>
       <option value="hospital">Hospital</option>
     </select>
+    <div *ngIf="selectedFunction === 'count'">
+      <label for="distance">Distance:</label>
+      <input
+        type="number"
+        id="distance"
+        [(ngModel)]="distance"
+        min="100"
+        step="100"
+      />
+    </div>
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
     <div *ngIf="nearestPlace" class="nearest-place-info">
       <h3>Nearest {{ nearestPlace.amenity }}:</h3>
       <p>Distance: {{ nearestPlace.distance }} meters</p>
       <p>Province: {{ nearestPlace.province }}</p>
+      <p>Lat: {{ nearestPlace.lat }}</p>
+      <p>Lon: {{ nearestPlace.lon }}</p>
+    </div>
+    <div *ngIf="amenityCount !== null" class="nearest-place-info">
+      <h3>Amenities Count:</h3>
+      <p>Count: {{ amenityCount }}</p>
+      <ul>
+        <li *ngFor="let amenity of amenities">
+          Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
+        </li>
+      </ul>
     </div>
   </div>
 </div>

@@ -74,4 +74,10 @@ export class ApiService {
       `${this.locationBaseUrl}nearest_place/?lat=${lat}&lon=${lon}&amenity=${amenity}`
     );
   }
+
+  countAmenities(lat: number, lon: number, amenity: string, distance: number): Observable<any> {
+    return this.http.get(
+      `${this.locationBaseUrl}count_amenities/?lat=${lat}&lon=${lon}&amenity=${amenity}&distance=${distance}`
+    );
+  }
 }
