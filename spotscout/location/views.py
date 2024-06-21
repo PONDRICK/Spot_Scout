@@ -290,3 +290,32 @@ class NearestPlaceView(APIView):
             output = {"message": f"No {amenity} found nearby."}
 
         return Response(output, status=status.HTTP_200_OK)
+    
+class CountAmenityView(APIView):
+    def get(self, request):
+        latitude = request.data.get('lat')
+        longitude = request.data.get('lon')
+        amenity = request.data.get('amenity')
+        distance = request.data.get('distance')
+
+        if not latitude or not longitude or not amenity or not distance:
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            distance = float(distance)
+        except ValueError:
+            return Response({"error": "Invalid latitude, longitude, or distance"}, status=status.HTTP_400_BAD_REQUEST)
+
+        node_coords = (latitude, longitude)
+        count = 0  # Initialize count
+        locations = Location.objects.filter(amenity=amenity)
+        
+        for location in locations:
+            place_coords = (location.lat, location.lon)
+            place_distance = geodesic(node_coords, place_coords).meters
+            if place_distance <= distance:
+                count += 1
+
+        return Response({"count": count, "amenity": amenity, "distance": distance}, status=status.HTTP_200_OK)
