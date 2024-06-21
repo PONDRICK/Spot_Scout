@@ -139,6 +139,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // Handle map click events
     this.map.on('click', (e: any) => {
+      if (!this.isSidebarOpen) return; // Do nothing if sidebar is not open
+
       const lat = e.latlng.lat.toFixed(4);
       const lon = e.latlng.lng.toFixed(4);
       this.latInput.nativeElement.value = lat;
@@ -205,7 +207,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }, 5000); // Check every 5 seconds
   }
 
-  
   private showSessionExpiredAlert() {
     Swal.fire({
       icon: 'warning',
@@ -250,6 +251,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+    // Remove marker code removed here
   }
 
   confirmSelection() {
@@ -304,4 +306,3 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.suggestions = [];
   }
 }
-

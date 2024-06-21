@@ -95,6 +95,7 @@ button {
 }
 
 .sidebar-content select,
+.sidebar-content input,
 .sidebar-content button {
   margin-bottom: 10px;
 }
@@ -140,6 +141,7 @@ button {
   width: 100%;
   margin-top: 10px;
 }
+
 .search-container {
   position: absolute;
   top: 56px; /* Adjust this value if your navbar height is different */
@@ -188,4 +190,3 @@ button {
 .suggestions .icon {
   margin-right: 10px;
 }
-
