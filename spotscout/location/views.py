@@ -8,7 +8,6 @@ from geopy.distance import geodesic
 from .models import Location
 
 
-
 class AddUserLocationView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -285,18 +284,21 @@ class NearestPlaceView(APIView):
                 "distance": min_distance,
                 "amenity": amenity,
                 "province": nearest_place.province,
+                "lat": nearest_place.lat,
+                "lon": nearest_place.lon
             }
         else:
             output = {"message": f"No {amenity} found nearby."}
 
         return Response(output, status=status.HTTP_200_OK)
     
+
 class CountAmenityView(APIView):
-    def get(self, request):
-        latitude = request.data.get('lat')
-        longitude = request.data.get('lon')
-        amenity = request.data.get('amenity')
-        distance = request.data.get('distance')
+    def get(self, request):  # Change post to get
+        latitude = request.GET.get('lat')
+        longitude = request.GET.get('lon')
+        amenity = request.GET.get('amenity')
+        distance = request.GET.get('distance')
 
         if not latitude or not longitude or not amenity or not distance:
             return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
@@ -312,10 +314,13 @@ class CountAmenityView(APIView):
         count = 0  # Initialize count
         locations = Location.objects.filter(amenity=amenity)
         
+        location_coords = []  # Collect lat/lon for matched locations
+
         for location in locations:
             place_coords = (location.lat, location.lon)
             place_distance = geodesic(node_coords, place_coords).meters
             if place_distance <= distance:
                 count += 1
+                location_coords.append({"lat": location.lat, "lon": location.lon})
 
-        return Response({"count": count, "amenity": amenity, "distance": distance}, status=status.HTTP_200_OK)
+        return Response({"count": count, "amenity": amenity, "distance": distance, "locations": location_coords}, status=status.HTTP_200_OK)
