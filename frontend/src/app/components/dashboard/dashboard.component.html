@@ -51,6 +51,7 @@
     </select>
     <label for="amenity">Select Amenity:</label>
     <select id="amenity" [(ngModel)]="selectedAmenity">
+      <!-- Add other options here -->
       <option value="apartment">Apartment</option>
       <option value="artwork">Artwork</option>
       <option value="atm">ATM</option>
@@ -106,23 +107,55 @@
       />
     </div>
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
-    <div *ngFor="let place of nearestPlaces; let i = index" class="nearest-place-info">
-      <h3>Nearest {{ place.amenity }}:</h3>
-      <p>Distance: {{ place.distance }} meters</p>
-      <p>Province: {{ place.province }}</p>
-      <p>Lat: {{ place.lat }}</p>
-      <p>Lon: {{ place.lon }}</p>
-      <button (click)="removePlace(i)" class="delete-button">X</button>
-    </div>
-    <div *ngFor="let count of amenitiesCount; let i = index" class="nearest-place-info">
-      <h3>Amenities Count:</h3>
-      <p>Count: {{ count.count }}</p>
-      <ul>
-        <li *ngFor="let amenity of count.locations">
-          Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
-        </li>
-      </ul>
-      <button (click)="removeCount(i)" class="delete-button">X</button>
+    <div *ngFor="let place of outputs" class="output-info">
+      <div *ngIf="place.type === 'nearest'" class="nearest-place-info">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <h3>Nearest {{ place.amenity }}:</h3>
+        <p>Distance: {{ place.distance }} meters</p>
+        <p>Province: {{ place.province }}</p>
+        <p>Lat: {{ place.lat }}</p>
+        <p>Lon: {{ place.lon }}</p>
+      </div>
+      <div *ngIf="place.type === 'count'" class="amenities-count-info">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <h3>Amenities Count:</h3>
+        <p>Count: {{ place.count }}</p>
+        <ul>
+          <li *ngFor="let amenity of place.locations">
+            Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -147,4 +180,3 @@
   </div>
 </div>
 <div id="map"></div>
-

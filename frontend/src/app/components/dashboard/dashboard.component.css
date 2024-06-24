@@ -137,6 +137,16 @@ button {
   color: #666;
 }
 
+.sidebar h3 {
+  margin-top: 0;
+}
+
+.sidebar select,
+.sidebar button {
+  width: 100%;
+  margin-top: 10px;
+}
+
 .search-container {
   position: absolute;
   top: 56px; /* Adjust this value if your navbar height is different */
@@ -186,7 +196,7 @@ button {
   margin-right: 10px;
 }
 
-.sidebar-content .delete-button {
+.output-info .delete-button {
   background: none;
   border: none;
   cursor: pointer;
