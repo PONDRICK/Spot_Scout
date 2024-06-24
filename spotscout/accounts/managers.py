@@ -2,7 +2,7 @@ from django.contrib.auth.models import BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.auth.models import Permission
 
 
 class UserManager(BaseUserManager):
@@ -33,13 +33,15 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_verified", True)
 
         if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("is staff must be true for admin user"))
-
+            raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError(_("is superuser must be true for admin user"))
+            raise ValueError(_("Superuser must have is_superuser=True."))
 
-        user = self.create_user(
-            email, first_name, last_name, password, **extra_fields
-        )
+        user = self.create_user(email, first_name, last_name, password, **extra_fields)
+        
+        # Assign all permissions
+        permissions = Permission.objects.all()
+        user.user_permissions.set(permissions)
+
         user.save(using=self._db)
         return user
