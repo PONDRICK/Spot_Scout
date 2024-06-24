@@ -39,9 +39,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   isSidebarOpen = false;
   selectedFunction = 'nearest';
   selectedAmenity = 'restaurant';
-  nearestPlace: any = null;
-  amenityCount: number | null = null;
-  amenities: any[] = [];
+  outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any; // Custom red icon
   isMarkerLocked = false; // Property to track if the marker is locked
@@ -310,9 +308,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .getNearestPlace(lat, lon, this.selectedAmenity)
         .subscribe({
           next: (response) => {
-            this.nearestPlace = response;
-            this.amenityCount = null;
-            this.amenities = [];
+            const nearestPlaceOutput = {
+              type: 'nearest',
+              amenity: response.amenity,
+              distance: response.distance,
+              province: response.province,
+              lat: response.lat,
+              lon: response.lon,
+            };
+            this.outputs.unshift(nearestPlaceOutput);
             console.log(response);
 
             // Remove existing polyline if it exists
@@ -340,9 +344,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
         .subscribe({
           next: (response) => {
-            this.amenityCount = response.count;
-            this.nearestPlace = null;
-            this.amenities = response.locations;
+            const amenitiesCountOutput = {
+              type: 'count',
+              count: response.count,
+              locations: response.locations,
+            };
+            this.outputs.unshift(amenitiesCountOutput);
             console.log(response);
 
             // Remove existing polyline if it exists
@@ -354,6 +361,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             console.error('Error counting amenities:', error);
           },
         });
+    }
+  }
+
+  removeOutput(output: any) {
+    const index = this.outputs.indexOf(output);
+    if (index > -1) {
+      this.outputs.splice(index, 1);
     }
   }
 
