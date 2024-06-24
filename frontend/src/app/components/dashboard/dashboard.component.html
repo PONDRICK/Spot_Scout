@@ -106,21 +106,23 @@
       />
     </div>
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
-    <div *ngIf="nearestPlace" class="nearest-place-info">
-      <h3>Nearest {{ nearestPlace.amenity }}:</h3>
-      <p>Distance: {{ nearestPlace.distance }} meters</p>
-      <p>Province: {{ nearestPlace.province }}</p>
-      <p>Lat: {{ nearestPlace.lat }}</p>
-      <p>Lon: {{ nearestPlace.lon }}</p>
+    <div *ngFor="let place of nearestPlaces; let i = index" class="nearest-place-info">
+      <h3>Nearest {{ place.amenity }}:</h3>
+      <p>Distance: {{ place.distance }} meters</p>
+      <p>Province: {{ place.province }}</p>
+      <p>Lat: {{ place.lat }}</p>
+      <p>Lon: {{ place.lon }}</p>
+      <button (click)="removePlace(i)" class="delete-button">X</button>
     </div>
-    <div *ngIf="amenityCount !== null" class="nearest-place-info">
+    <div *ngFor="let count of amenitiesCount; let i = index" class="nearest-place-info">
       <h3>Amenities Count:</h3>
-      <p>Count: {{ amenityCount }}</p>
+      <p>Count: {{ count.count }}</p>
       <ul>
-        <li *ngFor="let amenity of amenities">
+        <li *ngFor="let amenity of count.locations">
           Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
         </li>
       </ul>
+      <button (click)="removeCount(i)" class="delete-button">X</button>
     </div>
   </div>
 </div>
@@ -145,3 +147,4 @@
   </div>
 </div>
 <div id="map"></div>
+

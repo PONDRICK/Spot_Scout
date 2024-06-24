@@ -1,3 +1,4 @@
+// Import necessary modules
 import {
   Component,
   AfterViewInit,
@@ -40,8 +41,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   selectedFunction = 'nearest';
   selectedAmenity = 'restaurant';
   nearestPlace: any = null;
+  nearestPlaces: any[] = [];
   amenityCount: number | null = null;
   amenities: any[] = [];
+  amenitiesCount: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any; // Custom red icon
   isMarkerLocked = false; // Property to track if the marker is locked
@@ -314,6 +317,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.amenityCount = null;
             this.amenities = [];
             console.log(response);
+            this.nearestPlaces.unshift(response);
 
             // Remove existing polyline if it exists
             if (this.polyline) {
@@ -344,6 +348,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.nearestPlace = null;
             this.amenities = response.locations;
             console.log(response);
+            this.amenitiesCount.unshift(response);
 
             // Remove existing polyline if it exists
             if (this.polyline) {
@@ -398,5 +403,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     this.suggestions = [];
+  }
+
+  // Add methods to remove elements from arrays
+  removePlace(index: number) {
+    this.nearestPlaces.splice(index, 1);
+  }
+
+  removeCount(index: number) {
+    this.amenitiesCount.splice(index, 1);
   }
 }
