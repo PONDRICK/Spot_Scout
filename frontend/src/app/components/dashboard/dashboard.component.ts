@@ -1,12 +1,12 @@
 import {
   Component,
-  Inject,
-  PLATFORM_ID,
   AfterViewInit,
   ViewChild,
   ElementRef,
   OnInit,
   OnDestroy,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../api.service';
@@ -165,6 +165,24 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.polyline.remove();
         }
       }
+    });
+
+    // Initialize the drawing control and pass it the FeatureGroup of editable layers
+    import('leaflet-draw').then(() => {
+      const drawnItems = new L.FeatureGroup();
+      this.map.addLayer(drawnItems);
+
+      const drawControl = new L.Control.Draw({
+        edit: {
+          featureGroup: drawnItems,
+        },
+      });
+      this.map.addControl(drawControl);
+
+      this.map.on(L.Draw.Event.CREATED, (event: any) => {
+        const layer = event.layer;
+        drawnItems.addLayer(layer);
+      });
     });
   }
 
