@@ -27,8 +27,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
-  private marker: any; // Marker to be added on map click
-  private polyline: any; // Polyline to be added to the map
+  private marker: any;
+  private polyline: any;
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -41,8 +41,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   selectedAmenity = 'restaurant';
   outputs: any[] = [];
   distance = 1000; // Default distance
-  private redIcon: any; // Custom red icon
-  isMarkerLocked = false; // Property to track if the marker is locked
+  private redIcon: any;
+  isMarkerLocked = false;
 
   constructor(
     private apiService: ApiService,
@@ -56,10 +56,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     this.checkSession();
     this.startTokenCheck();
-    // Subscribe to router events to handle navigation changes
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.initOrReinitMap(); // Reinitialize the map and event listeners on navigation changes
+        this.initOrReinitMap();
       }
     });
   }
@@ -74,26 +73,23 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Dynamically import leaflet in the browser environment
-      import('leaflet').then((L) => {
-        this.initMap(L);
-      });
+      this.loadLeaflet();
     }
   }
 
   private initOrReinitMap() {
     if (isPlatformBrowser(this.platformId)) {
-      import('leaflet').then((L) => {
-        if (!this.map) {
-          // Check if the map instance already exists
-          this.initMap(L);
-        }
-      });
+      this.loadLeaflet();
     }
   }
 
+  private async loadLeaflet() {
+    const L = await import('leaflet');
+    await import('@geoman-io/leaflet-geoman-free');
+    this.initMap(L);
+  }
+
   private initMap(L: any): void {
-    // Check if the map container already has a map instance
     const mapContainer = document.getElementById('map');
     if (!mapContainer || (mapContainer && (mapContainer as any)._leaflet_id)) {
       console.log('Map instance already exists');
@@ -101,8 +97,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     const bounds = [
-      [5.0, 97.0], // Southwest coordinates of Thailand
-      [21.0, 106.0], // Northeast coordinates of Thailand
+      [5.0, 97.0],
+      [21.0, 106.0],
     ];
 
     this.map = L.map('map', {
@@ -110,7 +106,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       zoom: 6,
       maxBounds: bounds,
       maxBoundsViscosity: 1.0,
-      dragging: false, // Disable dragging initially
+      dragging: false,
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -119,10 +115,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
 
-    // Limit zoom to the initial size
     this.map.setMinZoom(6);
 
-    // Enable dragging when zooming in
     this.map.on('zoomend', () => {
       if (this.map.getZoom() > 6) {
         this.map.dragging.enable();
@@ -131,17 +125,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
 
-    // Define a custom red icon
     this.redIcon = L.icon({
       iconUrl:
         'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-      iconSize: [25, 41], // size of the icon
-      iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
-      popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
-      shadowSize: [41, 41], // size of the shadow
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
     });
 
-    // Handle map click events
     this.map.on('click', (e: any) => {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
@@ -149,7 +141,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.latInput.nativeElement.value = lat;
         this.lonInput.nativeElement.value = lon;
 
-        // Add or move marker to the clicked location with custom icon
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
@@ -158,37 +149,36 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           );
         }
 
-        // Remove existing polyline if it exists
         if (this.polyline) {
           this.polyline.remove();
         }
       }
     });
 
-    // Initialize the drawing control and pass it the FeatureGroup of editable layers
-    import('leaflet-draw').then(() => {
-      const drawnItems = new L.FeatureGroup();
-      this.map.addLayer(drawnItems);
+    this.map.pm.addControls({
+      position: 'topleft',
+      drawMarker: true,
+      drawPolygon: true,
+      drawPolyline: true,
+      drawCircle: true,
+      drawRectangle: true,
+      editMode: true,
+      dragMode: true,
+      cutPolygon: true,
+      removalMode: true,
+    });
 
-      const drawControl = new L.Control.Draw({
-        edit: {
-          featureGroup: drawnItems,
-        },
-      });
-      this.map.addControl(drawControl);
-
-      this.map.on(L.Draw.Event.CREATED, (event: any) => {
-        const layer = event.layer;
-        drawnItems.addLayer(layer);
-      });
+    this.map.on('pm:create', (e: any) => {
+      const layer = e.layer;
+      console.log('Created new layer', layer);
     });
   }
 
   private cleanupMap() {
     if (this.map) {
-      this.map.off(); // Remove all event listeners
-      this.map.remove(); // Completely remove the map instance
-      this.map = null; // Set map instance to null
+      this.map.off();
+      this.map.remove();
+      this.map = null;
       console.log('clean up Map');
     }
   }
@@ -204,7 +194,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const accessToken = this.cookieService.get('access_token');
     const refreshToken = this.cookieService.get('refresh_token');
     if (!accessToken && refreshToken) {
-      // Attempt to refresh token if access token is missing but refresh token exists
       this.apiService.refreshToken().subscribe({
         next: () => {},
         error: () => {
@@ -212,7 +201,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         },
       });
     } else if (!accessToken && !refreshToken) {
-      // Both tokens are missing, redirect to login
       this.router.navigate(['/login']);
     }
   }
@@ -231,7 +219,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 5000); // Check every 5 seconds
+    }, 5000);
   }
 
   private showSessionExpiredAlert() {
@@ -247,7 +235,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   logout() {
-    // Clear the token check interval
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
@@ -258,13 +245,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         (response) => {
           console.log('Logout successful', response);
           this.apiService.clearToken();
-          this.cleanup(); // Ensure map is destroyed
+          this.cleanup();
           this.navigateAfterLogout();
         },
         (error) => {
           console.error('Logout failed', error);
           this.apiService.clearToken();
-          this.cleanup(); // Ensure map is destroyed
+          this.cleanup();
           this.navigateAfterLogout();
         }
       );
@@ -272,24 +259,17 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private navigateAfterLogout() {
-    // Use replaceState to remove any trailing slashes and navigate to login
     window.location.replace('/login');
   }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
-    // Do not remove the marker when closing the sidebar
-    // if (!this.isSidebarOpen && this.marker) {
-    //   this.marker.remove();
-    //   this.marker = null;
-    // }
   }
 
   confirmSelection() {
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
 
-    // Move marker to the specified lat lon in text field
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
@@ -300,7 +280,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       });
     }
 
-    // Center map to the marker's location
     this.map.setView([lat, lon], this.map.getZoom());
 
     if (this.selectedFunction === 'nearest') {
@@ -319,12 +298,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.outputs.unshift(nearestPlaceOutput);
             console.log(response);
 
-            // Remove existing polyline if it exists
             if (this.polyline) {
               this.polyline.remove();
             }
 
-            // Draw polyline from selected location to the nearest place
             import('leaflet').then((L) => {
               this.polyline = L.polyline(
                 [
@@ -352,7 +329,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.outputs.unshift(amenitiesCountOutput);
             console.log(response);
 
-            // Remove existing polyline if it exists
             if (this.polyline) {
               this.polyline.remove();
             }
@@ -374,7 +350,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   onSearchInput(event: any) {
     const query = event.target.value;
     if (query.length > 2) {
-      // Start searching after 3 characters
       this.searchLocation(query);
     } else {
       this.suggestions = [];
@@ -393,9 +368,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const lon = suggestion.lon;
     this.latInput.nativeElement.value = lat;
     this.lonInput.nativeElement.value = lon;
-    this.map.setView([lat, lon], 13); // Center the map to the selected location
+    this.map.setView([lat, lon], 13);
 
-    // Add or move marker to the selected location with custom icon
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
@@ -406,7 +380,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       });
     }
 
-    // Remove existing polyline if it exists
     if (this.polyline) {
       this.polyline.remove();
     }
