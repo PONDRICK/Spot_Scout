@@ -4,12 +4,7 @@
       <span class="navbar-title">Admin Panel</span>
     </div>
     <div class="navbar-right">
-      <button
-        (click)="logout()"
-        class="bg-red-500 text-white px-4 py-2 rounded-md"
-      >
-        Logout
-      </button>
+      <button (click)="logout()" class="btn-logout">Logout</button>
     </div>
   </div>
 </nav>
@@ -51,5 +46,46 @@
         {{ log.timestamp }} - {{ log.user_email }} - {{ log.action }}
       </li>
     </ul>
+  </div>
+
+  <div class="admin-section">
+    <h2>Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <p>{{ totalUsers }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Roles</h3>
+        <p>{{ totalRoles }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Recent Activities</h3>
+        <p>{{ recentActivities }}</p>
+      </div>
+    </div>
+    <div class="charts">
+      <canvas
+        baseChart
+        [data]="usersChartData"
+        [options]="chartOptions"
+        chartType="bar"
+      >
+      </canvas>
+      <canvas
+        baseChart
+        [data]="rolesChartData"
+        [options]="chartOptions"
+        chartType="line"
+      >
+      </canvas>
+      <canvas
+        baseChart
+        [data]="activitiesChartData"
+        [options]="chartOptions"
+        chartType="doughnut"
+      >
+      </canvas>
+    </div>
   </div>
 </div>
