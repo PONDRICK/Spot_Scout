@@ -28,6 +28,7 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private marker: any;
+  private polylines: any[] = []; // Store multiple polylines
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -147,6 +148,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             this.map
           );
         }
+
+        // Clear all outputs and polylines
+        this.clearOutputsAndPolylines();
       }
     });
 
@@ -167,6 +171,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       const layer = e.layer;
       console.log('Created new layer', layer);
     });
+  }
+
+  private clearOutputsAndPolylines() {
+    // Clear outputs
+    this.outputs = [];
+    // Remove all polylines from the map
+    this.polylines.forEach((polyline) => polyline.remove());
+    this.polylines = [];
   }
 
   private cleanupMap() {
@@ -290,6 +302,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 ],
                 { color: 'black' }
               ).addTo(this.map);
+
+              this.polylines.push(polyline); // Store the polyline
 
               const nearestPlaceOutput = {
                 type: 'nearest',
