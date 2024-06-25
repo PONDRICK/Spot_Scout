@@ -92,4 +92,50 @@ export class ApiService {
     });
     return this.http.get(`${this.adminBaseUrl}users/`, { headers: headers });
   }
+
+  deleteUser(userId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.delete(`${this.adminBaseUrl}users/${userId}/delete/`, {
+      headers: headers,
+    });
+  }
+
+  getRoles(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.get(`${this.adminBaseUrl}roles/`, { headers: headers });
+  }
+
+  getSystemConfig(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.get(`${this.adminBaseUrl}system-config/`, {
+      headers: headers,
+    });
+  }
+
+  updateSystemConfig(config: any): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.post(
+      `${this.adminBaseUrl}system-config/`,
+      { config },
+      { headers: headers }
+    );
+  }
+
+  getActivityLogs(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.get(`${this.adminBaseUrl}activity-logs/`, {
+      headers: headers,
+    });
+  }
 }

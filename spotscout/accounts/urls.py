@@ -18,12 +18,12 @@ urlpatterns = [
     path('resend-otp/', ResendOTPView.as_view(), name='resend-otp'),
 
     # Admin URLs
-    path('admin/users/', AdminUserListView.as_view(), name='admin-user-list'),
-    path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
-    path('admin/users/<int:pk>/delete/', AdminUserDeleteView.as_view(), name='admin-user-delete'),
-    path('admin/roles/', AdminRoleListView.as_view(), name='admin-role-list'),
-    path('admin/roles/<int:pk>/', AdminRoleDetailView.as_view(), name='admin-role-detail'),
-    path('admin/logout/<int:pk>/', AdminLogoutUserView.as_view(), name='admin-logout-user'),
-    path('admin/system-config/', AdminSystemConfigView.as_view(), name='admin-system-config'),
-    path('admin/activity-logs/', AdminActivityLogView.as_view(), name='admin-activity-logs'),
+    path('users/', AdminUserListView.as_view(), name='admin-user-list'),
+    path('users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
+    path('users/<int:pk>/delete/', AdminUserDeleteView.as_view(), name='admin-user-delete'),
+    path('roles/', AdminRoleListView.as_view(), name='admin-role-list'),
+    path('roles/<int:pk>/', AdminRoleDetailView.as_view(), name='admin-role-detail'),
+    path('logout/<int:pk>/', AdminLogoutUserView.as_view(), name='admin-logout-user'),
+    path('system-config/', AdminSystemConfigView.as_view(), name='admin-system-config'),
+    path('activity-logs/', AdminActivityLogView.as_view(), name='admin-activity-logs'),
 ]
