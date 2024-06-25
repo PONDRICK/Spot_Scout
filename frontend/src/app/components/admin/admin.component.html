@@ -13,12 +13,36 @@
   <div class="admin-section">
     <h2>Users</h2>
     <button (click)="fetchUsers()" class="btn-refresh">Refresh Users</button>
-    <ul>
-      <li *ngFor="let user of users">
-        {{ user.email }} - {{ user.full_name }}
-        <button (click)="deleteUser(user.id)" class="btn-delete">Delete</button>
-      </li>
-    </ul>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Is Verified</th>
+          <th>Is Active</th>
+          <th>Date Joined</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.email }}</td>
+          <td>{{ user.first_name }}</td>
+          <td>{{ user.last_name }}</td>
+          <td>{{ user.is_verified }}</td>
+          <td>{{ user.is_active }}</td>
+          <td>{{ user.date_joined | date : "short" }}</td>
+          <td>{{ user.last_login | date : "short" }}</td>
+          <td>
+            <button (click)="deleteUser(user.id)" class="btn-delete">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="admin-section">
@@ -41,11 +65,24 @@
   <div class="admin-section">
     <h2>Activity Logs</h2>
     <button (click)="fetchLogs()" class="btn-refresh">Refresh Logs</button>
-    <ul>
-      <li *ngFor="let log of activityLogs">
-        {{ log.timestamp }} - {{ log.user_email }} - {{ log.action }}
-      </li>
-    </ul>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of activityLogs">
+            <td>{{ log.timestamp }}</td>
+            <td>{{ log.user_email }}</td>
+            <td>{{ log.action }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="admin-section">
