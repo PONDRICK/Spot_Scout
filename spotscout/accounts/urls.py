@@ -3,7 +3,7 @@ from .views import (
     RegisterUserView, VerifyUserEmail, LoginUserView, TestAuthenticationView,
     PasswordResetConfirm, PasswordResetRequestView, SetNewPassword, LogoutUserView, ResendOTPView,
     AdminUserListView, AdminUserDetailView, AdminRoleListView, AdminRoleDetailView,
-    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView
+    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView,AdminUserDeleteView
 )
 
 urlpatterns = [
@@ -20,6 +20,7 @@ urlpatterns = [
     # Admin URLs
     path('admin/users/', AdminUserListView.as_view(), name='admin-user-list'),
     path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
+    path('admin/users/<int:pk>/delete/', AdminUserDeleteView.as_view(), name='admin-user-delete'),
     path('admin/roles/', AdminRoleListView.as_view(), name='admin-role-list'),
     path('admin/roles/<int:pk>/', AdminRoleDetailView.as_view(), name='admin-role-detail'),
     path('admin/logout/<int:pk>/', AdminLogoutUserView.as_view(), name='admin-logout-user'),

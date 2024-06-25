@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.contrib.auth import get_user_model
 from .managers import UserManager
 from .validators import validate_email_address
 # Create your models here.
@@ -49,3 +49,13 @@ class OneTimePassword(models.Model):
         
         def __str__(self):
             return f"{self.user.first_name}--passcode"
+        
+        
+User = get_user_model()
+class ActivityLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.action} - {self.timestamp}"
