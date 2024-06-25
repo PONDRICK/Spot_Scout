@@ -4,16 +4,10 @@
       <span class="navbar-title">Spotscout</span>
     </div>
     <div class="navbar-right">
-      <button
-        (click)="toggleSidebar()"
-        class="bg-blue-500 text-white px-4 py-2 rounded-md"
-      >
+      <button (click)="toggleSidebar()" class="bg-blue-500 text-white px-4 py-2 rounded-md">
         Select
       </button>
-      <button
-        (click)="logout()"
-        class="bg-red-500 text-white px-4 py-2 rounded-md"
-      >
+      <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md">
         Logout
       </button>
     </div>
@@ -23,19 +17,8 @@
 <div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
   <div class="sidebar-content">
     <button (click)="toggleSidebar()" class="close-button">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6 18L18 6M6 6l12 12"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
     <input type="text" placeholder="Latitude" #latInput />
@@ -98,31 +81,14 @@
     </select>
     <div *ngIf="selectedFunction === 'count'">
       <label for="distance">Distance:</label>
-      <input
-        type="number"
-        id="distance"
-        [(ngModel)]="distance"
-        min="100"
-        step="100"
-      />
+      <input type="number" id="distance" [(ngModel)]="distance" min="100" step="100" />
     </div>
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
     <div *ngFor="let place of outputs" class="output-info">
       <div *ngIf="place.type === 'nearest'" class="nearest-place-info">
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <h3>Nearest {{ place.amenity }}:</h3>
@@ -133,27 +99,14 @@
       </div>
       <div *ngIf="place.type === 'count'" class="amenities-count-info">
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <h3>Amenities Count:</h3>
         <p>Count: {{ place.count }}</p>
         <ul>
-          <li *ngFor="let amenity of place.locations">
-            Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
-          </li>
+          <li *ngFor="let amenity of place.locations">Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}</li>
         </ul>
       </div>
     </div>
@@ -161,19 +114,10 @@
 </div>
 <div class="search-container">
   <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Search location"
-      (input)="onSearchInput($event)"
-      #searchInput
-    />
+    <input type="text" placeholder="Search location" (input)="onSearchInput($event)" #searchInput />
     <ul class="suggestions" *ngIf="suggestions.length">
-      <li
-        *ngFor="let suggestion of suggestions"
-        (click)="selectSuggestion(suggestion)"
-      >
+      <li *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion)">
         <span class="icon">📍</span>
-        <!-- Placeholder for the location icon -->
         {{ suggestion.display_name }}
       </li>
     </ul>

@@ -28,7 +28,6 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private marker: any;
-  private polyline: any;
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -147,10 +146,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
             this.map
           );
-        }
-
-        if (this.polyline) {
-          this.polyline.remove();
         }
       }
     });
@@ -287,29 +282,26 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .getNearestPlace(lat, lon, this.selectedAmenity)
         .subscribe({
           next: (response) => {
-            const nearestPlaceOutput = {
-              type: 'nearest',
-              amenity: response.amenity,
-              distance: response.distance,
-              province: response.province,
-              lat: response.lat,
-              lon: response.lon,
-            };
-            this.outputs.unshift(nearestPlaceOutput);
-            console.log(response);
-
-            if (this.polyline) {
-              this.polyline.remove();
-            }
-
             import('leaflet').then((L) => {
-              this.polyline = L.polyline(
+              const polyline = L.polyline(
                 [
                   [lat, lon],
                   [response.lat, response.lon],
                 ],
                 { color: 'black' }
               ).addTo(this.map);
+
+              const nearestPlaceOutput = {
+                type: 'nearest',
+                amenity: response.amenity,
+                distance: response.distance,
+                province: response.province,
+                lat: response.lat,
+                lon: response.lon,
+                polyline: polyline, // Store the polyline object
+              };
+
+              this.outputs.unshift(nearestPlaceOutput);
             });
           },
           error: (error) => {
@@ -328,10 +320,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             };
             this.outputs.unshift(amenitiesCountOutput);
             console.log(response);
-
-            if (this.polyline) {
-              this.polyline.remove();
-            }
           },
           error: (error) => {
             console.error('Error counting amenities:', error);
@@ -344,6 +332,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const index = this.outputs.indexOf(output);
     if (index > -1) {
       this.outputs.splice(index, 1);
+
+      // Remove the polyline associated with the output
+      if (output.polyline) {
+        output.polyline.remove();
+      }
     }
   }
 
@@ -379,11 +372,5 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         );
       });
     }
-
-    if (this.polyline) {
-      this.polyline.remove();
-    }
-
-    this.suggestions = [];
   }
 }
