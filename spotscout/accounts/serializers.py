@@ -9,6 +9,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import smart_bytes, force_str
 from django.urls import reverse
 from .utils import send_normal_email
+from django.contrib.auth.models import Permission
 from rest_framework_simplejwt.tokens import RefreshToken, Token
 from django.contrib.auth.password_validation import validate_password
 
@@ -149,3 +150,18 @@ class LogoutUserSerializer(serializers.Serializer):
         except TokenError :           
             return self.fail('bad_token')
         
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'

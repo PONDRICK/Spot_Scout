@@ -1,17 +1,88 @@
 from django.shortcuts import render
-from rest_framework.generics import GenericAPIView
-from .serializers import UserRegisterSerializer, LoginSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer, LogoutUserSerializer
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView
+from .serializers import UserRegisterSerializer, LoginSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer, LogoutUserSerializer,UserSerializer, RoleSerializer, PermissionSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .utils import send_code_to_user
 from .models import OneTimePassword, User
+from django.contrib.auth.models import Permission
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import smart_str , DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponse
+from django.core.management import call_command
+from datetime import datetime
+import json
 # Create your views here.
+def log_activity(user, action):
+    log_entry = {
+        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "user": user.email,
+        "action": action
+    }
+    with open("activity.log", "a") as log_file:
+        log_file.write(json.dumps(log_entry) + "\n")
 
+class AdminUserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        log_activity(request.user, "viewed_users")
+        return response
+
+class AdminUserDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+class AdminRoleListView(ListAPIView):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+class AdminRoleDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+class AdminLogoutUserView(UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        user = self.get_object()
+        refresh = RefreshToken.for_user(user)
+        refresh.blacklist()
+        return Response({"detail": "User logged out successfully"}, status=status.HTTP_200_OK)
+
+class AdminSystemConfigView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        config_data = request.data.get("config")
+        with open("system_config.json", "w") as config_file:
+            json.dump(config_data, config_file)
+        return Response({"detail": "System configuration updated successfully"}, status=status.HTTP_200_OK)
+
+    def get(self, request, *args, **kwargs):
+        with open("system_config.json", "r") as config_file:
+            config_data = json.load(config_file)
+        return Response({"config": config_data}, status=status.HTTP_200_OK)
+
+class AdminActivityLogView(ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        log_data = []
+        with open("activity.log", "r") as log_file:
+            for line in log_file:
+                log_data.append(json.loads(line.strip()))
+        return Response(log_data, status=status.HTTP_200_OK)
 class RegisterUserView(GenericAPIView):
     serializer_class=UserRegisterSerializer
     

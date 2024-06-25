@@ -85,6 +85,7 @@ export class ApiService {
       `${this.locationBaseUrl}count_amenities/?lat=${lat}&lon=${lon}&amenity=${amenity}&distance=${distance}`
     );
   }
+
   getUsers(): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.cookieService.get('access_token')}`,
