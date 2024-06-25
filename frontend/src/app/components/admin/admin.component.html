@@ -1,0 +1,52 @@
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <span class="navbar-title">Admin Panel</span>
+    </div>
+    <div class="navbar-right">
+      <button
+        (click)="logout()"
+        class="bg-red-500 text-white px-4 py-2 rounded-md"
+      >
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="admin-content">
+  <h2>Admin Dashboard</h2>
+  <div class="admin-section">
+    <h3>User Management</h3>
+    <button (click)="fetchUsers()">Fetch Users</button>
+    <ul *ngIf="users.length">
+      <li *ngFor="let user of users">
+        {{ user.email }} -
+        {{ user.is_superuser ? "Superuser" : "Regular User" }}
+      </li>
+    </ul>
+  </div>
+  <div class="admin-section">
+    <h3>Role and Permission Management</h3>
+    <!-- Add role and permission management functionality -->
+  </div>
+  <div class="admin-section">
+    <h3>Token Management</h3>
+    <!-- Add token management functionality -->
+  </div>
+  <div class="admin-section">
+    <h3>Cookie Management</h3>
+    <!-- Add cookie management functionality -->
+  </div>
+  <div class="admin-section">
+    <h3>System Management</h3>
+    <!-- Add system management functionality -->
+  </div>
+  <div class="admin-section">
+    <h3>Activity Logs</h3>
+    <!-- Add activity logs functionality -->
+  </div>
+  <div class="admin-section">
+    <h3>Statistics Dashboard</h3>
+    <!-- Add statistics dashboard functionality -->
+  </div>
+</div>

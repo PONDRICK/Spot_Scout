@@ -9,7 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
 export class ApiService {
   private baseUrl = 'http://localhost:8000/api/v1/auth/';
   private locationBaseUrl = 'http://localhost:8000/api/v1/location/';
-
+  private adminBaseUrl = 'http://localhost:8000/api/v1/admin/';
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   registerUser(userData: any): Observable<any> {
@@ -75,9 +75,20 @@ export class ApiService {
     );
   }
 
-  countAmenities(lat: number, lon: number, amenity: string, distance: number): Observable<any> {
+  countAmenities(
+    lat: number,
+    lon: number,
+    amenity: string,
+    distance: number
+  ): Observable<any> {
     return this.http.get(
       `${this.locationBaseUrl}count_amenities/?lat=${lat}&lon=${lon}&amenity=${amenity}&distance=${distance}`
     );
+  }
+  getUsers(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.get(`${this.adminBaseUrl}users/`, { headers: headers });
   }
 }
