@@ -28,7 +28,9 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private marker: any;
-  private polyline: any;
+  private polylines: any[] = [];
+  private circles: any[] = [];
+  private markers: any[] = [];
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -42,6 +44,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
+  private greenIcon: any; // Add green icon
   isMarkerLocked = false;
 
   constructor(
@@ -134,6 +137,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       shadowSize: [41, 41],
     });
 
+    this.greenIcon = L.icon({
+      iconUrl:
+        'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+      iconSize: [16, 28],
+      iconAnchor: [8, 28],
+      popupAnchor: [1, -34],
+      shadowSize: [28, 28],
+    });
+
     this.map.on('click', (e: any) => {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
@@ -149,9 +161,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           );
         }
 
-        if (this.polyline) {
-          this.polyline.remove();
-        }
+        // Clear all outputs and overlays
+        this.clearOutputsAndOverlays();
       }
     });
 
@@ -172,6 +183,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       const layer = e.layer;
       console.log('Created new layer', layer);
     });
+  }
+
+  private clearOutputsAndOverlays() {
+    this.outputs = [];
+    this.polylines.forEach((polyline) => polyline.remove());
+    this.polylines = [];
+    this.circles.forEach((circle) => circle.remove());
+    this.circles = [];
+    this.markers.forEach((marker) => marker.remove());
+    this.markers = [];
   }
 
   private cleanupMap() {
@@ -287,29 +308,28 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .getNearestPlace(lat, lon, this.selectedAmenity)
         .subscribe({
           next: (response) => {
-            const nearestPlaceOutput = {
-              type: 'nearest',
-              amenity: response.amenity,
-              distance: response.distance,
-              province: response.province,
-              lat: response.lat,
-              lon: response.lon,
-            };
-            this.outputs.unshift(nearestPlaceOutput);
-            console.log(response);
-
-            if (this.polyline) {
-              this.polyline.remove();
-            }
-
             import('leaflet').then((L) => {
-              this.polyline = L.polyline(
+              const polyline = L.polyline(
                 [
                   [lat, lon],
                   [response.lat, response.lon],
                 ],
                 { color: 'black' }
               ).addTo(this.map);
+
+              this.polylines.push(polyline);
+
+              const nearestPlaceOutput = {
+                type: 'nearest',
+                amenity: response.amenity,
+                distance: response.distance,
+                province: response.province,
+                lat: response.lat,
+                lon: response.lon,
+                polyline: polyline,
+              };
+
+              this.outputs.unshift(nearestPlaceOutput);
             });
           },
           error: (error) => {
@@ -321,17 +341,35 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
         .subscribe({
           next: (response) => {
-            const amenitiesCountOutput = {
-              type: 'count',
-              count: response.count,
-              locations: response.locations,
-            };
-            this.outputs.unshift(amenitiesCountOutput);
-            console.log(response);
+            import('leaflet').then((L) => {
+              const circle = L.circle([lat, lon], {
+                radius: this.distance,
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.2,
+              }).addTo(this.map);
 
-            if (this.polyline) {
-              this.polyline.remove();
-            }
+              this.circles.push(circle);
+
+              const markers = response.locations.map((location: any) => {
+                const marker = L.marker([location.lat, location.lon], {
+                  icon: this.greenIcon,
+                }).addTo(this.map);
+                this.markers.push(marker);
+                return marker;
+              });
+
+              const amenitiesCountOutput = {
+                type: 'count',
+                count: response.count,
+                locations: response.locations,
+                circle: circle,
+                markers: markers,
+              };
+
+              this.outputs.unshift(amenitiesCountOutput);
+            });
+            console.log(response);
           },
           error: (error) => {
             console.error('Error counting amenities:', error);
@@ -344,6 +382,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const index = this.outputs.indexOf(output);
     if (index > -1) {
       this.outputs.splice(index, 1);
+
+      if (output.polyline) {
+        output.polyline.remove();
+      }
+      if (output.circle) {
+        output.circle.remove();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => {
+          marker.remove();
+        });
+      }
     }
   }
 
@@ -379,11 +429,5 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         );
       });
     }
-
-    if (this.polyline) {
-      this.polyline.remove();
-    }
-
-    this.suggestions = [];
   }
 }
