@@ -1,0 +1,82 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: #333;
+  color: white;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+}
+
+.btn-logout {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-refresh,
+.btn-delete,
+.btn-update {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-refresh {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-update {
+  background-color: #007bff;
+  color: white;
+}
+
+.admin-content {
+  padding: 1rem;
+}
+
+.admin-section {
+  margin-bottom: 2rem;
+}
+
+.admin-section h2 {
+  margin-bottom: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin-bottom: 0.5rem;
+  color: #343a40;
+}
+
+.stat-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+}

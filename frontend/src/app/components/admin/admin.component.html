@@ -13,40 +13,43 @@
     </div>
   </div>
 </nav>
+
 <div class="admin-content">
-  <h2>Admin Dashboard</h2>
   <div class="admin-section">
-    <h3>User Management</h3>
-    <button (click)="fetchUsers()">Fetch Users</button>
-    <ul *ngIf="users.length">
+    <h2>Users</h2>
+    <button (click)="fetchUsers()" class="btn-refresh">Refresh Users</button>
+    <ul>
       <li *ngFor="let user of users">
-        {{ user.email }} -
-        {{ user.is_superuser ? "Superuser" : "Regular User" }}
+        {{ user.email }} - {{ user.full_name }}
+        <button (click)="deleteUser(user.id)" class="btn-delete">Delete</button>
       </li>
     </ul>
   </div>
+
   <div class="admin-section">
-    <h3>Role and Permission Management</h3>
-    <!-- Add role and permission management functionality -->
+    <h2>Roles</h2>
+    <button (click)="fetchRoles()" class="btn-refresh">Refresh Roles</button>
+    <ul>
+      <li *ngFor="let role of roles">
+        {{ role.name }}
+      </li>
+    </ul>
   </div>
+
   <div class="admin-section">
-    <h3>Token Management</h3>
-    <!-- Add token management functionality -->
+    <h2>System Configuration</h2>
+    <button (click)="fetchConfig()" class="btn-refresh">Refresh Config</button>
+    <pre>{{ systemConfig | json }}</pre>
+    <button (click)="updateConfig()" class="btn-update">Update Config</button>
   </div>
+
   <div class="admin-section">
-    <h3>Cookie Management</h3>
-    <!-- Add cookie management functionality -->
-  </div>
-  <div class="admin-section">
-    <h3>System Management</h3>
-    <!-- Add system management functionality -->
-  </div>
-  <div class="admin-section">
-    <h3>Activity Logs</h3>
-    <!-- Add activity logs functionality -->
-  </div>
-  <div class="admin-section">
-    <h3>Statistics Dashboard</h3>
-    <!-- Add statistics dashboard functionality -->
+    <h2>Activity Logs</h2>
+    <button (click)="fetchLogs()" class="btn-refresh">Refresh Logs</button>
+    <ul>
+      <li *ngFor="let log of activityLogs">
+        {{ log.timestamp }} - {{ log.user_email }} - {{ log.action }}
+      </li>
+    </ul>
   </div>
 </div>
