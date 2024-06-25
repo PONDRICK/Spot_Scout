@@ -28,7 +28,9 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private map: any;
   private marker: any;
-  private polylines: any[] = []; // Store multiple polylines
+  private polylines: any[] = [];
+  private circles: any[] = [];
+  private markers: any[] = [];
   private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
@@ -42,6 +44,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
+  private greenIcon: any; // Add green icon
   isMarkerLocked = false;
 
   constructor(
@@ -134,6 +137,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       shadowSize: [41, 41],
     });
 
+    this.greenIcon = L.icon({
+      iconUrl:
+        'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+      iconSize: [16, 28],
+      iconAnchor: [8, 28],
+      popupAnchor: [1, -34],
+      shadowSize: [28, 28],
+    });
+
     this.map.on('click', (e: any) => {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
@@ -149,8 +161,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           );
         }
 
-        // Clear all outputs and polylines
-        this.clearOutputsAndPolylines();
+        // Clear all outputs and overlays
+        this.clearOutputsAndOverlays();
       }
     });
 
@@ -173,12 +185,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  private clearOutputsAndPolylines() {
-    // Clear outputs
+  private clearOutputsAndOverlays() {
     this.outputs = [];
-    // Remove all polylines from the map
     this.polylines.forEach((polyline) => polyline.remove());
     this.polylines = [];
+    this.circles.forEach((circle) => circle.remove());
+    this.circles = [];
+    this.markers.forEach((marker) => marker.remove());
+    this.markers = [];
   }
 
   private cleanupMap() {
@@ -303,7 +317,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 { color: 'black' }
               ).addTo(this.map);
 
-              this.polylines.push(polyline); // Store the polyline
+              this.polylines.push(polyline);
 
               const nearestPlaceOutput = {
                 type: 'nearest',
@@ -312,7 +326,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 province: response.province,
                 lat: response.lat,
                 lon: response.lon,
-                polyline: polyline, // Store the polyline object
+                polyline: polyline,
               };
 
               this.outputs.unshift(nearestPlaceOutput);
@@ -327,12 +341,34 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
         .subscribe({
           next: (response) => {
-            const amenitiesCountOutput = {
-              type: 'count',
-              count: response.count,
-              locations: response.locations,
-            };
-            this.outputs.unshift(amenitiesCountOutput);
+            import('leaflet').then((L) => {
+              const circle = L.circle([lat, lon], {
+                radius: this.distance,
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.2,
+              }).addTo(this.map);
+
+              this.circles.push(circle);
+
+              const markers = response.locations.map((location: any) => {
+                const marker = L.marker([location.lat, location.lon], {
+                  icon: this.greenIcon,
+                }).addTo(this.map);
+                this.markers.push(marker);
+                return marker;
+              });
+
+              const amenitiesCountOutput = {
+                type: 'count',
+                count: response.count,
+                locations: response.locations,
+                circle: circle,
+                markers: markers,
+              };
+
+              this.outputs.unshift(amenitiesCountOutput);
+            });
             console.log(response);
           },
           error: (error) => {
@@ -347,9 +383,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     if (index > -1) {
       this.outputs.splice(index, 1);
 
-      // Remove the polyline associated with the output
       if (output.polyline) {
         output.polyline.remove();
+      }
+      if (output.circle) {
+        output.circle.remove();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => {
+          marker.remove();
+        });
       }
     }
   }
