@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.utils.html import format_html
 from spotscout import settings
 from .models import User, OneTimePassword
-
+from .models import ActivityLog
 def generateOtp():
     otp = ""
     for i in range(6):
@@ -53,3 +53,6 @@ def send_normal_email(data):
         to=[data['to_email']]
     )
     email.send()
+
+def log_activity(user, action):
+    ActivityLog.objects.create(user=user, action=action)

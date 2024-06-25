@@ -9,9 +9,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import smart_bytes, force_str
 from django.urls import reverse
 from .utils import send_normal_email
+from django.contrib.auth.models import Permission
 from rest_framework_simplejwt.tokens import RefreshToken, Token
 from django.contrib.auth.password_validation import validate_password
-
+from .models import ActivityLog
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length =6, write_only = True ,validators=[validate_password])
@@ -41,10 +42,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=155, min_length=6)
-    password=serializers.CharField(max_length=68, write_only=True)
-    full_name=serializers.CharField(max_length=255, read_only=True)
-    access_token=serializers.CharField(max_length=255, read_only=True)
-    refresh_token=serializers.CharField(max_length=255, read_only=True)
+    password = serializers.CharField(max_length=68, write_only=True)
+    full_name = serializers.CharField(max_length=255, read_only=True)
+    access_token = serializers.CharField(max_length=255, read_only=True)
+    refresh_token = serializers.CharField(max_length=255, read_only=True)
     is_superuser = serializers.BooleanField(read_only=True)
 
     class Meta:
@@ -57,16 +58,17 @@ class LoginSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = authenticate(request, email=email, password=password)
         if not user:
-            raise AuthenticationFailed("invalid credential try again")
+            raise AuthenticationFailed("Invalid credentials, try again.")
         if not user.is_verified:
-            raise AuthenticationFailed("Email is not verified")
+            raise AuthenticationFailed("Email is not verified.")
         tokens = user.tokens()
         return {
             'email': user.email,
             'full_name': user.get_full_name,
             'access_token': str(tokens.get('access')),
             'refresh_token': str(tokens.get('refresh')),
-            'is_superuser': user.is_superuser
+            'is_superuser': user.is_superuser,
+            'user': user  # Include the user instance
         }
 
     
@@ -149,3 +151,25 @@ class LogoutUserSerializer(serializers.Serializer):
         except TokenError :           
             return self.fail('bad_token')
         
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = '__all__'
+        
+class ActivityLogSerializer(serializers.ModelSerializer):
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+
+    class Meta:
+        model = ActivityLog
+        fields = ['user_email', 'action', 'timestamp']

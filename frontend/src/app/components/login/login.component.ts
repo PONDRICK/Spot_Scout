@@ -44,7 +44,15 @@ export class LoginComponent implements OnInit {
       (response) => {
         console.log('Login successful', response);
         this.apiService.setToken(response.access_token, response.refresh_token);
-        this.router.navigate(['/dashboard']);
+        this.cookieService.set(
+          'is_superuser',
+          response.is_superuser.toString()
+        );
+        if (response.is_superuser) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       },
       (error) => {
         console.error('Login failed', error);

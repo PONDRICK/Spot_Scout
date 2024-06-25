@@ -8,7 +8,8 @@ import { OTPVerificationComponent } from './components/otp-verification/otp-veri
 import { SetNewPasswordComponent } from './components/set-new-password/set-new-password.component';
 import { AuthGuard } from './auth.guard';
 import { GuestGuard } from './guest.guard';
-
+import { SuperUserGuard } from './super-user.guard';
+import { AdminComponent } from './components/admin/admin.component';
 export const routes: Routes = [
   {
     path: 'login',
@@ -24,6 +25,11 @@ export const routes: Routes = [
     path: 'reset-password',
     component: ResetPasswordComponent,
     canActivate: [GuestGuard],
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [AuthGuard, SuperUserGuard],
   },
   {
     path: 'dashboard',
