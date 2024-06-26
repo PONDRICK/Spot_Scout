@@ -1,3 +1,4 @@
+import osmnx as ox
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -327,20 +328,19 @@ class CountAmenityView(APIView):
     
 class PopulationView(APIView):
     def get(self, request):
-        latitude = request.GET.get('lat')
-        longitude = request.GET.get('lon')
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
         distance = request.GET.get('distance')
 
-        if not latitude or not longitude or not distance:
+        if not lat or not lon or not distance:
             return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            latitude = float(latitude)
-            longitude = float(longitude)
+            lat = float(lat)
+            lon = float(lon)
             distance = float(distance)
         except ValueError:
             return Response({"error": "Invalid latitude, longitude, or distance"}, status=status.HTTP_400_BAD_REQUEST)
 
-        population = get_population(latitude, longitude, distance)
-
-        return Response({"population": population, "lat": latitude, "lon": longitude, "distance": distance}, status=status.HTTP_200_OK)
+        population = get_population(lat, lon, distance)
+        return Response({"population": population}, status=status.HTTP_200_OK)
