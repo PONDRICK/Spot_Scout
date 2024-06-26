@@ -138,4 +138,17 @@ export class ApiService {
       headers: headers,
     });
   }
+
+  getPopulation(lat: number, lon: number, distance: number): Observable<any> {
+    return this.http.get(
+      `${this.locationBaseUrl}population/?lat=${lat}&lon=${lon}&distance=${distance}`
+    );
+  }
+
+  predictModel(lat: number, lon: number): Observable<any> {
+    return this.http.post(`${this.locationBaseUrl}add-location/`, {
+      lat: lat,
+      lon: lon,
+    });
+  }
 }

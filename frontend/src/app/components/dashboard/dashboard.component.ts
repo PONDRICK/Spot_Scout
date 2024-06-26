@@ -316,9 +316,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 ],
                 { color: 'black' }
               ).addTo(this.map);
-
               this.polylines.push(polyline);
-
               const nearestPlaceOutput = {
                 type: 'nearest',
                 amenity: response.amenity,
@@ -328,13 +326,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 lon: response.lon,
                 polyline: polyline,
               };
-
               this.outputs.unshift(nearestPlaceOutput);
             });
           },
-          error: (error) => {
-            console.error('Error fetching nearest place:', error);
-          },
+          error: (error) =>
+            console.error('Error fetching nearest place:', error),
         });
     } else if (this.selectedFunction === 'count') {
       this.apiService
@@ -348,9 +344,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 fillColor: '#30f',
                 fillOpacity: 0.2,
               }).addTo(this.map);
-
               this.circles.push(circle);
-
               const markers = response.locations.map((location: any) => {
                 const marker = L.marker([location.lat, location.lon], {
                   icon: this.greenIcon,
@@ -358,7 +352,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.markers.push(marker);
                 return marker;
               });
-
               const amenitiesCountOutput = {
                 type: 'count',
                 count: response.count,
@@ -366,15 +359,33 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 circle: circle,
                 markers: markers,
               };
-
               this.outputs.unshift(amenitiesCountOutput);
             });
-            console.log(response);
           },
-          error: (error) => {
-            console.error('Error counting amenities:', error);
-          },
+          error: (error) => console.error('Error counting amenities:', error),
         });
+    } else if (this.selectedFunction === 'population') {
+      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+        next: (response) => {
+          const populationOutput = {
+            type: 'population',
+            population: response.population,
+          };
+          this.outputs.unshift(populationOutput);
+        },
+        error: (error) => console.error('Error fetching population:', error),
+      });
+    } else if (this.selectedFunction === 'predict') {
+      this.apiService.predictModel(lat, lon).subscribe({
+        next: (response) => {
+          const predictModelOutput = {
+            type: 'predict',
+            predicted_amenity_category: response.predicted_amenity_category,
+          };
+          this.outputs.unshift(predictModelOutput);
+        },
+        error: (error) => console.error('Error predicting model:', error),
+      });
     }
   }
 
