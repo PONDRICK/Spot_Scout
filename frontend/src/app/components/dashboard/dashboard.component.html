@@ -4,10 +4,16 @@
       <span class="navbar-title">Spotscout</span>
     </div>
     <div class="navbar-right">
-      <button (click)="toggleSidebar()" class="bg-blue-500 text-white px-4 py-2 rounded-md">
+      <button
+        (click)="toggleSidebar()"
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
         Select
       </button>
-      <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md">
+      <button
+        (click)="logout()"
+        class="bg-red-500 text-white px-4 py-2 rounded-md"
+      >
         Logout
       </button>
     </div>
@@ -17,8 +23,19 @@
 <div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
   <div class="sidebar-content">
     <button (click)="toggleSidebar()" class="close-button">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     </button>
     <input type="text" placeholder="Latitude" #latInput />
@@ -31,64 +48,93 @@
     <select id="function" [(ngModel)]="selectedFunction">
       <option value="nearest">Nearest Place</option>
       <option value="count">Count Amenities</option>
+      <option value="population">Population</option>
+      <option value="predict">Predict Model</option>
     </select>
-    <label for="amenity">Select Amenity:</label>
-    <select id="amenity" [(ngModel)]="selectedAmenity">
-      <!-- Add other options here -->
-      <option value="apartment">Apartment</option>
-      <option value="artwork">Artwork</option>
-      <option value="atm">ATM</option>
-      <option value="bakery">Bakery</option>
-      <option value="bank">Bank</option>
-      <option value="bar">Bar</option>
-      <option value="beauty">Beauty</option>
-      <option value="bus_stop">Bus Stop</option>
-      <option value="cafe">Cafe</option>
-      <option value="clinic">Clinic</option>
-      <option value="clothes">Clothes</option>
-      <option value="coffee">Coffee</option>
-      <option value="college">College</option>
-      <option value="convenience">Convenience</option>
-      <option value="crossing">Crossing</option>
-      <option value="department_store">Department Store</option>
-      <option value="dentist">Dentist</option>
-      <option value="fast_food">Fast Food</option>
-      <option value="fire_station">Fire Station</option>
-      <option value="fuel">Fuel</option>
-      <option value="hamlet">Hamlet</option>
-      <option value="hospital">Hospital</option>
-      <option value="hostel">Hostel</option>
-      <option value="hotel">Hotel</option>
-      <option value="information">National Park/Visitor Center</option>
-      <option value="laundry">Laundry</option>
-      <option value="mall">Mall</option>
-      <option value="massage">Massage</option>
-      <option value="motel">Motel</option>
-      <option value="museum">Museum</option>
-      <option value="office">Office</option>
-      <option value="pharmacy">Pharmacy</option>
-      <option value="police">Police</option>
-      <option value="post_office">Post Office</option>
-      <option value="resort">Resort</option>
-      <option value="restaurant">Restaurant</option>
-      <option value="school">School</option>
-      <option value="station">Station</option>
-      <option value="supermarket">Supermarket</option>
-      <option value="townhall">Townhall</option>
-      <option value="university">University</option>
-      <option value="village">Village</option>
-      <option value="zoo">Zoo</option>
-    </select>
-    <div *ngIf="selectedFunction === 'count'">
-      <label for="distance">Distance:</label>
-      <input type="number" id="distance" [(ngModel)]="distance" min="100" step="100" />
+
+    <!-- Conditionally display the amenity selection based on the selected function -->
+    <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
+      <label for="amenity">Select Amenity:</label>
+      <select id="amenity" [(ngModel)]="selectedAmenity">
+        <option value="apartment">Apartment</option>
+        <option value="artwork">Artwork</option>
+        <option value="atm">ATM</option>
+        <option value="bakery">Bakery</option>
+        <option value="bank">Bank</option>
+        <option value="bar">Bar</option>
+        <option value="beauty">Beauty</option>
+        <option value="bus_stop">Bus Stop</option>
+        <option value="cafe">Cafe</option>
+        <option value="clinic">Clinic</option>
+        <option value="clothes">Clothes</option>
+        <option value="coffee">Coffee</option>
+        <option value="college">College</option>
+        <option value="convenience">Convenience</option>
+        <option value="crossing">Crossing</option>
+        <option value="department_store">Department Store</option>
+        <option value="dentist">Dentist</option>
+        <option value="fast_food">Fast Food</option>
+        <option value="fire_station">Fire Station</option>
+        <option value="fuel">Fuel</option>
+        <option value="hamlet">Hamlet</option>
+        <option value="hospital">Hospital</option>
+        <option value="hostel">Hostel</option>
+        <option value="hotel">Hotel</option>
+        <option value="information">National Park/Visitor Center</option>
+        <option value="laundry">Laundry</option>
+        <option value="mall">Mall</option>
+        <option value="massage">Massage</option>
+        <option value="motel">Motel</option>
+        <option value="museum">Museum</option>
+        <option value="office">Office</option>
+        <option value="pharmacy">Pharmacy</option>
+        <option value="police">Police</option>
+        <option value="post_office">Post Office</option>
+        <option value="resort">Resort</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="school">School</option>
+        <option value="station">Station</option>
+        <option value="supermarket">Supermarket</option>
+        <option value="townhall">Townhall</option>
+        <option value="university">University</option>
+        <option value="village">Village</option>
+        <option value="zoo">Zoo</option>
+      </select>
     </div>
+
+    <!-- Add distance input for Count and Population -->
+    <div
+      *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
+    >
+      <label for="distance">Distance:</label>
+      <input
+        type="number"
+        id="distance"
+        [(ngModel)]="distance"
+        min="100"
+        step="100"
+      />
+    </div>
+
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
+
+    <!-- Output Information -->
     <div *ngFor="let place of outputs" class="output-info">
       <div *ngIf="place.type === 'nearest'" class="nearest-place-info">
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <h3>Nearest {{ place.amenity }}:</h3>
@@ -97,26 +143,91 @@
         <p>Lat: {{ place.lat }}</p>
         <p>Lon: {{ place.lon }}</p>
       </div>
+
       <div *ngIf="place.type === 'count'" class="amenities-count-info">
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <h3>Amenities Count:</h3>
         <p>Count: {{ place.count }}</p>
         <ul>
-          <li *ngFor="let amenity of place.locations">Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}</li>
+          <li *ngFor="let amenity of place.locations">
+            Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
+          </li>
         </ul>
+      </div>
+
+      <div *ngIf="place.type === 'population'" class="population-info">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <h3>Population:</h3>
+        <p>Population: {{ place.population }}</p>
+      </div>
+
+      <div *ngIf="place.type === 'predict'" class="predict-info">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <h3>Predicted Amenity Category:</h3>
+        <p>{{ place.predicted_amenity_category }}</p>
       </div>
     </div>
   </div>
 </div>
+
 <div class="search-container">
   <div class="search-bar">
-    <input type="text" placeholder="Search location" (input)="onSearchInput($event)" #searchInput />
+    <input
+      type="text"
+      placeholder="Search location"
+      (input)="onSearchInput($event)"
+      #searchInput
+    />
     <ul class="suggestions" *ngIf="suggestions.length">
-      <li *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion)">
+      <li
+        *ngFor="let suggestion of suggestions"
+        (click)="selectSuggestion(suggestion)"
+      >
         <span class="icon">📍</span>
         {{ suggestion.display_name }}
       </li>
