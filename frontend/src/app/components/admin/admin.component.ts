@@ -1,3 +1,4 @@
+// frontend/src/app/components/admin/admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../api.service';
@@ -119,6 +120,29 @@ export class AdminComponent implements OnInit {
         console.error('Failed to fetch activity logs', error);
       }
     );
+  }
+
+  deleteUser(userId: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this user!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.apiService.deleteUser(userId).subscribe(
+          () => {
+            Swal.fire('Deleted!', 'The user has been deleted.', 'success');
+            this.fetchUsers(); // Refresh the user list
+          },
+          (error) => {
+            Swal.fire('Error!', 'Failed to delete user.', 'error');
+          }
+        );
+      }
+    });
   }
 
   private checkSession() {
