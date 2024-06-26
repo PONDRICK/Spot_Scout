@@ -250,7 +250,7 @@ class AddUserLocationView(APIView):
         user_location.predicted_amenity_category = predicted_amenity_category
         user_location.save()
 
-        return Response({"message": "Location added successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Location added successfully", "predicted_amenity_category": predicted_amenity_category}, status=status.HTTP_201_CREATED)
     
 class NearestPlaceView(APIView):
     def get(self, request):
@@ -324,3 +324,23 @@ class CountAmenityView(APIView):
                 location_coords.append({"lat": location.lat, "lon": location.lon})
 
         return Response({"count": count, "amenity": amenity, "distance": distance, "locations": location_coords}, status=status.HTTP_200_OK)
+    
+class PopulationView(APIView):
+    def get(self, request):
+        latitude = request.GET.get('lat')
+        longitude = request.GET.get('lon')
+        distance = request.GET.get('distance')
+
+        if not latitude or not longitude or not distance:
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            distance = float(distance)
+        except ValueError:
+            return Response({"error": "Invalid latitude, longitude, or distance"}, status=status.HTTP_400_BAD_REQUEST)
+
+        population = get_population(latitude, longitude, distance)
+
+        return Response({"population": population, "lat": latitude, "lon": longitude, "distance": distance}, status=status.HTTP_200_OK)
