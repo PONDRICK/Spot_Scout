@@ -131,7 +131,9 @@ button {
 }
 
 .nearest-place-info,
-.amenities-count-info {
+.amenities-count-info,
+.population-info,
+.predict-info {
   position: relative;
   padding: 16px;
   margin-bottom: 10px;
@@ -141,14 +143,18 @@ button {
 }
 
 .nearest-place-info h3,
-.amenities-count-info h3 {
+.amenities-count-info h3,
+.population-info h3,
+.predict-info h3 {
   margin-bottom: 10px;
   color: #333;
 }
 
 .nearest-place-info p,
 .amenities-count-info p,
-.amenities-count-info ul li {
+.amenities-count-info ul li,
+.population-info p,
+.predict-info p {
   margin-bottom: 5px;
   color: #666;
 }

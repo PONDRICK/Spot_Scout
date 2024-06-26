@@ -102,7 +102,7 @@
       </select>
     </div>
 
-    <!-- Add distance input for Population -->
+    <!-- Add distance input for Count and Population -->
     <div
       *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
     >
@@ -117,6 +117,8 @@
     </div>
 
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
+
+    <!-- Output Information -->
     <div *ngFor="let place of outputs" class="output-info">
       <div *ngIf="place.type === 'nearest'" class="nearest-place-info">
         <button (click)="removeOutput(place)" class="delete-button">
