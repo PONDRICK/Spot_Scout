@@ -52,6 +52,17 @@ INSTALLED_APPS = [
 
 CORS_ALLOW_ALL_ORIGINS = True  
 
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'X-CSRFToken'
+]
+
+CORS_EXPOSE_HEADERS = ['Content-Disposition', 'Authorization']
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -119,9 +130,13 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+    #"ACCESS_TOKEN_LIFETIME": timedelta(seconds=30),  
+    #"REFRESH_TOKEN_LIFETIME": timedelta(minutes=1),  
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1), 
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "ROTATE_REFRESH_TOKENS": True,  # Ensure tokens are rotated
+    "BLACKLIST_AFTER_ROTATION": False,  # Ensure old tokens are blacklisted
 }
 
 

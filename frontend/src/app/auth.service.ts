@@ -36,22 +36,23 @@ export class AuthService {
     this.cookieService.set('refresh_token', authResult.refresh, { path: '/' });
   }
 
+
   refreshToken(): Observable<AuthResponse> {
     const refreshToken = this.cookieService.get('refresh_token');
     return this.http
-      .post<AuthResponse>(`${this.baseUrl}token/refresh/`, {
-        refresh: refreshToken,
-      })
+      .post<AuthResponse>(`${this.baseUrl}token/refresh/`, { refresh: refreshToken })
       .pipe(
-        tap((response) =>
-          this.cookieService.set('access_token', response.access, { path: '/' })
-        ),
+        tap((response) => {
+          this.cookieService.set('access_token', response.access, { path: '/' });
+          console.log('New access token:', response.access); // Log new access token
+        }),
         catchError((error) => {
           this.logout();
           return throwError(error);
         })
       );
   }
+
 
   logout(): void {
     this.cookieService.delete('access_token', '/');
