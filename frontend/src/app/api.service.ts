@@ -64,9 +64,7 @@ export class ApiService {
 
   refreshToken(): Observable<any> {
     const refreshToken = this.cookieService.get('refresh_token');
-    return this.http.post(`${this.baseUrl}token/refresh/`, {
-      refresh: refreshToken,
-    });
+    return this.http.post(`${this.baseUrl}token/refresh/`, { refresh: refreshToken });
   }
 
   getNearestPlace(lat: number, lon: number, amenity: string): Observable<any> {

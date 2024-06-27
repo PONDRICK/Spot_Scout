@@ -23,12 +23,16 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        if (error.status === 401 && !req.url.includes('token/refresh/')) {
           // Token expired, attempt to refresh
           return this.authService.refreshToken().pipe(
             switchMap((newTokens: any) => {
               if (newTokens) {
                 this.cookieService.set('access_token', newTokens.access, { path: '/' });
+                
+                // Console log the new access token
+                console.log('New access token:', newTokens.access);
+                
                 req = req.clone({
                   setHeaders: {
                     Authorization: `Bearer ${newTokens.access}`

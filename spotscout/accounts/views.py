@@ -15,7 +15,11 @@ from django.http import HttpResponse
 from django.core.management import call_command
 from datetime import datetime
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 import json
+import logging
+logger = logging.getLogger(__name__)
+
 # Create your views here.
 class AdminUserListView(ListAPIView):
     queryset = User.objects.all()
@@ -205,16 +209,17 @@ class ResendOTPView(GenericAPIView):
 
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):
-        refresh_token = request.data.get('refresh')
-        if refresh_token:
-            try:
+        try:
+            refresh_token = request.data.get('refresh')
+            if refresh_token:
                 token = RefreshToken(refresh_token)
                 return Response({
                     'access': str(token.access_token)
                 })
-            except TokenError:
-                return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
+        except (TokenError, InvalidToken) as e:
+            logger.error(f'Token refresh error: {str(e)}')
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 def index(request):
     if 'authenticated' in request.session:
