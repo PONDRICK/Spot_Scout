@@ -14,6 +14,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponse
 from django.core.management import call_command
 from datetime import datetime
+from rest_framework.views import APIView
 import json
 # Create your views here.
 class AdminUserListView(ListAPIView):
@@ -201,6 +202,19 @@ class ResendOTPView(GenericAPIView):
             return Response({'message': 'OTP has been resent'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+class TokenRefreshView(APIView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                return Response({
+                    'access': str(token.access_token)
+                })
+            except TokenError:
+                return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
 
 def index(request):
     if 'authenticated' in request.session:

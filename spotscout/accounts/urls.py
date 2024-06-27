@@ -3,7 +3,7 @@ from .views import (
     RegisterUserView, VerifyUserEmail, LoginUserView, TestAuthenticationView,
     PasswordResetConfirm, PasswordResetRequestView, SetNewPassword, LogoutUserView, ResendOTPView,
     AdminUserListView, AdminUserDetailView, AdminRoleListView, AdminRoleDetailView,
-    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView,AdminUserDeleteView
+    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView,AdminUserDeleteView,TokenRefreshView
 )
 
 urlpatterns = [
@@ -16,7 +16,7 @@ urlpatterns = [
     path('set-new-password/', SetNewPassword.as_view(), name='set-new-password'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
     path('resend-otp/', ResendOTPView.as_view(), name='resend-otp'),
-
+    path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     # Admin URLs
     path('users/', AdminUserListView.as_view(), name='admin-user-list'),
     path('users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
