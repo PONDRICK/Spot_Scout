@@ -247,7 +247,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 5000);
+    }, 300000);
   }
 
   private showSessionExpiredAlert() {
