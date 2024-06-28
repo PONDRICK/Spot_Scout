@@ -156,9 +156,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
-            this.map
-          );
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(this.map);
+          (this.marker as any).isOutputLayer = true; // Add a unique identifier to the red marker
         }
 
         // Clear all outputs and overlays
@@ -182,6 +181,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.map.on('pm:create', (e: any) => {
       const layer = e.layer;
       console.log('Created new layer', layer);
+    });
+
+    // Add event listener for pm:remove to prevent removal of the red marker and output layers
+    this.map.on('pm:remove', (e: any) => {
+      if ((e.layer as any).isOutputLayer) {
+        console.log('Attempted to remove protected layer, action prevented.');
+        e.layer.addTo(this.map); // Re-add the layer to the map
+      }
     });
   }
 
@@ -240,7 +247,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       } else if (this.authService.isRefreshTokenExpired()) {
         this.showSessionExpiredAlert();
       }
-    }, 5000);
+    }, 300000);
   }
 
   private showSessionExpiredAlert() {
@@ -298,6 +305,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
           this.map
         );
+        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
       });
     }
 
@@ -316,6 +324,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 ],
                 { color: 'black' }
               ).addTo(this.map);
+              (polyline as any).isOutputLayer = true; // Mark as output layer
               this.polylines.push(polyline);
               const nearestPlaceOutput = {
                 type: 'nearest',
@@ -344,11 +353,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 fillColor: '#30f',
                 fillOpacity: 0.2,
               }).addTo(this.map);
+              (circle as any).isOutputLayer = true; // Mark as output layer
               this.circles.push(circle);
               const markers = response.locations.map((location: any) => {
                 const marker = L.marker([location.lat, location.lon], {
                   icon: this.greenIcon,
                 }).addTo(this.map);
+                (marker as any).isOutputLayer = true; // Mark as output layer
                 this.markers.push(marker);
                 return marker;
               });
@@ -438,6 +449,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
           this.map
         );
+        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
       });
     }
   }
