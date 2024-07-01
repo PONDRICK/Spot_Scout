@@ -12,6 +12,11 @@
 <div class="admin-content">
   <div class="admin-section">
     <h2>Users</h2>
+    <input
+      [(ngModel)]="userSearchTerm"
+      (input)="searchUsers()"
+      placeholder="Search Users"
+    />
     <button (click)="fetchUsers()" class="btn-refresh">Refresh Users</button>
     <table class="table">
       <thead>
@@ -27,7 +32,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users">
+        <tr *ngFor="let user of filteredUsers">
           <td>{{ user.email }}</td>
           <td>{{ user.first_name }}</td>
           <td>{{ user.last_name }}</td>
@@ -64,6 +69,11 @@
 
   <div class="admin-section">
     <h2>Activity Logs</h2>
+    <input
+      [(ngModel)]="logSearchTerm"
+      (input)="searchLogs()"
+      placeholder="Search Logs"
+    />
     <button (click)="fetchLogs()" class="btn-refresh">Refresh Logs</button>
     <div class="table-container">
       <table class="table">
@@ -75,7 +85,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let log of activityLogs">
+          <tr *ngFor="let log of filteredLogs">
             <td>{{ log.timestamp }}</td>
             <td>{{ log.user_email }}</td>
             <td>{{ log.action }}</td>
