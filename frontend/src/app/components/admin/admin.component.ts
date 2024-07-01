@@ -1,4 +1,3 @@
-// frontend/src/app/components/admin/admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../api.service';
@@ -20,9 +19,16 @@ import Swal from 'sweetalert2';
 })
 export class AdminComponent implements OnInit {
   users: any[] = [];
+  filteredUsers: any[] = [];
+  userSearchTerm: string = '';
+
   roles: any[] = [];
+
   systemConfig: any;
   activityLogs: any[] = [];
+  filteredLogs: any[] = [];
+  logSearchTerm: string = '';
+
   private tokenCheckInterval: any;
   totalUsers: number = 0;
   totalRoles: number = 0;
@@ -68,6 +74,7 @@ export class AdminComponent implements OnInit {
     this.apiService.getUsers().subscribe(
       (response) => {
         this.users = response;
+        this.filteredUsers = response;
         this.totalUsers = this.users.length;
       },
       (error) => {
@@ -114,11 +121,33 @@ export class AdminComponent implements OnInit {
     this.apiService.getActivityLogs().subscribe(
       (response) => {
         this.activityLogs = response;
+        this.filteredLogs = response;
         this.recentActivities = this.activityLogs.length;
       },
       (error) => {
         console.error('Failed to fetch activity logs', error);
       }
+    );
+  }
+
+  searchUsers() {
+    this.filteredUsers = this.users.filter(
+      (user) =>
+        user.email.toLowerCase().includes(this.userSearchTerm.toLowerCase()) ||
+        user.first_name
+          .toLowerCase()
+          .includes(this.userSearchTerm.toLowerCase()) ||
+        user.last_name.toLowerCase().includes(this.userSearchTerm.toLowerCase())
+    );
+  }
+
+  searchLogs() {
+    this.filteredLogs = this.activityLogs.filter(
+      (log) =>
+        log.user_email
+          .toLowerCase()
+          .includes(this.logSearchTerm.toLowerCase()) ||
+        log.action.toLowerCase().includes(this.logSearchTerm.toLowerCase())
     );
   }
 
