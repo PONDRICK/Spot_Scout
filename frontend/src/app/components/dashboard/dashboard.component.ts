@@ -309,105 +309,137 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  confirmSelection() {
-    const lat = parseFloat(this.latInput.nativeElement.value);
-    const lon = parseFloat(this.lonInput.nativeElement.value);
+
+  private outputExists(lat: number, lon: number, functionType: string, amenity?: string, distance?: number): boolean {
+    return this.outputs.some(output => {
+      if (output.type !== functionType) {
+        return false;
+      }
   
-    if (this.marker) {
-      this.marker.setLatLng([lat, lon]);
-    } else {
-      import('leaflet').then((L) => {
-        this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(this.map);
-        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
-      });
-    }
-  
-    this.map.setView([lat, lon], this.map.getZoom());
-  
-    const loadingOutput = {
-      type: this.selectedFunction,
-      loading: true,
-      visible: true,
-    };
-    this.outputs.unshift(loadingOutput);
-  
-    if (this.selectedFunction === 'nearest') {
-      this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
-        next: (response) => {
-          import('leaflet').then((L) => {
-            const polyline = L.polyline(
-              [
-                [lat, lon],
-                [response.lat, response.lon],
-              ],
-              { color: 'black' }
-            ).addTo(this.map);
-            (polyline as any).isOutputLayer = true; // Mark as output layer
-            this.polylines.push(polyline);
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              amenity: response.amenity,
-              distance: response.distance,
-              province: response.province,
-              lat: response.lat,
-              lon: response.lon,
-              polyline: polyline,
-            });
-          });
-        },
-        error: (error) => console.error('Error fetching nearest place:', error),
-      });
-    } else if (this.selectedFunction === 'count') {
-      this.apiService.countAmenities(lat, lon, this.selectedAmenity, this.distance).subscribe({
-        next: (response) => {
-          import('leaflet').then((L) => {
-            const circle = L.circle([lat, lon], {
-              radius: this.distance,
-              color: 'blue',
-              fillColor: '#30f',
-              fillOpacity: 0.2,
-            }).addTo(this.map);
-            (circle as any).isOutputLayer = true; // Mark as output layer
-            this.circles.push(circle);
-            const markers = response.locations.map((location: any) => {
-              const marker = L.marker([location.lat, location.lon], { icon: this.greenIcon }).addTo(this.map);
-              (marker as any).isOutputLayer = true; // Mark as output layer
-              this.markers.push(marker);
-              return marker;
-            });
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              count: response.count,
-              locations: response.locations,
-              circle: circle,
-              markers: markers,
-            });
-          });
-        },
-        error: (error) => console.error('Error counting amenities:', error),
-      });
-    } else if (this.selectedFunction === 'population') {
-      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
-        next: (response) => {
-          loadingOutput.loading = false;
-          Object.assign(loadingOutput, {
-            population: response.population,
-          });
-        },
-        error: (error) => console.error('Error fetching population:', error),
-      });
-    } else if (this.selectedFunction === 'predict') {
-      this.apiService.predictModel(lat, lon).subscribe({
-        next: (response) => {
-          loadingOutput.loading = false;
-          Object.assign(loadingOutput, {
-            predicted_amenity_category: response.predicted_amenity_category,
-          });
-        },
-        error: (error) => console.error('Error predicting model:', error),
-      });
-    }
+      switch (functionType) {
+        case 'nearest':
+          return output.amenity === amenity;
+        case 'count':
+          return output.amenity === amenity && output.distance === distance && output.lat === lat && output.lon === lon;
+        case 'population':
+          return output.distance === distance && output.lat === lat && output.lon === lon;
+        case 'predict':
+          return output.lat === lat && output.lon === lon;
+        default:
+          return false;
+      }
+    });
   }
+
+ confirmSelection() {
+  const lat = parseFloat(this.latInput.nativeElement.value);
+  const lon = parseFloat(this.lonInput.nativeElement.value);
+
+  if (this.marker) {
+    this.marker.setLatLng([lat, lon]);
+  } else {
+    import('leaflet').then((L) => {
+      this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(this.map);
+      (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+    });
+  }
+
+  this.map.setView([lat, lon], this.map.getZoom());
+
+  if (this.outputExists(lat, lon, this.selectedFunction, this.selectedAmenity, this.distance)) {
+    console.log(`Output for ${this.selectedFunction} from lat ${lat}, lon ${lon} already exists`);
+    return;
+  }
+
+  const loadingOutput = {
+    type: this.selectedFunction,
+    loading: true,
+    visible: true,
+    lat: lat,
+    lon: lon,
+    amenity: this.selectedAmenity,
+    distance: this.distance
+  };
+  this.outputs.unshift(loadingOutput);
+
+  if (this.selectedFunction === 'nearest') {
+    this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
+      next: (response) => {
+        import('leaflet').then((L) => {
+          const polyline = L.polyline(
+            [
+              [lat, lon],
+              [response.lat, response.lon],
+            ],
+            { color: 'black' }
+          ).addTo(this.map);
+          (polyline as any).isOutputLayer = true; // Mark as output layer
+          this.polylines.push(polyline);
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            amenity: response.amenity,
+            distance: response.distance,
+            province: response.province,
+            lat: response.lat,
+            lon: response.lon,
+            polyline: polyline,
+          });
+        });
+      },
+      error: (error) => console.error('Error fetching nearest place:', error),
+    });
+  } else if (this.selectedFunction === 'count') {
+    this.apiService.countAmenities(lat, lon, this.selectedAmenity, this.distance).subscribe({
+      next: (response) => {
+        import('leaflet').then((L) => {
+          const circle = L.circle([lat, lon], {
+            radius: this.distance,
+            color: 'blue',
+            fillColor: '#30f',
+            fillOpacity: 0.2,
+          }).addTo(this.map);
+          (circle as any).isOutputLayer = true; // Mark as output layer
+          this.circles.push(circle);
+          const markers = response.locations.map((location: any) => {
+            const marker = L.marker([location.lat, location.lon], { icon: this.greenIcon }).addTo(this.map);
+            (marker as any).isOutputLayer = true; // Mark as output layer
+            this.markers.push(marker);
+            return marker;
+          });
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            count: response.count,
+            locations: response.locations,
+            circle: circle,
+            markers: markers,
+          });
+        });
+      },
+      error: (error) => console.error('Error counting amenities:', error),
+    });
+  } else if (this.selectedFunction === 'population') {
+    this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+      next: (response) => {
+        loadingOutput.loading = false;
+        Object.assign(loadingOutput, {
+          population: response.population,
+        });
+      },
+      error: (error) => console.error('Error fetching population:', error),
+    });
+  } else if (this.selectedFunction === 'predict') {
+    this.apiService.predictModel(lat, lon).subscribe({
+      next: (response) => {
+        loadingOutput.loading = false;
+        Object.assign(loadingOutput, {
+          predicted_amenity_category: response.predicted_amenity_category,
+        });
+      },
+      error: (error) => console.error('Error predicting model:', error),
+    });
+  }
+}
+
   
   toggleVisibility(output: any) {
     output.visible = !output.visible;
