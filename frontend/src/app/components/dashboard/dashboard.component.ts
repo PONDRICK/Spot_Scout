@@ -45,6 +45,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   distance = 1000; // Default distance
   private redIcon: any;
   private greenIcon: any; // Add green icon
+  private blueIcon: any; // Add blue icon
   isMarkerLocked = false;
 
   constructor(
@@ -146,6 +147,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       shadowSize: [28, 28],
     });
 
+    this.blueIcon = L.icon({
+      iconUrl:
+        'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+
     this.map.on('click', (e: any) => {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
@@ -156,7 +166,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(this.map);
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
+            this.map
+          );
           (this.marker as any).isOutputLayer = true; // Add a unique identifier to the red marker
         }
 
@@ -180,6 +192,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.map.on('pm:create', (e: any) => {
       const layer = e.layer;
+      if (layer instanceof L.Marker) {
+        layer.setIcon(this.blueIcon); // Set the icon to blue for the created markers
+      }
       console.log('Created new layer', layer);
     });
 
