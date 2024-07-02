@@ -267,3 +267,18 @@ button {
   padding: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+.custom-popup .leaflet-popup-content-wrapper {
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+}
+
+.custom-popup .leaflet-popup-tip {
+  background: white;
+}

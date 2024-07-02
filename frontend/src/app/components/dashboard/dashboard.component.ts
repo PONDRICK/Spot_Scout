@@ -465,18 +465,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         next: (response) => {
           import('leaflet').then((L) => {
             const popupContent = `<div class="predict-info-box">
-            <h3>Predicted Amenity Category:</h3>
-            <p>${response.predicted_amenity_category}</p>
-          </div>`;
-            const popup = L.popup()
-              .setLatLng([lat, lon])
-              .setContent(popupContent)
-              .openOn(this.map);
-            (popup as any).isOutputLayer = true; // Mark as output layer
+              <h3>Predicted Amenity Category:</h3>
+              <p>${response.predicted_amenity_category}</p>
+            </div>`;
+            if (this.marker) {
+              this.marker
+                .bindPopup(popupContent, { className: 'custom-popup' })
+                .openPopup();
+            }
             loadingOutput.loading = false;
             Object.assign(loadingOutput, {
               predicted_amenity_category: response.predicted_amenity_category,
-              popup: popup,
+              marker: this.marker,
             });
           });
         },
@@ -501,11 +501,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         output.visible ? marker.addTo(this.map) : marker.remove();
       });
     }
-    if (output.popup) {
+    if (output.marker && output.marker.getPopup()) {
       if (output.visible) {
-        output.popup.openOn(this.map);
+        output.marker.openPopup();
       } else {
-        this.map.closePopup(output.popup);
+        output.marker.closePopup();
       }
     }
   }
