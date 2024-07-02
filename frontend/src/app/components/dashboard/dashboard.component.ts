@@ -514,7 +514,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const index = this.outputs.indexOf(output);
     if (index > -1) {
       this.outputs.splice(index, 1);
-
+  
       if (output.polyline) {
         output.polyline.remove();
       }
@@ -526,8 +526,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           marker.remove();
         });
       }
-      if (output.popup) {
-        this.map.closePopup(output.popup);
+      if (output.marker && output.marker.getPopup()) {
+        this.map.closePopup(output.marker.getPopup());
+        output.marker.unbindPopup();
       }
     }
   }
@@ -554,7 +555,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.latInput.nativeElement.value = lat;
     this.lonInput.nativeElement.value = lon;
     this.map.setView([lat, lon], 13);
-
+  
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
@@ -565,5 +566,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
       });
     }
+    this.suggestions = []; // Clear the suggestions array
   }
 }
