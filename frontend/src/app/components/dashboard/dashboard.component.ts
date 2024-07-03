@@ -184,6 +184,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       drawPolyline: true,
       drawCircle: true,
       drawRectangle: true,
+      drawText: true, // เพิ่มตัวเลือกนี้
       editMode: true,
       dragMode: true,
       cutPolygon: true,
@@ -192,12 +193,17 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.map.on('pm:create', (e: any) => {
       const layer = e.layer;
-      if (layer instanceof L.Marker) {
-        layer.setIcon(this.blueIcon); // Set the icon to blue for the created markers
+      if (e.shape === 'Text') {
+        // จัดการกับ Text layer
+        layer.options.editable = true;
+        layer.on('click', () => {
+          layer.pm.enable();
+        });
+      } else if (layer instanceof L.Marker) {
+        layer.setIcon(this.blueIcon);
       }
       console.log('Created new layer', layer);
     });
-
     // Add event listener for pm:remove to prevent removal of the red marker and output layers
     this.map.on('pm:remove', (e: any) => {
       if ((e.layer as any).isOutputLayer) {
@@ -514,7 +520,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const index = this.outputs.indexOf(output);
     if (index > -1) {
       this.outputs.splice(index, 1);
-  
+
       if (output.polyline) {
         output.polyline.remove();
       }
@@ -555,7 +561,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.latInput.nativeElement.value = lat;
     this.lonInput.nativeElement.value = lon;
     this.map.setView([lat, lon], 13);
-  
+
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
