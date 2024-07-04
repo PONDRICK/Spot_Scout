@@ -11,6 +11,18 @@
         Select
       </button>
       <button
+        (click)="saveMap()"
+        class="bg-green-500 text-white px-4 py-2 rounded-md"
+      >
+        Save
+      </button>
+      <button
+        (click)="viewHistory()"
+        class="bg-yellow-500 text-white px-4 py-2 rounded-md"
+      >
+        History
+      </button>
+      <button
         (click)="logout()"
         class="bg-red-500 text-white px-4 py-2 rounded-md"
       >
@@ -276,6 +288,18 @@
       >
         <span class="icon">📍</span>
         {{ suggestion.display_name }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div *ngIf="showHistoryModal" class="modal">
+  <div class="modal-content">
+    <span class="close" (click)="closeHistoryModal()">&times;</span>
+    <h2>Saved Maps History</h2>
+    <ul>
+      <li *ngFor="let map of savedMaps" (click)="loadMap(map)">
+        Map ID: {{ map.id }}, Map Name: {{ map.name }}
       </li>
     </ul>
   </div>

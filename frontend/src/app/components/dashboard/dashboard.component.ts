@@ -48,6 +48,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private blueIcon: any; // Add blue icon
   isMarkerLocked = false;
 
+  showHistoryModal = false;
+  savedMaps: any[] = [];
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
@@ -204,6 +207,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
       console.log('Created new layer', layer);
     });
+
     // Add event listener for pm:remove to prevent removal of the red marker and output layers
     this.map.on('pm:remove', (e: any) => {
       if ((e.layer as any).isOutputLayer) {
@@ -573,5 +577,94 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       });
     }
     this.suggestions = []; // Clear the suggestions array
+  }
+
+  // Save and Load Map Functions
+  saveMap() {
+    const mapData = {
+      drawnItems: this.map.pm
+        .getGeomanDrawLayers()
+        .map((layer: any) => layer.toGeoJSON()),
+      outputs: this.outputs,
+    };
+    const mapName = prompt('Enter a name for the map:');
+    if (mapName) {
+      this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
+        next: (response) => {
+          console.log('Map saved successfully', response);
+        },
+        error: (error) => console.error('Error saving map:', error),
+      });
+    }
+  }
+
+  loadMap(map: any) {
+    this.clearOutputsAndOverlays();
+
+    map.data.drawnItems.forEach((geoJson: any) => {
+      import('leaflet').then((L) => {
+        const layer = L.geoJSON(geoJson).addTo(this.map);
+        if (layer instanceof L.Marker) {
+          layer.setIcon(this.blueIcon);
+        }
+      });
+    });
+
+    this.outputs = map.data.outputs;
+    this.outputs.forEach((output: any) => {
+      if (output.polyline) {
+        import('leaflet').then((L) => {
+          const polyline = L.polyline(output.polyline.coordinates, {
+            color: 'black',
+          }).addTo(this.map);
+          this.polylines.push(polyline);
+          output.polyline = polyline;
+        });
+      }
+      if (output.circle) {
+        import('leaflet').then((L) => {
+          const circle = L.circle(output.circle.coordinates, {
+            radius: output.circle.radius,
+            color: 'blue',
+            fillColor: '#30f',
+            fillOpacity: 0.2,
+          }).addTo(this.map);
+          this.circles.push(circle);
+          output.circle = circle;
+        });
+      }
+      if (output.markers) {
+        output.markers.forEach((markerData: any) => {
+          import('leaflet').then((L) => {
+            const marker = L.marker([markerData.lat, markerData.lon], {
+              icon: this.greenIcon,
+            }).addTo(this.map);
+            this.markers.push(marker);
+          });
+        });
+      }
+    });
+  }
+
+  viewHistory() {
+    this.apiService.getUserMaps().subscribe({
+      next: (maps) => {
+        this.savedMaps = maps;
+        this.showHistoryModal = true;
+      },
+      error: (error) => console.error('Error fetching saved maps:', error),
+    });
+  }
+
+  closeHistoryModal() {
+    this.showHistoryModal = false;
+  }
+
+  loadSelectedMap(mapId: string) {
+    const selectedMap = this.savedMaps.find((map) => map.id === mapId);
+    if (selectedMap) {
+      this.loadMap(selectedMap);
+      this.closeHistoryModal();
+    }
   }
 }
