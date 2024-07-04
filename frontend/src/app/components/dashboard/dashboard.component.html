@@ -19,7 +19,9 @@
     </div>
   </div>
 </nav>
-<div id="map" style="height: calc(100vh - 56px); width: 100%"></div>
+
+<div id="map"></div>
+
 <div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
   <div class="sidebar-content">
     <button (click)="toggleSidebar()" class="close-button">
@@ -122,21 +124,46 @@
     <div *ngFor="let place of outputs" class="output-info">
       <div *ngIf="place.loading" class="loading-indicator">
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <p>Loading...</p>
       </div>
-    
-      <div *ngIf="!place.loading && place.type === 'nearest'" class="nearest-place-info">
+
+      <div
+        *ngIf="!place.loading && place.type === 'nearest'"
+        class="nearest-place-info"
+      >
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? 'Hide' : 'Show' }}
+          {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Nearest {{ place.amenity }}:</h3>
         <p>Distance: {{ place.distance }} meters</p>
@@ -144,15 +171,29 @@
         <p>Lat: {{ place.lat }}</p>
         <p>Lon: {{ place.lon }}</p>
       </div>
-    
-      <div *ngIf="!place.loading && place.type === 'count'" class="amenities-count-info">
+
+      <div
+        *ngIf="!place.loading && place.type === 'count'"
+        class="amenities-count-info"
+      >
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? 'Hide' : 'Show' }}
+          {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Amenities Count:</h3>
         <p>Count: {{ place.count }}</p>
@@ -162,33 +203,61 @@
           </li>
         </ul>
       </div>
-    
-      <div *ngIf="!place.loading && place.type === 'population'" class="population-info">
+
+      <div
+        *ngIf="!place.loading && place.type === 'population'"
+        class="population-info"
+      >
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? 'Hide' : 'Show' }}
+          {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Population:</h3>
         <p>Population: {{ place.population }}</p>
       </div>
-    
-      <div *ngIf="!place.loading && place.type === 'predict'" class="predict-info">
+
+      <div
+        *ngIf="!place.loading && place.type === 'predict'"
+        class="predict-info"
+      >
         <button (click)="removeOutput(place)" class="delete-button">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
         <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? 'Hide' : 'Show' }}
+          {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Predicted Amenity Category:</h3>
         <p>{{ place.predicted_amenity_category }}</p>
       </div>
-    </div>    
+    </div>
   </div>
 </div>
 
@@ -211,4 +280,3 @@
     </ul>
   </div>
 </div>
-<div id="map"></div>
