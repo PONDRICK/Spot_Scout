@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'location',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'maps',
     
 ]
 

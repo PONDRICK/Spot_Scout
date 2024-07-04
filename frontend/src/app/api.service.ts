@@ -10,8 +10,11 @@ export class ApiService {
   private baseUrl = 'http://localhost:8000/api/v1/auth/';
   private locationBaseUrl = 'http://localhost:8000/api/v1/location/';
   private adminBaseUrl = 'http://localhost:8000/api/v1/admin/';
+  private mapBaseUrl = 'http://localhost:8000/api/v1/maps/';
+
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
+  // User related APIs
   registerUser(userData: any): Observable<any> {
     return this.http.post(`${this.baseUrl}register/`, userData);
   }
@@ -64,9 +67,12 @@ export class ApiService {
 
   refreshToken(): Observable<any> {
     const refreshToken = this.cookieService.get('refresh_token');
-    return this.http.post(`${this.baseUrl}token/refresh/`, { refresh: refreshToken });
+    return this.http.post(`${this.baseUrl}token/refresh/`, {
+      refresh: refreshToken,
+    });
   }
 
+  // Location related APIs
   getNearestPlace(lat: number, lon: number, amenity: string): Observable<any> {
     return this.http.get(
       `${this.locationBaseUrl}nearest_place/?lat=${lat}&lon=${lon}&amenity=${amenity}`
@@ -148,5 +154,23 @@ export class ApiService {
       lat: lat,
       lon: lon,
     });
+  }
+
+  // Map related APIs
+  saveUserMap(mapData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.post(`${this.mapBaseUrl}save_map/`, mapData, {
+      headers: headers,
+    });
+  }
+
+  getUserMaps(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    });
+    return this.http.get(`${this.mapBaseUrl}user_maps/`, { headers: headers });
   }
 }
