@@ -395,6 +395,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       lon: lon,
       amenity: this.selectedAmenity,
       distance: this.distance,
+      startLat: lat,  // Save the starting lat
+      startLon: lon,  // Save the starting lon
     };
     this.outputs.unshift(loadingOutput);
 
@@ -421,6 +423,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 lat: response.lat,
                 lon: response.lon,
                 polyline: polyline,
+                startLat: lat,  // Save the starting lat
+                startLon: lon,  // Save the starting lon
               });
             });
           },
@@ -585,8 +589,29 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       drawnItems: this.map.pm
         .getGeomanDrawLayers()
         .map((layer: any) => layer.toGeoJSON()),
-      outputs: this.outputs,
+      outputs: this.outputs.map((output) => {
+        const serializedOutput = { ...output };
+        if (output.polyline) {
+          serializedOutput.polyline = {
+            coordinates: output.polyline.getLatLngs(),
+          };
+        }
+        if (output.circle) {
+          serializedOutput.circle = {
+            coordinates: output.circle.getLatLng(),
+            radius: output.circle.getRadius(),
+          };
+        }
+        if (output.markers) {
+          serializedOutput.markers = output.markers.map((marker: any) => ({
+            lat: marker.getLatLng().lat,
+            lon: marker.getLatLng().lng,
+          }));
+        }
+        return serializedOutput;
+      }),
     };
+
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
@@ -641,6 +666,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             }).addTo(this.map);
             this.markers.push(marker);
           });
+        });
+      }
+      if (output.startLat && output.startLon) {
+        import('leaflet').then((L) => {
+          const redMarker = L.marker([output.startLat, output.startLon], { icon: this.redIcon }).addTo(this.map);
+          this.markers.push(redMarker);
+          this.latInput.nativeElement.value = output.startLat;
+          this.lonInput.nativeElement.value = output.startLon;
         });
       }
     });
