@@ -225,6 +225,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.circles = [];
     this.markers.forEach((marker) => marker.remove());
     this.markers = [];
+    if (this.marker) {
+      this.marker.remove();
+      this.marker = null;
+    }
   }
 
   private cleanupMap() {
@@ -522,6 +526,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         output.marker.closePopup();
       }
     }
+    if (output.redMarker) {
+      output.visible ? output.redMarker.addTo(this.map) : output.redMarker.remove();
+    }
   }
 
   removeOutput(output: any) {
@@ -543,6 +550,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (output.marker && output.marker.getPopup()) {
         this.map.closePopup(output.marker.getPopup());
         output.marker.unbindPopup();
+      }
+      if (output.redMarker) {
+        output.redMarker.remove();
       }
     }
   }
@@ -659,21 +669,36 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         });
       }
       if (output.markers) {
-        output.markers.forEach((markerData: any) => {
-          import('leaflet').then((L) => {
+        output.markers = output.markers.map((markerData: any) => {
+          return import('leaflet').then((L) => {
             const marker = L.marker([markerData.lat, markerData.lon], {
               icon: this.greenIcon,
             }).addTo(this.map);
             this.markers.push(marker);
+            return marker;
           });
+        });
+        Promise.all(output.markers).then((markers) => {
+          output.markers = markers;
         });
       }
       if (output.startLat && output.startLon) {
+        // Use startLat and startLon for "nearest" function
         import('leaflet').then((L) => {
           const redMarker = L.marker([output.startLat, output.startLon], { icon: this.redIcon }).addTo(this.map);
           this.markers.push(redMarker);
+          output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.startLat;
           this.lonInput.nativeElement.value = output.startLon;
+        });
+      } else {
+        // Use lat and lon for other functions
+        import('leaflet').then((L) => {
+          const redMarker = L.marker([output.lat, output.lon], { icon: this.redIcon }).addTo(this.map);
+          this.markers.push(redMarker);
+          output.redMarker = redMarker;
+          this.latInput.nativeElement.value = output.lat;
+          this.lonInput.nativeElement.value = output.lon;
         });
       }
     });
