@@ -358,7 +358,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   confirmSelection() {
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
-
+  
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
@@ -369,9 +369,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
       });
     }
-
+  
     this.map.setView([lat, lon], this.map.getZoom());
-
+  
     if (
       this.outputExists(
         lat,
@@ -386,7 +386,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
-
+  
     const loadingOutput = {
       type: this.selectedFunction,
       loading: true,
@@ -399,7 +399,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       startLon: lon,  // Save the starting lon
     };
     this.outputs.unshift(loadingOutput);
-
+  
     if (this.selectedFunction === 'nearest') {
       this.apiService
         .getNearestPlace(lat, lon, this.selectedAmenity)
@@ -477,21 +477,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
-          import('leaflet').then((L) => {
-            const popupContent = `<div class="predict-info-box">
-              <h3>Predicted Amenity Category:</h3>
-              <p>${response.predicted_amenity_category}</p>
-            </div>`;
-            if (this.marker) {
-              this.marker
-                .bindPopup(popupContent, { className: 'custom-popup' })
-                .openPopup();
-            }
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              predicted_amenity_category: response.predicted_amenity_category,
-              marker: this.marker,
-            });
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            predicted_amenity_category: response.predicted_amenity_category,
           });
         },
         error: (error) => console.error('Error predicting model:', error),
@@ -501,7 +489,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleVisibility(output: any) {
     output.visible = !output.visible;
-
+  
     if (output.polyline) {
       output.visible
         ? output.polyline.addTo(this.map)
@@ -523,7 +511,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
     if (output.redMarker) {
-      output.visible ? output.redMarker.addTo(this.map) : output.redMarker.remove();
+      if (output.visible && output.redMarker.getPopup()) {
+        output.redMarker.openPopup();
+      } else if (output.redMarker.getPopup()) {
+        output.redMarker.closePopup();
+      }
     }
   }
 
@@ -631,7 +623,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-
+  
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         const layer = L.geoJSON(geoJson).addTo(this.map);
@@ -640,7 +632,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       });
     });
-
+  
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -695,6 +687,30 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.lat;
           this.lonInput.nativeElement.value = output.lon;
+        });
+      }
+  
+      if (output.type === 'predict') {
+        import('leaflet').then((L) => {
+          const popupContent = `<div class="predict-info-box">
+            <h3>Predicted Amenity Category:</h3>
+            <p>${output.predicted_amenity_category}</p>
+          </div>`;
+          if (output.redMarker) {
+            output.redMarker.bindPopup(popupContent, { className: 'custom-popup' });
+            if (output.visible) {
+              output.redMarker.openPopup();
+            }
+          } else {
+            const redMarker = L.marker([output.lat, output.lon], { icon: this.redIcon })
+              .addTo(this.map)
+              .bindPopup(popupContent, { className: 'custom-popup' });
+            this.markers.push(redMarker);
+            output.redMarker = redMarker;
+            if (output.visible) {
+              redMarker.openPopup();
+            }
+          }
         });
       }
     });
