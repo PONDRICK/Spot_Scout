@@ -102,12 +102,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       console.log('Map instance already exists');
       return;
     }
-
+  
     const bounds = [
       [5.0, 97.0],
       [21.0, 106.0],
     ];
-
+  
     this.map = L.map('map', {
       center: [15.87, 100.9925],
       zoom: 6,
@@ -115,15 +115,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       maxBoundsViscosity: 1.0,
       dragging: false,
     });
-
+  
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
-
+  
     this.map.setMinZoom(6);
-
+  
     this.map.on('zoomend', () => {
       if (this.map.getZoom() > 6) {
         this.map.dragging.enable();
@@ -131,7 +131,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.map.dragging.disable();
       }
     });
-
+  
     this.redIcon = L.icon({
       iconUrl:
         'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -140,7 +140,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       popupAnchor: [1, -34],
       shadowSize: [41, 41],
     });
-
+  
     this.greenIcon = L.icon({
       iconUrl:
         'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
@@ -149,7 +149,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       popupAnchor: [1, -34],
       shadowSize: [28, 28],
     });
-
+  
     this.blueIcon = L.icon({
       iconUrl:
         'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
@@ -158,28 +158,26 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       popupAnchor: [1, -34],
       shadowSize: [41, 41],
     });
-
+  
     this.map.on('click', (e: any) => {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
         const lon = e.latlng.lng.toFixed(4);
         this.latInput.nativeElement.value = lat;
         this.lonInput.nativeElement.value = lon;
-
+  
+        // Clear all outputs and overlays
+        this.clearOutputsAndOverlays();
+  
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
-            this.map
-          );
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(this.map);
           (this.marker as any).isOutputLayer = true; // Add a unique identifier to the red marker
         }
-
-        // Clear all outputs and overlays
-        this.clearOutputsAndOverlays();
       }
     });
-
+  
     this.map.pm.addControls({
       position: 'topleft',
       drawMarker: true,
@@ -187,17 +185,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       drawPolyline: true,
       drawCircle: true,
       drawRectangle: true,
-      drawText: true, // เพิ่มตัวเลือกนี้
+      drawText: true,
       editMode: true,
       dragMode: true,
       cutPolygon: true,
       removalMode: true,
     });
-
+  
     this.map.on('pm:create', (e: any) => {
       const layer = e.layer;
       if (e.shape === 'Text') {
-        // จัดการกับ Text layer
         layer.options.editable = true;
         layer.on('click', () => {
           layer.pm.enable();
@@ -207,16 +204,15 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
       console.log('Created new layer', layer);
     });
-
-    // Add event listener for pm:remove to prevent removal of the red marker and output layers
+  
     this.map.on('pm:remove', (e: any) => {
       if ((e.layer as any).isOutputLayer) {
         console.log('Attempted to remove protected layer, action prevented.');
-        e.layer.addTo(this.map); // Re-add the layer to the map
+        e.layer.addTo(this.map);
       }
     });
   }
-
+  
   private clearOutputsAndOverlays() {
     this.outputs = [];
     this.polylines.forEach((polyline) => polyline.remove());
@@ -362,7 +358,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   confirmSelection() {
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
-
+  
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
@@ -373,9 +369,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
       });
     }
-
+  
     this.map.setView([lat, lon], this.map.getZoom());
-
+  
     if (
       this.outputExists(
         lat,
@@ -390,7 +386,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
-
+  
     const loadingOutput = {
       type: this.selectedFunction,
       loading: true,
@@ -403,7 +399,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       startLon: lon,  // Save the starting lon
     };
     this.outputs.unshift(loadingOutput);
-
+  
     if (this.selectedFunction === 'nearest') {
       this.apiService
         .getNearestPlace(lat, lon, this.selectedAmenity)
@@ -481,21 +477,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
-          import('leaflet').then((L) => {
-            const popupContent = `<div class="predict-info-box">
-              <h3>Predicted Amenity Category:</h3>
-              <p>${response.predicted_amenity_category}</p>
-            </div>`;
-            if (this.marker) {
-              this.marker
-                .bindPopup(popupContent, { className: 'custom-popup' })
-                .openPopup();
-            }
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              predicted_amenity_category: response.predicted_amenity_category,
-              marker: this.marker,
-            });
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            predicted_amenity_category: response.predicted_amenity_category,
           });
         },
         error: (error) => console.error('Error predicting model:', error),
@@ -505,7 +489,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleVisibility(output: any) {
     output.visible = !output.visible;
-
+  
     if (output.polyline) {
       output.visible
         ? output.polyline.addTo(this.map)
@@ -527,7 +511,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
     if (output.redMarker) {
-      output.visible ? output.redMarker.addTo(this.map) : output.redMarker.remove();
+      if (output.visible && output.redMarker.getPopup()) {
+        output.redMarker.openPopup();
+      } else if (output.redMarker.getPopup()) {
+        output.redMarker.closePopup();
+      }
     }
   }
 
@@ -635,7 +623,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-
+  
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         const layer = L.geoJSON(geoJson).addTo(this.map);
@@ -644,7 +632,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       });
     });
-
+  
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -699,6 +687,30 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.lat;
           this.lonInput.nativeElement.value = output.lon;
+        });
+      }
+  
+      if (output.type === 'predict') {
+        import('leaflet').then((L) => {
+          const popupContent = `<div class="predict-info-box">
+            <h3>Predicted Amenity Category:</h3>
+            <p>${output.predicted_amenity_category}</p>
+          </div>`;
+          if (output.redMarker) {
+            output.redMarker.bindPopup(popupContent, { className: 'custom-popup' });
+            if (output.visible) {
+              output.redMarker.openPopup();
+            }
+          } else {
+            const redMarker = L.marker([output.lat, output.lon], { icon: this.redIcon })
+              .addTo(this.map)
+              .bindPopup(popupContent, { className: 'custom-popup' });
+            this.markers.push(redMarker);
+            output.redMarker = redMarker;
+            if (output.visible) {
+              redMarker.openPopup();
+            }
+          }
         });
       }
     });
