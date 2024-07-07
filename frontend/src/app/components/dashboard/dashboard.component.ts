@@ -599,43 +599,49 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // Save and Load Map Functions
   saveMap() {
-    const mapData = {
-      drawnItems: this.map.pm.getGeomanDrawLayers().map((layer: any) => {
-        const geoJson = layer.toGeoJSON();
-        geoJson.properties = {
-          type: layer.pm.getShape(),
-          color: layer.options.color,
-          radius: layer.getRadius ? layer.getRadius() : null,
-          text: layer.options.text ? layer.options.text : null, // Save the text content
+    // Combine drawn items from the map and outputs loaded from history
+    const drawnItems = this.map.pm.getGeomanDrawLayers().map((layer: any) => {
+      const geoJson = layer.toGeoJSON();
+      geoJson.properties = {
+        type: layer.pm.getShape(),
+        color: layer.options.color,
+        radius: layer.getRadius ? layer.getRadius() : null,
+        text: layer.options.text ? layer.options.text : null, // Save the text content
+      };
+      return geoJson;
+    });
+  
+    // Combine outputs from the current session and loaded outputs
+    const combinedOutputs = [...this.outputs].map((output) => {
+      const serializedOutput = { ...output };
+      if (output.polyline) {
+        serializedOutput.polyline = {
+          coordinates: output.polyline.getLatLngs(),
         };
-        return geoJson;
-      }),
-      outputs: this.outputs.map((output) => {
-        const serializedOutput = { ...output };
-        if (output.polyline) {
-          serializedOutput.polyline = {
-            coordinates: output.polyline.getLatLngs(),
-          };
-        }
-        if (output.circle) {
-          serializedOutput.circle = {
-            coordinates: output.circle.getLatLng(),
-            radius: output.circle.getRadius(),
-          };
-        }
-        if (output.markers) {
-          serializedOutput.markers = output.markers.map((marker: any) => ({
-            lat: marker.getLatLng().lat,
-            lon: marker.getLatLng().lng,
-          }));
-        }
-        // Remove the marker reference to avoid circular reference
-        delete serializedOutput.marker;
-        delete serializedOutput.redMarker;
-        return serializedOutput;
-      }),
+      }
+      if (output.circle) {
+        serializedOutput.circle = {
+          coordinates: output.circle.getLatLng(),
+          radius: output.circle.getRadius(),
+        };
+      }
+      if (output.markers) {
+        serializedOutput.markers = output.markers.map((marker: any) => ({
+          lat: marker.getLatLng().lat,
+          lon: marker.getLatLng().lng,
+        }));
+      }
+      // Remove the marker reference to avoid circular reference
+      delete serializedOutput.marker;
+      delete serializedOutput.redMarker;
+      return serializedOutput;
+    });
+  
+    const mapData = {
+      drawnItems: drawnItems,
+      outputs: combinedOutputs,
     };
-
+  
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
