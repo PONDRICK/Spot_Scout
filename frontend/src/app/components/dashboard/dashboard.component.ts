@@ -403,36 +403,33 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.outputs.unshift(loadingOutput);
 
     if (this.selectedFunction === 'nearest') {
-      this.apiService
-        .getNearestPlace(lat, lon, this.selectedAmenity)
-        .subscribe({
-          next: (response) => {
-            import('leaflet').then((L) => {
-              const polyline = L.polyline(
-                [
-                  [lat, lon],
-                  [response.lat, response.lon],
-                ],
-                { color: 'black' }
-              ).addTo(this.map);
-              (polyline as any).isOutputLayer = true; // Mark as output layer
-              this.polylines.push(polyline);
-              loadingOutput.loading = false;
-              Object.assign(loadingOutput, {
-                amenity: response.amenity,
-                distance: response.distance,
-                province: response.province,
-                lat: response.lat,
-                lon: response.lon,
-                polyline: polyline,
-                startLat: lat, // Save the starting lat
-                startLon: lon, // Save the starting lon
-              });
+      this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
+        next: (response) => {
+          import('leaflet').then((L) => {
+            const polyline = L.polyline(
+              [
+                [lat, lon],
+                [response.lat, response.lon],
+              ],
+              { color: 'black', dashArray: '5, 10' } // Dashed line pattern
+            ).addTo(this.map);
+            (polyline as any).isOutputLayer = true; // Mark as output layer
+            this.polylines.push(polyline);
+            loadingOutput.loading = false;
+            Object.assign(loadingOutput, {
+              amenity: response.amenity,
+              distance: response.distance,
+              province: response.province,
+              lat: response.lat,
+              lon: response.lon,
+              polyline: polyline,
+              startLat: lat, // Save the starting lat
+              startLon: lon, // Save the starting lon
             });
-          },
-          error: (error) =>
-            console.error('Error fetching nearest place:', error),
-        });
+          });
+        },
+        error: (error) => console.error('Error fetching nearest place:', error),
+      });
     } else if (this.selectedFunction === 'count') {
       this.apiService
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
@@ -555,7 +552,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         output.marker.unbindPopup();
       }
       if (output.redMarker) {
-        output.redMarker.remove();
+        output.redMarker.closePopup()
       }
     }
   }
@@ -656,7 +653,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (output.polyline) {
         import('leaflet').then((L) => {
           const polyline = L.polyline(output.polyline.coordinates, {
-            color: 'black',
+            color: 'black' , dashArray: '5, 10' ,
           }).addTo(this.map);
           this.polylines.push(polyline);
           output.polyline = polyline;
