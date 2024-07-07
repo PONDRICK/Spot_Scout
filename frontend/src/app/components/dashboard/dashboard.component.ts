@@ -599,43 +599,49 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // Save and Load Map Functions
   saveMap() {
-    const mapData = {
-      drawnItems: this.map.pm.getGeomanDrawLayers().map((layer: any) => {
-        const geoJson = layer.toGeoJSON();
-        geoJson.properties = {
-          type: layer.pm.getShape(),
-          color: layer.options.color,
-          radius: layer.getRadius ? layer.getRadius() : null,
-          text: layer.options.text ? layer.options.text : null, // Save the text content
+    // Combine drawn items from the map and outputs loaded from history
+    const drawnItems = this.map.pm.getGeomanDrawLayers().map((layer: any) => {
+      const geoJson = layer.toGeoJSON();
+      geoJson.properties = {
+        type: layer.pm.getShape(),
+        color: layer.options.color,
+        radius: layer.getRadius ? layer.getRadius() : null,
+        text: layer.options.text ? layer.options.text : null, // Save the text content
+      };
+      return geoJson;
+    });
+  
+    // Combine outputs from the current session and loaded outputs
+    const combinedOutputs = [...this.outputs].map((output) => {
+      const serializedOutput = { ...output };
+      if (output.polyline) {
+        serializedOutput.polyline = {
+          coordinates: output.polyline.getLatLngs(),
         };
-        return geoJson;
-      }),
-      outputs: this.outputs.map((output) => {
-        const serializedOutput = { ...output };
-        if (output.polyline) {
-          serializedOutput.polyline = {
-            coordinates: output.polyline.getLatLngs(),
-          };
-        }
-        if (output.circle) {
-          serializedOutput.circle = {
-            coordinates: output.circle.getLatLng(),
-            radius: output.circle.getRadius(),
-          };
-        }
-        if (output.markers) {
-          serializedOutput.markers = output.markers.map((marker: any) => ({
-            lat: marker.getLatLng().lat,
-            lon: marker.getLatLng().lng,
-          }));
-        }
-        // Remove the marker reference to avoid circular reference
-        delete serializedOutput.marker;
-        delete serializedOutput.redMarker;
-        return serializedOutput;
-      }),
+      }
+      if (output.circle) {
+        serializedOutput.circle = {
+          coordinates: output.circle.getLatLng(),
+          radius: output.circle.getRadius(),
+        };
+      }
+      if (output.markers) {
+        serializedOutput.markers = output.markers.map((marker: any) => ({
+          lat: marker.getLatLng().lat,
+          lon: marker.getLatLng().lng,
+        }));
+      }
+      // Remove the marker reference to avoid circular reference
+      delete serializedOutput.marker;
+      delete serializedOutput.redMarker;
+      return serializedOutput;
+    });
+  
+    const mapData = {
+      drawnItems: drawnItems,
+      outputs: combinedOutputs,
     };
-
+  
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
@@ -649,7 +655,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-
+  
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -665,7 +671,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               color: geoJson.properties.color,
             }).addTo(this.map);
             break;
-          case 'Rectangle':
           case 'Polygon':
             layer = L.geoJSON(geoJson, {
               style: {
@@ -681,27 +686,34 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               }
             ).addTo(this.map);
             break;
+          case 'CircleMarker':
+            layer = L.circleMarker(geoJson.geometry.coordinates.reverse(), {
+              radius: geoJson.properties.radius,
+              color: geoJson.properties.color,
+              fillColor: geoJson.properties.fillColor,
+            }).addTo(this.map);
+            break;
           case 'Text':
-            layer = L.marker(geoJson.geometry.coordinates.reverse(), {
-              opacity: 0, // Make the marker itself invisible
-            })
-              .addTo(this.map)
-              .bindTooltip(geoJson.properties.text, {
-                permanent: true,
-                direction: 'right',
-                className: 'leaflet-text-tooltip', // Optionally add a class for further styling
-              });
+            const textLatLng = geoJson.geometry.coordinates.reverse();
+            const textLayer = L.marker(textLatLng, {
+              icon: L.divIcon({
+                className: 'text-label',
+                html: geoJson.properties.text,
+                iconSize: [100, 40],
+              }),
+            }).addTo(this.map);
+            this.markers.push(textLayer);
             break;
           default:
             layer = L.geoJSON(geoJson).addTo(this.map);
         }
-
+  
         if (layer) {
           this.markers.push(layer);
         }
       });
     });
-
+  
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -761,7 +773,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.lonInput.nativeElement.value = output.lon;
         });
       }
-
+  
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
