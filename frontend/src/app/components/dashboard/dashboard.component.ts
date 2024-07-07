@@ -649,7 +649,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-
+  
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -665,7 +665,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               color: geoJson.properties.color,
             }).addTo(this.map);
             break;
-          case 'Rectangle':
           case 'Polygon':
             layer = L.geoJSON(geoJson, {
               style: {
@@ -681,27 +680,34 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               }
             ).addTo(this.map);
             break;
+          case 'CircleMarker':
+            layer = L.circleMarker(geoJson.geometry.coordinates.reverse(), {
+              radius: geoJson.properties.radius,
+              color: geoJson.properties.color,
+              fillColor: geoJson.properties.fillColor,
+            }).addTo(this.map);
+            break;
           case 'Text':
-            layer = L.marker(geoJson.geometry.coordinates.reverse(), {
-              opacity: 0, // Make the marker itself invisible
-            })
-              .addTo(this.map)
-              .bindTooltip(geoJson.properties.text, {
-                permanent: true,
-                direction: 'right',
-                className: 'leaflet-text-tooltip', // Optionally add a class for further styling
-              });
+            const textLatLng = geoJson.geometry.coordinates.reverse();
+            const textLayer = L.marker(textLatLng, {
+              icon: L.divIcon({
+                className: 'text-label',
+                html: geoJson.properties.text,
+                iconSize: [100, 40],
+              }),
+            }).addTo(this.map);
+            this.markers.push(textLayer);
             break;
           default:
             layer = L.geoJSON(geoJson).addTo(this.map);
         }
-
+  
         if (layer) {
           this.markers.push(layer);
         }
       });
     });
-
+  
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -761,7 +767,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.lonInput.nativeElement.value = output.lon;
         });
       }
-
+  
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
