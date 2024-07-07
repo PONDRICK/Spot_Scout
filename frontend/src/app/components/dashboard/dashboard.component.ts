@@ -187,6 +187,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       drawPolyline: true,
       drawCircle: true,
       drawRectangle: true,
+      drawCircleMarker: true,
       drawText: true,
       editMode: true,
       dragMode: true,
@@ -403,33 +404,36 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.outputs.unshift(loadingOutput);
 
     if (this.selectedFunction === 'nearest') {
-      this.apiService.getNearestPlace(lat, lon, this.selectedAmenity).subscribe({
-        next: (response) => {
-          import('leaflet').then((L) => {
-            const polyline = L.polyline(
-              [
-                [lat, lon],
-                [response.lat, response.lon],
-              ],
-              { color: 'black', dashArray: '5, 10' } // Dashed line pattern
-            ).addTo(this.map);
-            (polyline as any).isOutputLayer = true; // Mark as output layer
-            this.polylines.push(polyline);
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              amenity: response.amenity,
-              distance: response.distance,
-              province: response.province,
-              lat: response.lat,
-              lon: response.lon,
-              polyline: polyline,
-              startLat: lat, // Save the starting lat
-              startLon: lon, // Save the starting lon
+      this.apiService
+        .getNearestPlace(lat, lon, this.selectedAmenity)
+        .subscribe({
+          next: (response) => {
+            import('leaflet').then((L) => {
+              const polyline = L.polyline(
+                [
+                  [lat, lon],
+                  [response.lat, response.lon],
+                ],
+                { color: 'black', dashArray: '5, 10' } // Dashed line pattern
+              ).addTo(this.map);
+              (polyline as any).isOutputLayer = true; // Mark as output layer
+              this.polylines.push(polyline);
+              loadingOutput.loading = false;
+              Object.assign(loadingOutput, {
+                amenity: response.amenity,
+                distance: response.distance,
+                province: response.province,
+                lat: response.lat,
+                lon: response.lon,
+                polyline: polyline,
+                startLat: lat, // Save the starting lat
+                startLon: lon, // Save the starting lon
+              });
             });
-          });
-        },
-        error: (error) => console.error('Error fetching nearest place:', error),
-      });
+          },
+          error: (error) =>
+            console.error('Error fetching nearest place:', error),
+        });
     } else if (this.selectedFunction === 'count') {
       this.apiService
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
@@ -552,7 +556,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         output.marker.unbindPopup();
       }
       if (output.redMarker) {
-        output.redMarker.closePopup()
+        output.redMarker.closePopup();
       }
     }
   }
@@ -596,9 +600,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   // Save and Load Map Functions
   saveMap() {
     const mapData = {
-      drawnItems: this.map.pm
-        .getGeomanDrawLayers()
-        .map((layer: any) => layer.toGeoJSON()),
+      drawnItems: this.map.pm.getGeomanDrawLayers().map((layer: any) => {
+        const geoJson = layer.toGeoJSON();
+        geoJson.properties = {
+          type: layer.pm.getShape(),
+          color: layer.options.color,
+          radius: layer.getRadius ? layer.getRadius() : null,
+          text: layer.options.text ? layer.options.text : null, // Save the text content
+        };
+        return geoJson;
+      }),
       outputs: this.outputs.map((output) => {
         const serializedOutput = { ...output };
         if (output.polyline) {
@@ -641,9 +652,52 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
-        const layer = L.geoJSON(geoJson).addTo(this.map);
-        if (layer instanceof L.Marker) {
-          layer.setIcon(this.blueIcon);
+        let layer;
+        switch (geoJson.properties.type) {
+          case 'Marker':
+            layer = L.marker(geoJson.geometry.coordinates.reverse(), {
+              icon: this.blueIcon,
+            }).addTo(this.map);
+            break;
+          case 'Circle':
+            layer = L.circle(geoJson.geometry.coordinates.reverse(), {
+              radius: geoJson.properties.radius,
+              color: geoJson.properties.color,
+            }).addTo(this.map);
+            break;
+          case 'Rectangle':
+          case 'Polygon':
+            layer = L.geoJSON(geoJson, {
+              style: {
+                color: geoJson.properties.color,
+              },
+            }).addTo(this.map);
+            break;
+          case 'Polyline':
+            layer = L.polyline(
+              geoJson.geometry.coordinates.map((coord: any) => coord.reverse()),
+              {
+                color: geoJson.properties.color,
+              }
+            ).addTo(this.map);
+            break;
+          case 'Text':
+            layer = L.marker(geoJson.geometry.coordinates.reverse(), {
+              opacity: 0, // Make the marker itself invisible
+            })
+              .addTo(this.map)
+              .bindTooltip(geoJson.properties.text, {
+                permanent: true,
+                direction: 'right',
+                className: 'leaflet-text-tooltip', // Optionally add a class for further styling
+              });
+            break;
+          default:
+            layer = L.geoJSON(geoJson).addTo(this.map);
+        }
+
+        if (layer) {
+          this.markers.push(layer);
         }
       });
     });
@@ -653,7 +707,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (output.polyline) {
         import('leaflet').then((L) => {
           const polyline = L.polyline(output.polyline.coordinates, {
-            color: 'black' , dashArray: '5, 10' ,
+            color: 'black',
+            dashArray: '5, 10',
           }).addTo(this.map);
           this.polylines.push(polyline);
           output.polyline = polyline;
@@ -686,7 +741,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         });
       }
       if (output.startLat && output.startLon) {
-        // Use startLat and startLon for "nearest" function
         import('leaflet').then((L) => {
           const redMarker = L.marker([output.startLat, output.startLon], {
             icon: this.redIcon,
@@ -697,7 +751,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.lonInput.nativeElement.value = output.startLon;
         });
       } else {
-        // Use lat and lon for other functions
         import('leaflet').then((L) => {
           const redMarker = L.marker([output.lat, output.lon], {
             icon: this.redIcon,
