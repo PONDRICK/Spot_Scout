@@ -206,9 +206,10 @@
         </button>
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <h3>Amenities Count:</h3>
+        </button>  
+        <h3>Amenity : {{ place.amenity }}</h3>
         <p>Count: {{ place.count }}</p>
+
         <ul>
           <li *ngFor="let amenity of place.locations">
             Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
@@ -267,7 +268,11 @@
           {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Predicted Amenity Category:</h3>
-        <p>{{ place.predicted_amenity_category }}</p>
+        <p>Most Suitable Amenity</p>
+        <p *ngFor="let pred of place.top_predictions">
+          {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
+        </p>
+        <p>other : {{ place.remaining_score.toFixed(2) }}%</p>
       </div>
     </div>
   </div>
