@@ -247,8 +247,8 @@ class AddUserLocationView(APIView):
         )
 
         # Predict the amenity category using the trained model
-        ranked_predictions = predict_amenity_category(user_location)
-        user_location.predicted_amenity_category = ranked_predictions[0]["category"]
+        ranked_predictions, top_ranked_prediction = predict_amenity_category(user_location)
+        user_location.predicted_amenity_category = top_ranked_prediction["category"]
         user_location.save()
 
         return Response({

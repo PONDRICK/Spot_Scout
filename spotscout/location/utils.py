@@ -236,4 +236,6 @@ def predict_amenity_category(user_location):
 
     ranked_predictions = [{"category": label, "score": score} for label, score in zip(top_labels, top_scores)]
 
-    return ranked_predictions
+    top_ranked_prediction = ranked_predictions[0]  # Get the top-ranked prediction
+
+    return ranked_predictions, top_ranked_prediction
