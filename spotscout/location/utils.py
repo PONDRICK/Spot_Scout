@@ -227,12 +227,13 @@ def predict_amenity_category(user_location):
     test_df = test_df[feature_order]
 
     # Predict the amenity category using the trained model
-    predicted_category_numeric = rf_classifier.predict(test_df)[0]
+    predicted_probabilities = rf_classifier.predict_proba(test_df)[0]
 
-    # Ensure predicted_category_numeric is an integer type
-    predicted_category_numeric = int(predicted_category_numeric)
+    # Convert the numeric predictions back to the original labels
+    top_indices = np.argsort(predicted_probabilities)[::-1]
+    top_labels = label_encoder.inverse_transform(top_indices)
+    top_scores = predicted_probabilities[top_indices]
 
-    # Convert the numeric prediction back to the original label
-    predicted_category_label = label_encoder.inverse_transform([predicted_category_numeric])[0]
+    ranked_predictions = [{"category": label, "score": score} for label, score in zip(top_labels, top_scores)]
 
-    return predicted_category_label
+    return ranked_predictions

@@ -247,11 +247,14 @@ class AddUserLocationView(APIView):
         )
 
         # Predict the amenity category using the trained model
-        predicted_amenity_category = predict_amenity_category(user_location)
-        user_location.predicted_amenity_category = predicted_amenity_category
+        ranked_predictions = predict_amenity_category(user_location)
+        user_location.predicted_amenity_category = ranked_predictions[0]["category"]
         user_location.save()
 
-        return Response({"message": "Location added successfully", "predicted_amenity_category": predicted_amenity_category}, status=status.HTTP_201_CREATED)
+        return Response({
+            "message": "Location added successfully", 
+            "ranked_predictions": ranked_predictions
+        }, status=status.HTTP_201_CREATED)
     
 class NearestPlaceView(APIView):
     def get(self, request):
