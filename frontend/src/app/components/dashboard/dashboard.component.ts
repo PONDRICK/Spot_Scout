@@ -363,167 +363,183 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const lon = parseFloat(this.lonInput.nativeElement.value);
 
     if (this.marker) {
-        this.marker.setLatLng([lat, lon]);
+      this.marker.setLatLng([lat, lon]);
     } else {
-        import('leaflet').then((L) => {
-            this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(this.map);
-            (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
-        });
+      import('leaflet').then((L) => {
+        this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
+          this.map
+        );
+        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+      });
     }
 
     this.map.setView([lat, lon], this.map.getZoom());
 
     if (
-        this.outputExists(
-            lat,
-            lon,
-            this.selectedFunction,
-            this.selectedAmenity,
-            this.distance
-        )
+      this.outputExists(
+        lat,
+        lon,
+        this.selectedFunction,
+        this.selectedAmenity,
+        this.distance
+      )
     ) {
-        console.log(
-            `Output for ${this.selectedFunction} from lat ${lat}, lon ${lon} already exists`
-        );
-        return;
+      console.log(
+        `Output for ${this.selectedFunction} from lat ${lat}, lon ${lon} already exists`
+      );
+      return;
     }
 
     const loadingOutput = {
-        type: this.selectedFunction,
-        loading: true,
-        visible: true,
-        lat: lat,
-        lon: lon,
-        amenity: this.selectedAmenity,
-        distance: this.distance,
-        startLat: lat, // Save the starting lat
-        startLon: lon, // Save the starting lon
+      type: this.selectedFunction,
+      loading: true,
+      visible: true,
+      lat: lat,
+      lon: lon,
+      amenity: this.selectedAmenity,
+      distance: this.distance,
+      startLat: lat, // Save the starting lat
+      startLon: lon, // Save the starting lon
     };
     this.outputs.unshift(loadingOutput);
 
     if (this.selectedFunction === 'nearest') {
-        this.apiService
-            .getNearestPlace(lat, lon, this.selectedAmenity)
-            .subscribe({
-                next: (response) => {
-                    import('leaflet').then((L) => {
-                        const polyline = L.polyline(
-                            [
-                                [lat, lon],
-                                [response.lat, response.lon],
-                            ],
-                            { color: 'black', dashArray: '5, 10' } // Dashed line pattern
-                        ).addTo(this.map);
-                        (polyline as any).isOutputLayer = true; // Mark as output layer
-                        this.polylines.push(polyline);
-                        loadingOutput.loading = false;
-                        Object.assign(loadingOutput, {
-                            amenity: response.amenity,
-                            distance: response.distance,
-                            province: response.province,
-                            lat: response.lat,
-                            lon: response.lon,
-                            polyline: polyline,
-                            startLat: lat, // Save the starting lat
-                            startLon: lon, // Save the starting lon
-                        });
-                    });
-                },
-                error: (error) =>
-                    console.error('Error fetching nearest place:', error),
+      this.apiService
+        .getNearestPlace(lat, lon, this.selectedAmenity)
+        .subscribe({
+          next: (response) => {
+            import('leaflet').then((L) => {
+              const polyline = L.polyline(
+                [
+                  [lat, lon],
+                  [response.lat, response.lon],
+                ],
+                { color: 'black', dashArray: '5, 10' } // Dashed line pattern
+              ).addTo(this.map);
+              (polyline as any).isOutputLayer = true; // Mark as output layer
+              this.polylines.push(polyline);
+              loadingOutput.loading = false;
+              Object.assign(loadingOutput, {
+                amenity: response.amenity,
+                distance: response.distance,
+                province: response.province,
+                lat: response.lat,
+                lon: response.lon,
+                polyline: polyline,
+                startLat: lat, // Save the starting lat
+                startLon: lon, // Save the starting lon
+              });
             });
-    } else if (this.selectedFunction === 'count') {
-        this.apiService
-            .countAmenities(lat, lon, this.selectedAmenity, this.distance)
-            .subscribe({
-                next: (response) => {
-                    import('leaflet').then((L) => {
-                        const circle = L.circle([lat, lon], {
-                            radius: this.distance,
-                            color: 'blue',
-                            fillColor: '#30f',
-                            fillOpacity: 0.2,
-                        }).addTo(this.map);
-                        (circle as any).isOutputLayer = true; // Mark as output layer
-                        this.circles.push(circle);
-                        const markers = response.locations.map((location: any) => {
-                            const marker = L.marker([location.lat, location.lon], {
-                                icon: this.greenIcon,
-                            }).addTo(this.map);
-                            (marker as any).isOutputLayer = true; // Mark as output layer
-                            this.markers.push(marker);
-                            return marker;
-                        });
-                        loadingOutput.loading = false;
-                        Object.assign(loadingOutput, {
-                            count: response.count,
-                            locations: response.locations,
-                            circle: circle,
-                            markers: markers,
-                        });
-                    });
-                },
-                error: (error) => console.error('Error counting amenities:', error),
-            });
-    } else if (this.selectedFunction === 'population') {
-        this.apiService.getPopulation(lat, lon, this.distance).subscribe({
-            next: (response) => {
-                loadingOutput.loading = false;
-                Object.assign(loadingOutput, {
-                    population: response.population,
-                });
-            },
-            error: (error) => console.error('Error fetching population:', error),
+          },
+          error: (error) =>
+            console.error('Error fetching nearest place:', error),
         });
+    } else if (this.selectedFunction === 'count') {
+      this.apiService
+        .countAmenities(lat, lon, this.selectedAmenity, this.distance)
+        .subscribe({
+          next: (response) => {
+            import('leaflet').then((L) => {
+              const circle = L.circle([lat, lon], {
+                radius: this.distance,
+                color: 'blue',
+                fillColor: '#30f',
+                fillOpacity: 0.2,
+              }).addTo(this.map);
+              (circle as any).isOutputLayer = true; // Mark as output layer
+              this.circles.push(circle);
+              const markers = response.locations.map((location: any) => {
+                const marker = L.marker([location.lat, location.lon], {
+                  icon: this.greenIcon,
+                }).addTo(this.map);
+                (marker as any).isOutputLayer = true; // Mark as output layer
+                this.markers.push(marker);
+                return marker;
+              });
+              loadingOutput.loading = false;
+              Object.assign(loadingOutput, {
+                count: response.count,
+                locations: response.locations,
+                circle: circle,
+                markers: markers,
+              });
+            });
+          },
+          error: (error) => console.error('Error counting amenities:', error),
+        });
+    } else if (this.selectedFunction === 'population') {
+      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+        next: (response) => {
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            population: response.population,
+          });
+        },
+        error: (error) => console.error('Error fetching population:', error),
+      });
     } else if (this.selectedFunction === 'predict') {
-        this.apiService.predictModel(lat, lon).subscribe({
-            next: (response) => {
-                import('leaflet').then((L) => {
-                    if (response && response.ranked_predictions && response.ranked_predictions.length > 0) {
-                        const top3Predictions: Array<{ category: string, score: number }> = response.ranked_predictions.slice(0, 3);
-                        const remainingScore = response.ranked_predictions.slice(3)
-                            .reduce((acc: number, curr: { score: number }) => acc + curr.score, 0) * 100;
+      this.apiService.predictModel(lat, lon).subscribe({
+        next: (response) => {
+          import('leaflet').then((L) => {
+            if (
+              response &&
+              response.ranked_predictions &&
+              response.ranked_predictions.length > 0
+            ) {
+              const top3Predictions: Array<{
+                category: string;
+                score: number;
+              }> = response.ranked_predictions.slice(0, 3);
+              const remainingScore =
+                response.ranked_predictions
+                  .slice(3)
+                  .reduce(
+                    (acc: number, curr: { score: number }) => acc + curr.score,
+                    0
+                  ) * 100;
 
-                        // Debugging: Log top3Predictions to ensure it's correctly formatted
-                        console.log('Top 3 Predictions:', top3Predictions);
+              // Debugging: Log top3Predictions to ensure it's correctly formatted
+              console.log('Top 3 Predictions:', top3Predictions);
 
-                        const predictionHtml = top3Predictions.map((pred: { category: string, score: number }) => {
-                            // Safeguard against undefined properties
-                            const category = pred.category ? pred.category : 'Unknown';
-                            const score = pred.score ? (pred.score * 100).toFixed(2) : '0.00';
-                            return `<p>${category} : ${score}%</p>`;
-                        }).join('');
+              const predictionHtml = top3Predictions
+                .map((pred: { category: string; score: number }) => {
+                  // Safeguard against undefined properties
+                  const category = pred.category ? pred.category : 'Unknown';
+                  const score = pred.score
+                    ? (pred.score * 100).toFixed(2)
+                    : '0.00';
+                  return `<p>${category} : ${score}%</p>`;
+                })
+                .join('');
 
-                        const popupContent = `
+              const popupContent = `
                             <div class="predict-info-box">
                                 <h3>Predicted Amenity Category:</h3>
                                 <p>${top3Predictions[0].category}</p>
                             </div>`;
 
-                        if (this.marker) {
-                            this.marker
-                                .bindPopup(popupContent, { className: 'custom-popup' })
-                                .openPopup();
-                        }
-                        loadingOutput.loading = false;
-                        Object.assign(loadingOutput, {
-                            predicted_amenity_category: top3Predictions[0].category,
-                            top_predictions: top3Predictions,
-                            remaining_score: remainingScore,
-                            marker: this.marker,
-                            popupContent: popupContent, // Save popup content to output
-                        });
-                    } else {
-                        console.error('Invalid response format:', response);
-                    }
-                });
-            },
-            error: (error) => console.error('Error predicting model:', error),
-        });
+              if (this.marker) {
+                this.marker
+                  .bindPopup(popupContent, { className: 'custom-popup' })
+                  .openPopup();
+              }
+              loadingOutput.loading = false;
+              Object.assign(loadingOutput, {
+                predicted_amenity_category: top3Predictions[0].category,
+                top_predictions: top3Predictions,
+                remaining_score: remainingScore,
+                marker: this.marker,
+                popupContent: popupContent, // Save popup content to output
+              });
+            } else {
+              console.error('Invalid response format:', response);
+            }
+          });
+        },
+        error: (error) => console.error('Error predicting model:', error),
+      });
     }
-}
-
-
+  }
 
   toggleVisibility(output: any) {
     output.visible = !output.visible;
@@ -632,7 +648,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       };
       return geoJson;
     });
-  
+
     // Combine outputs from the current session and loaded outputs
     const combinedOutputs = [...this.outputs].map((output) => {
       const serializedOutput = { ...output };
@@ -658,12 +674,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       delete serializedOutput.redMarker;
       return serializedOutput;
     });
-  
+
     const mapData = {
       drawnItems: drawnItems,
       outputs: combinedOutputs,
     };
-  
+
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
@@ -677,7 +693,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-  
+
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -723,19 +739,37 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 html: geoJson.properties.text,
                 iconSize: [100, 40],
               }),
+              textMarker: true,
+              text: geoJson.properties.text,
             }).addTo(this.map);
-            this.markers.push(textLayer);
+
+            // Explicitly type the layer as a Leaflet Marker with text properties
+            const textMarkerLayer = textLayer as L.Marker & {
+              options: { text: string };
+            };
+
+            // Enable text editing
+            textMarkerLayer.pm.enable();
+            textMarkerLayer.pm.focus();
+
+            // Add event listeners for text editing
+            textMarkerLayer.on('pm:textchange', (e: any) => {
+              const newText = e.text;
+              textMarkerLayer.options.text = newText; // Update the text in the layer's options
+            });
+
+            layer = textMarkerLayer;
             break;
           default:
             layer = L.geoJSON(geoJson).addTo(this.map);
         }
-  
+
         if (layer) {
           this.markers.push(layer);
         }
       });
     });
-  
+
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -795,7 +829,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.lonInput.nativeElement.value = output.lon;
         });
       }
-  
+
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
