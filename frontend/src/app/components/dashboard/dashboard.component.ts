@@ -637,10 +637,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // Save and Load Map Functions
   saveMap() {
-    // Gather all layers from the map
-    const allLayers: any[] = [];
+    // Gather only user-drawn layers from the map
+    const drawnLayers: any[] = [];
     this.map.eachLayer((layer: any) => {
-      if (layer.pm && layer.pm.getShape) {
+      if (layer.pm && layer.pm.getShape && !layer.isOutputLayer) {
         const geoJson = layer.toGeoJSON();
         geoJson.properties = {
           type: layer.pm.getShape(),
@@ -648,10 +648,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           radius: layer.getRadius ? layer.getRadius() : null,
           text: layer.options.text ? layer.options.text : null, // Save the text content
         };
-        allLayers.push(geoJson);
+        drawnLayers.push(geoJson);
       }
     });
-  
+
     // Combine outputs from the current session and loaded outputs
     const combinedOutputs = [...this.outputs].map((output) => {
       const serializedOutput = { ...output };
@@ -677,12 +677,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       delete serializedOutput.redMarker;
       return serializedOutput;
     });
-  
+
     const mapData = {
-      drawnItems: allLayers,
+      drawnItems: drawnLayers,
       outputs: combinedOutputs,
     };
-  
+
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
@@ -696,7 +696,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-  
+
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -745,32 +745,33 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               textMarker: true,
               text: geoJson.properties.text,
             }).addTo(this.map);
-  
+
             const textMarkerLayer = textLayer as L.Marker & {
               options: { text: string };
             };
-  
+
             textMarkerLayer.pm.enable();
             textMarkerLayer.pm.focus();
-  
+
             textMarkerLayer.on('pm:textchange', (e: any) => {
               const newText = e.text;
               textMarkerLayer.options.text = newText;
             });
-  
+
             layer = textMarkerLayer;
             break;
           default:
             layer = L.geoJSON(geoJson).addTo(this.map);
         }
-  
+
         if (layer) {
+          layer.isUserDrawn = true; // Mark this layer as user-drawn
           this.markers.push(layer);
           console.log('Created new layer', layer); // Log layer creation
         }
       });
     });
-  
+
     this.outputs = map.data.outputs;
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
@@ -779,6 +780,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             color: 'black',
             dashArray: '5, 10',
           }).addTo(this.map);
+          polyline.isOutputLayer = true; // Mark as output layer
           this.polylines.push(polyline);
           output.polyline = polyline;
         });
@@ -791,6 +793,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             fillColor: '#30f',
             fillOpacity: 0.2,
           }).addTo(this.map);
+          circle.isOutputLayer = true; // Mark as output layer
           this.circles.push(circle);
           output.circle = circle;
         });
@@ -801,6 +804,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             const marker = L.marker([markerData.lat, markerData.lon], {
               icon: this.greenIcon,
             }).addTo(this.map);
+            marker.isOutputLayer = true; // Mark as output layer
             this.markers.push(marker);
             return marker;
           });
@@ -814,6 +818,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           const redMarker = L.marker([output.startLat, output.startLon], {
             icon: this.redIcon,
           }).addTo(this.map);
+          redMarker.isOutputLayer = true; // Mark as output layer
           this.markers.push(redMarker);
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.startLat;
@@ -824,13 +829,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           const redMarker = L.marker([output.lat, output.lon], {
             icon: this.redIcon,
           }).addTo(this.map);
+          redMarker.isOutputLayer = true; // Mark as output layer
           this.markers.push(redMarker);
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.lat;
           this.lonInput.nativeElement.value = output.lon;
         });
       }
-  
+
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
@@ -850,6 +856,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             })
               .addTo(this.map)
               .bindPopup(output.popupContent, { className: 'custom-popup' });
+            redMarker.isOutputLayer = true; // Mark as output layer
             this.markers.push(redMarker);
             output.redMarker = redMarker;
             if (output.visible) {
@@ -866,7 +873,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       next: (maps) => {
         this.savedMaps = maps;
         this.showHistoryModal = true;
-      },  
+      },
       error: (error) => console.error('Error fetching saved maps:', error),
     });
   }
