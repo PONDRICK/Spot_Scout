@@ -637,18 +637,22 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // Save and Load Map Functions
   saveMap() {
-    // Combine drawn items from the map and outputs loaded from history
-    const drawnItems = this.map.pm.getGeomanDrawLayers().map((layer: any) => {
-      const geoJson = layer.toGeoJSON();
-      geoJson.properties = {
-        type: layer.pm.getShape(),
-        color: layer.options.color,
-        radius: layer.getRadius ? layer.getRadius() : null,
-        text: layer.options.text ? layer.options.text : null, // Save the text content
-      };
-      return geoJson;
+    // Gather all layers created using Geoman tools
+    const drawnItems: any[] = [];
+    this.map.eachLayer((layer: any) => {
+      // Check if the layer is a Geoman layer and not an output from sidebar
+      if (layer.pm && layer.pm.getShape && !layer.options.isOutputLayer) {
+        const geoJson = layer.toGeoJSON();
+        geoJson.properties = {
+          type: layer.pm.getShape(),
+          color: layer.options.color,
+          radius: layer.getRadius ? layer.getRadius() : null,
+          text: layer.options.text ? layer.options.text : null, // Save the text content
+        };
+        drawnItems.push(geoJson);
+      }
     });
-
+  
     // Combine outputs from the current session and loaded outputs
     const combinedOutputs = [...this.outputs].map((output) => {
       const serializedOutput = { ...output };
@@ -674,12 +678,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       delete serializedOutput.redMarker;
       return serializedOutput;
     });
-
+  
     const mapData = {
       drawnItems: drawnItems,
       outputs: combinedOutputs,
     };
-
+  
     const mapName = prompt('Enter a name for the map:');
     if (mapName) {
       this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
@@ -694,6 +698,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
 
+    // Load drawn items from Geoman tools
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -743,19 +748,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               text: geoJson.properties.text,
             }).addTo(this.map);
 
-            // Explicitly type the layer as a Leaflet Marker with text properties
             const textMarkerLayer = textLayer as L.Marker & {
               options: { text: string };
             };
 
-            // Enable text editing
             textMarkerLayer.pm.enable();
             textMarkerLayer.pm.focus();
 
-            // Add event listeners for text editing
             textMarkerLayer.on('pm:textchange', (e: any) => {
               const newText = e.text;
-              textMarkerLayer.options.text = newText; // Update the text in the layer's options
+              textMarkerLayer.options.text = newText;
             });
 
             layer = textMarkerLayer;
@@ -766,12 +768,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (layer) {
           this.markers.push(layer);
+          console.log('Created new layer', layer); // Log layer creation
         }
       });
     });
 
-    this.outputs = map.data.outputs;
-    this.outputs.forEach((output: any) => {
+    // Load outputs from sidebar functions without duplication
+    map.data.outputs.forEach((output: any) => {
       if (output.polyline) {
         import('leaflet').then((L) => {
           const polyline = L.polyline(output.polyline.coordinates, {
@@ -865,7 +868,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       next: (maps) => {
         this.savedMaps = maps;
         this.showHistoryModal = true;
-      },
+      },  
       error: (error) => console.error('Error fetching saved maps:', error),
     });
   }
