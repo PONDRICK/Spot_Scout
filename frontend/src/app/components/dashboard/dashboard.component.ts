@@ -637,11 +637,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   // Save and Load Map Functions
   saveMap() {
-    // Gather all layers created using Geoman tools
-    const drawnItems: any[] = [];
+    // Gather all layers from the map
+    const allLayers: any[] = [];
     this.map.eachLayer((layer: any) => {
-      // Check if the layer is a Geoman layer and not an output from sidebar
-      if (layer.pm && layer.pm.getShape && !layer.options.isOutputLayer) {
+      if (layer.pm && layer.pm.getShape) {
         const geoJson = layer.toGeoJSON();
         geoJson.properties = {
           type: layer.pm.getShape(),
@@ -649,7 +648,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           radius: layer.getRadius ? layer.getRadius() : null,
           text: layer.options.text ? layer.options.text : null, // Save the text content
         };
-        drawnItems.push(geoJson);
+        allLayers.push(geoJson);
       }
     });
   
@@ -680,7 +679,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   
     const mapData = {
-      drawnItems: drawnItems,
+      drawnItems: allLayers,
       outputs: combinedOutputs,
     };
   
@@ -697,8 +696,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   loadMap(map: any) {
     this.clearOutputsAndOverlays();
-
-    // Load drawn items from Geoman tools
+  
     map.data.drawnItems.forEach((geoJson: any) => {
       import('leaflet').then((L) => {
         let layer;
@@ -747,34 +745,34 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               textMarker: true,
               text: geoJson.properties.text,
             }).addTo(this.map);
-
+  
             const textMarkerLayer = textLayer as L.Marker & {
               options: { text: string };
             };
-
+  
             textMarkerLayer.pm.enable();
             textMarkerLayer.pm.focus();
-
+  
             textMarkerLayer.on('pm:textchange', (e: any) => {
               const newText = e.text;
               textMarkerLayer.options.text = newText;
             });
-
+  
             layer = textMarkerLayer;
             break;
           default:
             layer = L.geoJSON(geoJson).addTo(this.map);
         }
-
+  
         if (layer) {
           this.markers.push(layer);
           console.log('Created new layer', layer); // Log layer creation
         }
       });
     });
-
-    // Load outputs from sidebar functions without duplication
-    map.data.outputs.forEach((output: any) => {
+  
+    this.outputs = map.data.outputs;
+    this.outputs.forEach((output: any) => {
       if (output.polyline) {
         import('leaflet').then((L) => {
           const polyline = L.polyline(output.polyline.coordinates, {
@@ -832,7 +830,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.lonInput.nativeElement.value = output.lon;
         });
       }
-
+  
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
