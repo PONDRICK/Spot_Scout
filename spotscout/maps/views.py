@@ -32,3 +32,16 @@ class GetUserMapsView(APIView):
         user_maps = UserMap.objects.filter(user=user)
         serializer = UserMapSerializer(user_maps, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class DeleteUserMapView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, map_id):
+        user = request.user
+        try:
+            user_map = UserMap.objects.get(id=map_id, user=user)
+            user_map.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserMap.DoesNotExist:
+            return Response({"error": "Map not found"}, status=status.HTTP_404_NOT_FOUND)
