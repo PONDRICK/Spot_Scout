@@ -173,4 +173,14 @@ export class ApiService {
     });
     return this.http.get(`${this.mapBaseUrl}user_maps/`, { headers: headers });
   }
+
+  deleteUserMap(mapId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.delete(`${this.mapBaseUrl}delete_map/${mapId}/`, {
+      headers: headers,
+    });
+  }
 }

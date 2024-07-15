@@ -1,4 +1,3 @@
-// history.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../api.service';
@@ -6,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { SharedService } from '../../shared.service'; // Import the shared service
-
 
 @Component({
   selector: 'app-history',
@@ -34,12 +32,21 @@ export class HistoryComponent implements OnInit {
   }
 
   loadMap(map: any) {
-    console.log("Navigating to dashboard with map data:", map);
+    console.log('Navigating to dashboard with map data:', map);
     this.sharedService.setMapData(map); // Set the map data in the shared service
     this.router.navigate(['/dashboard']);
   }
 
   navigateToDashboard() {
     this.router.navigate(['/dashboard']);
+  }
+
+  deleteMap(mapId: number) {
+    this.apiService.deleteUserMap(mapId).subscribe({
+      next: () => {
+        this.savedMaps = this.savedMaps.filter((map) => map.id !== mapId);
+      },
+      error: (error) => console.error('Error deleting map:', error),
+    });
   }
 }
