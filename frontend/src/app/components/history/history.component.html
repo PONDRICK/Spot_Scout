@@ -1,0 +1,10 @@
+<div class="modal-content">
+    <span class="close" (click)="navigateToDashboard()">&times;</span>
+    <h2>Saved Maps History</h2>
+    <ul>
+      <li *ngFor="let map of savedMaps" (click)="loadMap(map)">
+        Map ID: {{ map.id }}, Map Name: {{ map.name }}
+      </li>
+    </ul>
+  </div>
+  

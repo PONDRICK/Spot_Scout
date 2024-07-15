@@ -10,6 +10,8 @@ import { AuthGuard } from './auth.guard';
 import { GuestGuard } from './guest.guard';
 import { SuperUserGuard } from './super-user.guard';
 import { AdminComponent } from './components/admin/admin.component';
+import { HistoryComponent } from './components/history/history.component';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -46,6 +48,11 @@ export const routes: Routes = [
     component: SetNewPasswordComponent,
   },
   {
+    path: 'history',
+    component: HistoryComponent,
+    canActivate: [AuthGuard],
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
@@ -55,3 +62,4 @@ export const routes: Routes = [
     redirectTo: 'login',
   },
 ];
+
