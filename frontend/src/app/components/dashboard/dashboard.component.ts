@@ -1,13 +1,4 @@
-import {
-  Component,
-  AfterViewInit,
-  ViewChild,
-  ElementRef,
-  OnInit,
-  OnDestroy,
-  Inject,
-  PLATFORM_ID,
-} from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -17,6 +8,7 @@ import { AuthService } from '../../auth.service';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { SharedService } from '../../shared.service'; // Import the shared service
 
 @Component({
   selector: 'app-dashboard',
@@ -57,12 +49,23 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     private router: Router,
     private cookieService: CookieService,
     private http: HttpClient,
+    private sharedService: SharedService, // Inject the shared service
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
     this.checkSession();
     this.startTokenCheck();
+
+    const mapData = this.sharedService.getMapData();
+    if (mapData) {
+      console.log("Received map data in ngOnInit:", mapData);
+      // Initialize or reinitialize map and ensure it's complete before loading map data
+      this.initOrReinitMap().then(() => {
+        this.loadMap(mapData);
+        this.sharedService.clearMapData(); // Clear the map data after loading
+      });
+    }
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.initOrReinitMap();
@@ -84,13 +87,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private initOrReinitMap() {
+  private async initOrReinitMap(): Promise<void> {
     if (isPlatformBrowser(this.platformId)) {
-      this.loadLeaflet();
+      await this.loadLeaflet();
     }
   }
 
-  private async loadLeaflet() {
+  private async loadLeaflet(): Promise<void> {
     const L = await import('leaflet');
     await import('@geoman-io/leaflet-geoman-free');
     this.initMap(L);
@@ -166,16 +169,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.latInput.nativeElement.value = lat;
         this.lonInput.nativeElement.value = lon;
 
-        // Clear all outputs and overlays
         this.clearOutputsAndOverlays();
 
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
-            this.map
-          );
-          (this.marker as any).isOutputLayer = true; // Add a unique identifier to the red marker
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(this.map);
+          (this.marker as any).isOutputLayer = true;
         }
       }
     });
@@ -695,6 +695,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   loadMap(map: any) {
+    console.log("Loading map data:", map);
     this.clearOutputsAndOverlays();
 
     map.data.drawnItems.forEach((geoJson: any) => {
@@ -869,13 +870,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   viewHistory() {
-    this.apiService.getUserMaps().subscribe({
-      next: (maps) => {
-        this.savedMaps = maps;
-        this.showHistoryModal = true;
-      },
-      error: (error) => console.error('Error fetching saved maps:', error),
-    });
+    this.router.navigate(['/history']);
   }
 
   closeHistoryModal() {
