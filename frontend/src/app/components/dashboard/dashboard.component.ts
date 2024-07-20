@@ -1,4 +1,13 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -59,7 +68,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     const mapData = this.sharedService.getMapData();
     if (mapData) {
-      console.log("Received map data in ngOnInit:", mapData);
+      console.log('Received map data in ngOnInit:', mapData);
       // Initialize or reinitialize map and ensure it's complete before loading map data
       this.initOrReinitMap().then(() => {
         this.loadMap(mapData);
@@ -174,7 +183,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.marker) {
           this.marker.setLatLng(e.latlng);
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(this.map);
+          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
+            this.map
+          );
           (this.marker as any).isOutputLayer = true;
         }
       }
@@ -361,7 +372,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   validateDistance() {
     if (this.selectedFunction === 'count' && this.distance > 10000) {
       this.distance = 10000;
-    } else if (this.selectedFunction === 'population' && this.distance > 10000) {
+    } else if (
+      this.selectedFunction === 'population' &&
+      this.distance > 10000
+    ) {
       this.distance = 10000;
     } else if (this.distance < 100) {
       this.distance = 100;
@@ -369,7 +383,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   confirmSelection() {
-
     this.validateDistance();
 
     const lat = parseFloat(this.latInput.nativeElement.value);
@@ -402,8 +415,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
-
-    
 
     const loadingOutput = {
       type: this.selectedFunction,
@@ -483,17 +494,17 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           },
           error: (error) => console.error('Error counting amenities:', error),
         });
-      } else if (this.selectedFunction === 'population') {
-        this.apiService.getPopulation(lat, lon, this.distance).subscribe({
-          next: (response) => {
-            loadingOutput.loading = false;
-            Object.assign(loadingOutput, {
-              population: response.population,
-              distance: this.distance 
-            });
-          },
-          error: (error) => console.error('Error fetching population:', error),
-        });
+    } else if (this.selectedFunction === 'population') {
+      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+        next: (response) => {
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            population: response.population,
+            distance: this.distance,
+          });
+        },
+        error: (error) => console.error('Error fetching population:', error),
+      });
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
@@ -712,7 +723,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   loadMap(map: any) {
-    console.log("Loading map data:", map);
+    console.log('Loading map data:', map);
     this.clearOutputsAndOverlays();
 
     map.data.drawnItems.forEach((geoJson: any) => {
@@ -902,3 +913,5 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 }
+
+///space
