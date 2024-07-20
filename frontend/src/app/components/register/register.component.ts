@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../api.service';
+import { ApiService } from '../../services/api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -81,7 +81,8 @@ export class RegisterComponent {
         if (error.error.email) {
           this.errorMessage = 'Invalid email address.';
         } else {
-          this.errorMessage = 'Registration failed. Please check the entered details.';
+          this.errorMessage =
+            'Registration failed. Please check the entered details.';
         }
       }
     );

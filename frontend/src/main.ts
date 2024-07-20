@@ -10,7 +10,7 @@ import {
 } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { routes } from './app/app.routes';
-import { AuthService } from './app/auth.service';
+import { AuthService } from './app/services/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthInterceptor } from './app/auth.interceptor';
 
