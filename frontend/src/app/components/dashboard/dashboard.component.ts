@@ -358,7 +358,20 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  validateDistance() {
+    if (this.selectedFunction === 'count' && this.distance > 10000) {
+      this.distance = 10000;
+    } else if (this.selectedFunction === 'population' && this.distance > 10000) {
+      this.distance = 10000;
+    } else if (this.distance < 100) {
+      this.distance = 100;
+    }
+  }
+
   confirmSelection() {
+
+    this.validateDistance();
+
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
 
@@ -389,6 +402,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
+
+    
 
     const loadingOutput = {
       type: this.selectedFunction,
@@ -459,6 +474,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
                 count: response.count,
+                distance: this.distance,
                 locations: response.locations,
                 circle: circle,
                 markers: markers,
@@ -467,16 +483,17 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           },
           error: (error) => console.error('Error counting amenities:', error),
         });
-    } else if (this.selectedFunction === 'population') {
-      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
-        next: (response) => {
-          loadingOutput.loading = false;
-          Object.assign(loadingOutput, {
-            population: response.population,
-          });
-        },
-        error: (error) => console.error('Error fetching population:', error),
-      });
+      } else if (this.selectedFunction === 'population') {
+        this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+          next: (response) => {
+            loadingOutput.loading = false;
+            Object.assign(loadingOutput, {
+              population: response.population,
+              distance: this.distance 
+            });
+          },
+          error: (error) => console.error('Error fetching population:', error),
+        });
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {

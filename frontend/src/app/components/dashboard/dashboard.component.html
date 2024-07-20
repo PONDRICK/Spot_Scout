@@ -127,6 +127,7 @@
         [(ngModel)]="distance"
         min="100"
         step="100"
+        (change)="validateDistance()"
       />
     </div>
 
@@ -177,7 +178,7 @@
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
         </button>
-        <h3>Nearest {{ place.amenity }}:</h3>
+        <h3>Nearest: {{ place.amenity }}</h3>
         <p>Distance: {{ place.distance }} meters</p>
         <p>Province: {{ place.province }}</p>
         <p>Lat: {{ place.lat }}</p>
@@ -207,7 +208,8 @@
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
         </button>  
-        <h3>Amenity : {{ place.amenity }}</h3>
+        <h3>Amenity: {{ place.amenity }}</h3>
+        <p>Distance: {{ place.distance }} meters</p>
         <p>Count: {{ place.count }}</p>
 
         <ul>
@@ -241,6 +243,7 @@
           {{ place.visible ? "Hide" : "Show" }}
         </button>
         <h3>Population:</h3>
+        <p>Distance: {{ place.distance }} meters</p>
         <p>Population: {{ place.population }}</p>
       </div>
 
@@ -267,7 +270,7 @@
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
         </button>
-        <h3>Predicted Amenity Category:</h3>
+        <h3>Prediction Results:</h3>
         <p>Most Suitable Amenity</p>
         <p *ngFor="let pred of place.top_predictions">
           {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
