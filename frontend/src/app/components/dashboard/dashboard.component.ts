@@ -359,8 +359,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   validateDistance() {
-    if (this.selectedFunction === 'count' && this.distance > 30000) {
-      this.distance = 30000;
+    if (this.selectedFunction === 'count' && this.distance > 10000) {
+      this.distance = 10000;
     } else if (this.selectedFunction === 'population' && this.distance > 10000) {
       this.distance = 10000;
     } else if (this.distance < 100) {
