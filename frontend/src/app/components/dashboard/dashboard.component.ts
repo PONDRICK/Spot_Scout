@@ -9,15 +9,15 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { ApiService } from '../../api.service';
+import { ApiService } from '../../services/api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { AuthService } from '../../auth.service';
+import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { SharedService } from '../../shared.service'; // Import the shared service
+import { SharedService } from '../../services/shared.service'; // Import the shared service
 
 @Component({
   selector: 'app-dashboard',
@@ -913,5 +913,3 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 }
-
-///space

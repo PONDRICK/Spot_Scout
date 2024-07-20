@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from '../../api.service';
+import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { SharedService } from '../../shared.service'; // Import the shared service
+import { SharedService } from '../../services/shared.service'; // Import the shared service
 
 @Component({
   selector: 'app-history',

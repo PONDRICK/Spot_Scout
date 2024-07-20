@@ -6,9 +6,9 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { OTPVerificationComponent } from './components/otp-verification/otp-verification.component';
 import { SetNewPasswordComponent } from './components/set-new-password/set-new-password.component';
-import { AuthGuard } from './auth.guard';
-import { GuestGuard } from './guest.guard';
-import { SuperUserGuard } from './super-user.guard';
+import { AuthGuard } from './guards/auth.guard';
+import { GuestGuard } from './guards/guest.guard';
+import { SuperUserGuard } from './guards/super-user.guard';
 import { AdminComponent } from './components/admin/admin.component';
 import { HistoryComponent } from './components/history/history.component';
 
@@ -62,4 +62,3 @@ export const routes: Routes = [
     redirectTo: 'login',
   },
 ];
-
