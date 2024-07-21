@@ -16,6 +16,7 @@ from django.core.management import call_command
 from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework.exceptions import AuthenticationFailed
 import json
 import logging
 logger = logging.getLogger(__name__)
@@ -89,6 +90,39 @@ class AdminUserDeleteView(DestroyAPIView):
         instance.delete()
         # Log the activity
         log_activity(self.request.user, f"deleted_user {user_email}")
+
+class BanUserView(GenericAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get("user_id")
+        try:
+            user = User.objects.get(id=user_id)
+            user.is_banned = True
+            user.is_online = False  # Force logout if currently logged in
+            user.save()
+            log_activity(request.user, f"banned_user {user.email}")
+            return Response({"message": "User has been banned successfully."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+class UnbanUserView(GenericAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get("user_id")
+        try:
+            user = User.objects.get(id=user_id)
+            user.is_banned = False
+            user.save()
+            log_activity(request.user, f"unbanned_user {user.email}")
+            return Response({"message": "User has been unbanned successfully."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 class RegisterUserView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -133,9 +167,12 @@ class LoginUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        if user.is_banned:
+            raise AuthenticationFailed("This account has been banned.")
+        user.is_online = True
+        user.save()
         log_activity(user, "logged_in")
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 class TestAuthenticationView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -189,9 +226,10 @@ class LogoutUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        request.user.is_online = False
+        request.user.save()
         log_activity(request.user, "logged_out")
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class ResendOTPView(GenericAPIView):
     def post(self, request):

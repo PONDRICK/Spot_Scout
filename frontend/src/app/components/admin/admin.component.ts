@@ -1,3 +1,4 @@
+// admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -168,6 +169,52 @@ export class AdminComponent implements OnInit {
           },
           (error) => {
             Swal.fire('Error!', 'Failed to delete user.', 'error');
+          }
+        );
+      }
+    });
+  }
+
+  banUser(userId: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will ban this user!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, ban it!',
+      cancelButtonText: 'No, keep it',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.apiService.banUser(userId).subscribe(
+          () => {
+            Swal.fire('Banned!', 'The user has been banned.', 'success');
+            this.fetchUsers(); // Refresh the user list
+          },
+          (error) => {
+            Swal.fire('Error!', 'Failed to ban user.', 'error');
+          }
+        );
+      }
+    });
+  }
+
+  unbanUser(userId: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will unban this user!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, unban it!',
+      cancelButtonText: 'No, keep it',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.apiService.unbanUser(userId).subscribe(
+          () => {
+            Swal.fire('Unbanned!', 'The user has been unbanned.', 'success');
+            this.fetchUsers(); // Refresh the user list
+          },
+          (error) => {
+            Swal.fire('Error!', 'Failed to unban user.', 'error');
           }
         );
       }

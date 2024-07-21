@@ -1,3 +1,4 @@
+// api.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -104,6 +105,30 @@ export class ApiService {
     return this.http.delete(`${this.adminBaseUrl}users/${userId}/delete/`, {
       headers: headers,
     });
+  }
+
+  banUser(userId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.post(
+      `${this.adminBaseUrl}ban-user/`,
+      { user_id: userId },
+      { headers: headers }
+    );
+  }
+
+  unbanUser(userId: number): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.post(
+      `${this.adminBaseUrl}unban-user/`,
+      { user_id: userId },
+      { headers: headers }
+    );
   }
 
   getRoles(): Observable<any> {
