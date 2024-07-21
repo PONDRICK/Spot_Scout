@@ -37,7 +37,9 @@ body {
 
 .btn-refresh,
 .btn-delete,
-.btn-update {
+.btn-update,
+.btn-ban,
+.btn-unban {
   margin: 0.5rem;
   padding: 0.5rem 1rem;
   border: none;
@@ -71,6 +73,24 @@ body {
 
 .btn-update:hover {
   background-color: #0056b3;
+}
+
+.btn-ban {
+  background-color: #ff9800;
+  color: white;
+}
+
+.btn-ban:hover {
+  background-color: #fb8c00;
+}
+
+.btn-unban {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-unban:hover {
+  background-color: #138496;
 }
 
 .admin-content {

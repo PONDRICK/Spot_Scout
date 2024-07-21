@@ -4,7 +4,8 @@ from .views import (
     RegisterUserView, VerifyUserEmail, LoginUserView, TestAuthenticationView,
     PasswordResetConfirm, PasswordResetRequestView, SetNewPassword, LogoutUserView, ResendOTPView,
     AdminUserListView, AdminUserDetailView, AdminRoleListView, AdminRoleDetailView,
-    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView, AdminUserDeleteView
+    AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView, AdminUserDeleteView,
+    BanUserView,UnbanUserView
 )
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path('logout/<int:pk>/', AdminLogoutUserView.as_view(), name='admin-logout-user'),
     path('system-config/', AdminSystemConfigView.as_view(), name='admin-system-config'),
     path('activity-logs/', AdminActivityLogView.as_view(), name='admin-activity-logs'),
+    path('ban-user/', BanUserView.as_view(), name='ban-user'),
+    path('unban-user/', UnbanUserView.as_view(), name='unban-user'),
 ]
