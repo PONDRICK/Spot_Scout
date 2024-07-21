@@ -133,9 +133,10 @@ class LoginUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        user.is_online = True
+        user.save()
         log_activity(user, "logged_in")
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 class TestAuthenticationView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -189,9 +190,10 @@ class LogoutUserView(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        request.user.is_online = False
+        request.user.save()
         log_activity(request.user, "logged_out")
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class ResendOTPView(GenericAPIView):
     def post(self, request):
