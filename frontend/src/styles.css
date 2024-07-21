@@ -1,7 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch&family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Apply the font to the whole website */
+body,
+html {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+
 /* You can add global styles to this file, and also import other style files */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* Custom styles for Leaflet Geoman toolbar */
 .leaflet-bar.leaflet-control {
