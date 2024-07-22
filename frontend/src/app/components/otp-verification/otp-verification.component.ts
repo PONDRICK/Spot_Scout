@@ -28,10 +28,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.email = history.state.email; // Get the email from the router state
 
-    // Retrieve expiration time from local storage
-    const expirationTimeString = localStorage.getItem('otpExpirationTime');
-    if (expirationTimeString) {
-      this.expirationTime = new Date(expirationTimeString);
+    // Retrieve expiration time from state
+    if (history.state.expirationTime) {
+      this.expirationTime = new Date(history.state.expirationTime);
       this.startCountdown();
     }
   }
@@ -82,14 +81,13 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   }
 
   resendOTP() {
-    this.apiService.resendOTP({ email: this.email }).subscribe(
+    this.apiService.resendOTP(this.email).subscribe(
       (response) => {
         console.log('OTP resent successfully', response);
         this.successMessage = 'OTP has been resent. Please check your email.';
         this.errorMessage = ''; // Clear error message when OTP is resent
         if (response.expiration_time) {
           this.expirationTime = new Date(response.expiration_time);
-          localStorage.setItem('otpExpirationTime', this.expirationTime.toISOString());
           this.startCountdown();
         }
       },

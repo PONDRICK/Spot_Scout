@@ -4,7 +4,6 @@ import { ApiService } from '../../services/api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { RouterLink, RouterOutlet } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -14,8 +13,6 @@ import Swal from 'sweetalert2';
     CommonModule,
     FormsModule,
     HttpClientModule,
-    RouterLink,
-    RouterOutlet,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
@@ -72,7 +69,7 @@ export class RegisterComponent {
           text: 'An OTP has been sent to your email address.',
         }).then(() => {
           this.router.navigate(['/verify-otp'], {
-            state: { email: this.user.email },
+            state: { email: this.user.email, expirationTime: response.expiration_time },  // Pass expiration time
           });
         });
       },

@@ -134,11 +134,12 @@ class RegisterUserView(GenericAPIView):
         serializer = self.serializer_class(data=user_data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            send_code_to_user(user.email)
+            otp_code, expiration_time = send_code_to_user(user.email)
             log_activity(user, "registered")
             return Response({
                 'data': serializer.data,
-                'message': 'Thanks for signing up!'
+                'message': 'Thanks for signing up!',
+                'expiration_time': expiration_time
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -252,6 +253,19 @@ class ResendOTPView(GenericAPIView):
             return Response({'message': 'OTP has been resent', 'expiration_time': expiration_time}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+class GetOTPExpirationView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            otp = OneTimePassword.objects.get(user=user)
+            expiration_time = otp.expires_at
+            return Response({'expiration_time': expiration_time}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'OTP not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):
