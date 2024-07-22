@@ -77,12 +77,27 @@ export class OTPVerificationComponent implements OnInit {
     }
   }
 
-  handleBackspace(event: KeyboardEvent, currentIndex: number, prevIndex: number | null) {
+  handleKeyDown(event: KeyboardEvent, currentIndex: number, prevIndex: number | null, nextIndex: number | null) {
     const input = event.target as HTMLInputElement;
     if (event.key === 'Backspace' && input.value.length === 0 && prevIndex !== null) {
       const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
       if (prevInput) {
         prevInput.focus();
+      }
+    } else if (event.key === 'ArrowLeft' && prevIndex !== null) {
+      const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+      if (prevInput) {
+        prevInput.focus();
+        setTimeout(() => {
+          prevInput.setSelectionRange(1, 1);
+        }, 0);
+      }
+    } else if (event.key === 'ArrowLeft' && prevIndex === null) {
+      event.preventDefault(); // Prevent moving the cursor to the left in the first input
+    } else if (event.key === 'ArrowRight' && nextIndex !== null) {
+      const nextInput = document.getElementsByName(`otp${nextIndex}`)[0] as HTMLInputElement;
+      if (nextInput) {
+        nextInput.focus();
       }
     }
   }
