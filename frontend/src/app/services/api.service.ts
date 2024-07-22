@@ -36,6 +36,10 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}resend-otp/`, email);
   }
 
+  getOTPExpiration(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/get-otp-expiration/`, email);
+  }
+
   logoutUser(refreshToken: string): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.cookieService.get('access_token')}`,

@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
-    RegisterUserView, VerifyUserEmail, LoginUserView, TestAuthenticationView,
+    GetOTPExpirationView, RegisterUserView, VerifyUserEmail, LoginUserView, TestAuthenticationView,
     PasswordResetConfirm, PasswordResetRequestView, SetNewPassword, LogoutUserView, ResendOTPView,
     AdminUserListView, AdminUserDetailView, AdminRoleListView, AdminRoleDetailView,
     AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView, AdminUserDeleteView,
@@ -30,4 +30,5 @@ urlpatterns = [
     path('activity-logs/', AdminActivityLogView.as_view(), name='admin-activity-logs'),
     path('ban-user/', BanUserView.as_view(), name='ban-user'),
     path('unban-user/', UnbanUserView.as_view(), name='unban-user'),
+    path('api/get-otp-expiration/', GetOTPExpirationView.as_view(), name='get-otp-expiration'),
 ]

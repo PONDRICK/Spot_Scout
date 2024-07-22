@@ -5,6 +5,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from .managers import UserManager
 from .validators import validate_email_address
+from django.utils import timezone
+from datetime import timedelta
+
 # Create your models here.
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -45,14 +48,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     
 class OneTimePassword(models.Model):
-        user = models.OneToOneField(User, on_delete= models.CASCADE)
-        code = models.CharField(max_length=6,unique=True)
-        
-        def __str__(self):
-            return f"{self.user.first_name}--passcode"
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6, unique=True)
+    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=3))
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(minutes=3)  # OTP expires in 10 minutes
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user.first_name} -- passcode"
         
         
 User = get_user_model()
+
 class ActivityLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)

@@ -19,6 +19,9 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.exceptions import AuthenticationFailed
 import json
 import logging
+from django.utils import timezone
+
+
 logger = logging.getLogger(__name__)
 
 # Create your views here.
@@ -131,33 +134,39 @@ class RegisterUserView(GenericAPIView):
         serializer = self.serializer_class(data=user_data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            send_code_to_user(user.email)
+            otp_code, expiration_time = send_code_to_user(user.email)
             log_activity(user, "registered")
             return Response({
                 'data': serializer.data,
-                'message': 'Thanks for signing up!'
+                'message': 'Thanks for signing up!',
+                'expiration_time': expiration_time
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyUserEmail(GenericAPIView):
-    def post(sle, request):
-        otpcode=request.data.get('otp')
+    def post(self, request):
+        otpcode = request.data.get('otp')
         try:
-            user_code_obj=OneTimePassword.objects.get(code=otpcode)
+            user_code_obj = OneTimePassword.objects.get(code=otpcode)
             user = user_code_obj.user
+
+            if user_code_obj.expires_at < timezone.now():
+                return Response({'message': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
+
             if not user.is_verified:
-                user.is_verified=True
+                user.is_verified = True
                 user.save()
                 log_activity(user, "verified_email")
                 return Response({
-                    'message':'account email verified successfully'
+                    'message': 'Account email verified successfully'
                 }, status=status.HTTP_200_OK)
+
             return Response({
-                'message':'code is invalid user already verified'
-            }, status=status.HTTP_204_CONTENT)
-        
+                'message': 'Code is invalid, user already verified'
+            }, status=status.HTTP_204_NO_CONTENT)
+
         except OneTimePassword.DoesNotExist:
-            return Response({'message':'passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
         
 
 class LoginUserView(GenericAPIView):
@@ -239,11 +248,24 @@ class ResendOTPView(GenericAPIView):
             # Delete old OTP
             OneTimePassword.objects.filter(user=user).delete()
             # Generate and send new OTP
-            send_code_to_user(email)
+            otp_code, expiration_time = send_code_to_user(email)
             log_activity(user, "resent_otp")
-            return Response({'message': 'OTP has been resent'}, status=status.HTTP_200_OK)
+            return Response({'message': 'OTP has been resent', 'expiration_time': expiration_time}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+class GetOTPExpirationView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            otp = OneTimePassword.objects.get(user=user)
+            expiration_time = otp.expires_at
+            return Response({'expiration_time': expiration_time}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'OTP not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):
