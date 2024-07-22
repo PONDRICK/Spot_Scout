@@ -39,7 +39,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'verify-otp',
+    path: 'verify-otp/:token',
     component: OTPVerificationComponent,
     canActivate: [GuestGuard],
   },

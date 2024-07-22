@@ -6,6 +6,7 @@ from .models import User, OneTimePassword
 from .models import ActivityLog
 from django.utils import timezone
 from datetime import timedelta
+import jwt
 
 def generateOtp():
     otp = ""
@@ -13,22 +14,33 @@ def generateOtp():
         otp += str(random.randint(1, 9))
     return otp
 
+def generate_verification_token(user):
+    payload = {
+        'user_id': user.id,
+        'email': user.email
+    }
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+    return token
+
 def send_code_to_user(email):
     Subject = "One time passcode for Email verification"
     otp_code = generateOtp()
     print(otp_code)
     user = User.objects.get(email=email)
     current_site = "Spotscout.com"
-    
+    token = generate_verification_token(user)
+    verification_link = f"http://localhost:4200/verify-otp/{token}/"
+
     email_body = format_html(
         '''
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
             <h2 style="color: #333; text-align: center;">One Time Passcode (OTP) Verification</h2>
             <p style="color: #555; text-align: center;">Hi <strong>{first_name}</strong>,</p>
-            <p style="color: #555; text-align: center;">Thanks for signing up at <a href="https://{current_site}" style="color: #0066cc; text-decoration: none;">{current_site}</a>. Please verify your email by entering the following one-time passcode (OTP):</p>
+            <p style="color: #555; text-align: center;">Thanks for signing up at <a href="https://{current_site}" style="color: #0066cc; text-decoration: none;">{current_site}</a>. Please verify your email by entering the following one-time passcode (OTP) or click the link below:</p>
             <div style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px; padding: 10px; background-color: #fff;">
                 {otp_code}
             </div>
+            <p style="color: #555; text-align: center;">Or click <a href="{verification_link}">this link</a> to verify your email.</p>
             <p style="color: #555; text-align: center;">If you did not sign up for an account, you can ignore this email.</p>
             <p style="color: #555; text-align: center;">Best regards,<br>The Spotscout Team</p>
             <hr style="border-top: 1px solid #eee; margin: 20px 0;">
@@ -37,7 +49,8 @@ def send_code_to_user(email):
         ''',
         first_name=user.first_name,
         current_site=current_site,
-        otp_code=otp_code
+        otp_code=otp_code,
+        verification_link=verification_link
     )
 
     from_email = settings.DEFAULT_FROM_EMAIL
@@ -48,7 +61,7 @@ def send_code_to_user(email):
     d_email.content_subtype = "html"  # Main content is now text/html
     d_email.send(fail_silently=True)
 
-    return otp_code, expiration_time  # Return the OTP code and expiration time
+    return otp_code, expiration_time, token # Return the OTP code and expiration time
 
 def send_normal_email(data):
     email = EmailMessage(

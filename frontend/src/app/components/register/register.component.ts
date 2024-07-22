@@ -1,3 +1,4 @@
+// register.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -9,11 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-  ],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
@@ -68,8 +65,12 @@ export class RegisterComponent {
           title: 'OTP Sent',
           text: 'An OTP has been sent to your email address.',
         }).then(() => {
-          this.router.navigate(['/verify-otp'], {
-            state: { email: this.user.email, expirationTime: response.expiration_time },  // Pass expiration time
+          this.router.navigate(['/verify-otp', response.token], {
+            // Pass the token
+            state: {
+              email: this.user.email,
+              expirationTime: response.expiration_time,
+            },
           });
         });
       },

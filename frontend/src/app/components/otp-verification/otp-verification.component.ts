@@ -1,5 +1,7 @@
+// otp-verification.component.ts
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,8 +24,13 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   expirationTime: Date | null = null;
   timeLeft: number = 0;
   timerSubscription: Subscription | null = null;
+  token: string = '';
 
-  constructor(private apiService: ApiService, private router: Router) {}
+  constructor(
+    private apiService: ApiService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     this.email = history.state.email; // Get the email from the router state
@@ -33,6 +40,11 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
       this.expirationTime = new Date(history.state.expirationTime);
       this.startCountdown();
     }
+
+    // Get the token from the route parameters
+    this.route.params.subscribe((params) => {
+      this.token = params['token'];
+    });
   }
 
   ngOnDestroy() {
@@ -43,7 +55,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
 
   startCountdown() {
     if (this.expirationTime) {
-      this.timeLeft = Math.floor((this.expirationTime.getTime() - new Date().getTime()) / 1000);
+      this.timeLeft = Math.floor(
+        (this.expirationTime.getTime() - new Date().getTime()) / 1000
+      );
       this.timerSubscription = interval(1000).subscribe(() => {
         this.timeLeft--;
         if (this.timeLeft <= 0 && this.timerSubscription) {
@@ -62,7 +76,7 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
 
   verifyOTP() {
     const otp = this.otp.join('');
-    this.apiService.verifyOTP({ otp }).subscribe(
+    this.apiService.verifyOTP({ otp }, this.token).subscribe(
       (response) => {
         console.log('OTP verification successful', response);
         Swal.fire({
@@ -75,7 +89,8 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error('OTP verification failed', error);
-        this.errorMessage = 'OTP verification failed. Please check your OTP code.';
+        this.errorMessage =
+          'OTP verification failed. Please check your OTP code.';
       }
     );
   }
@@ -98,18 +113,27 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
     );
   }
 
-  moveToNext(event: Event, currentIndex: number, nextIndex: number | null, prevIndex: number | null) {
+  moveToNext(
+    event: Event,
+    currentIndex: number,
+    nextIndex: number | null,
+    prevIndex: number | null
+  ) {
     const input = event.target as HTMLInputElement;
     if (input.value.length === 1 && nextIndex !== null) {
       setTimeout(() => {
-        const nextInput = document.getElementsByName(`otp${nextIndex}`)[0] as HTMLInputElement;
+        const nextInput = document.getElementsByName(
+          `otp${nextIndex}`
+        )[0] as HTMLInputElement;
         if (nextInput) {
           nextInput.focus();
         }
       }, 10);
     } else if (input.value.length === 0 && prevIndex !== null) {
       setTimeout(() => {
-        const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+        const prevInput = document.getElementsByName(
+          `otp${prevIndex}`
+        )[0] as HTMLInputElement;
         if (prevInput) {
           prevInput.focus();
         }
@@ -117,15 +141,28 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleKeyDown(event: KeyboardEvent, currentIndex: number, prevIndex: number | null, nextIndex: number | null) {
+  handleKeyDown(
+    event: KeyboardEvent,
+    currentIndex: number,
+    prevIndex: number | null,
+    nextIndex: number | null
+  ) {
     const input = event.target as HTMLInputElement;
-    if (event.key === 'Backspace' && input.value.length === 0 && prevIndex !== null) {
-      const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+    if (
+      event.key === 'Backspace' &&
+      input.value.length === 0 &&
+      prevIndex !== null
+    ) {
+      const prevInput = document.getElementsByName(
+        `otp${prevIndex}`
+      )[0] as HTMLInputElement;
       if (prevInput) {
         prevInput.focus();
       }
     } else if (event.key === 'ArrowLeft' && prevIndex !== null) {
-      const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+      const prevInput = document.getElementsByName(
+        `otp${prevIndex}`
+      )[0] as HTMLInputElement;
       if (prevInput) {
         prevInput.focus();
         setTimeout(() => {
@@ -135,7 +172,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
     } else if (event.key === 'ArrowLeft' && prevIndex === null) {
       event.preventDefault(); // Prevent moving the cursor to the left in the first input
     } else if (event.key === 'ArrowRight' && nextIndex !== null) {
-      const nextInput = document.getElementsByName(`otp${nextIndex}`)[0] as HTMLInputElement;
+      const nextInput = document.getElementsByName(
+        `otp${nextIndex}`
+      )[0] as HTMLInputElement;
       if (nextInput) {
         nextInput.focus();
       }
@@ -150,7 +189,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
         this.otp[i] = clipboardData[i];
       }
       // Move focus to the last input
-      const lastInput = document.getElementsByName('otp5')[0] as HTMLInputElement;
+      const lastInput = document.getElementsByName(
+        'otp5'
+      )[0] as HTMLInputElement;
       if (lastInput) {
         lastInput.focus();
       }
