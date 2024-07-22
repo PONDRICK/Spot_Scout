@@ -75,5 +75,5 @@
   <button (click)="resendOTP()" class="resend-button">Resend One-Time Password</button>
   <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
   <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
-  <a routerLink="/login" class="wrong-number">Entered a wrong number?</a>
+  <p *ngIf="timeLeft > 0" class="countdown-timer">OTP will expire in: {{ formatTimeLeft() }}</p>
 </div>

@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-otp-verification',
@@ -13,16 +14,51 @@ import Swal from 'sweetalert2';
   templateUrl: './otp-verification.component.html',
   styleUrls: ['./otp-verification.component.css'],
 })
-export class OTPVerificationComponent implements OnInit {
+export class OTPVerificationComponent implements OnInit, OnDestroy {
   otp: string[] = ['', '', '', '', '', ''];
   email = '';
   errorMessage = '';
   successMessage = '';
+  expirationTime: Date | null = null;
+  timeLeft: number = 0;
+  timerSubscription: Subscription | null = null;
 
   constructor(private apiService: ApiService, private router: Router) {}
 
   ngOnInit() {
     this.email = history.state.email; // Get the email from the router state
+
+    // Retrieve expiration time from local storage
+    const expirationTimeString = localStorage.getItem('otpExpirationTime');
+    if (expirationTimeString) {
+      this.expirationTime = new Date(expirationTimeString);
+      this.startCountdown();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+  }
+
+  startCountdown() {
+    if (this.expirationTime) {
+      this.timeLeft = Math.floor((this.expirationTime.getTime() - new Date().getTime()) / 1000);
+      this.timerSubscription = interval(1000).subscribe(() => {
+        this.timeLeft--;
+        if (this.timeLeft <= 0 && this.timerSubscription) {
+          this.timerSubscription.unsubscribe();
+          this.errorMessage = 'OTP has expired. Please request a new one.';
+        }
+      });
+    }
+  }
+
+  formatTimeLeft(): string {
+    const minutes = Math.floor(this.timeLeft / 60);
+    const seconds = this.timeLeft % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds} minutes`;
   }
 
   verifyOTP() {
@@ -50,6 +86,12 @@ export class OTPVerificationComponent implements OnInit {
       (response) => {
         console.log('OTP resent successfully', response);
         this.successMessage = 'OTP has been resent. Please check your email.';
+        this.errorMessage = ''; // Clear error message when OTP is resent
+        if (response.expiration_time) {
+          this.expirationTime = new Date(response.expiration_time);
+          localStorage.setItem('otpExpirationTime', this.expirationTime.toISOString());
+          this.startCountdown();
+        }
       },
       (error) => {
         console.error('Resend OTP failed', error);

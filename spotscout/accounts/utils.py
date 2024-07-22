@@ -4,6 +4,9 @@ from django.utils.html import format_html
 from spotscout import settings
 from .models import User, OneTimePassword
 from .models import ActivityLog
+from django.utils import timezone
+from datetime import timedelta
+
 def generateOtp():
     otp = ""
     for i in range(6):
@@ -38,12 +41,14 @@ def send_code_to_user(email):
     )
 
     from_email = settings.DEFAULT_FROM_EMAIL
-    
-    OneTimePassword.objects.create(user=user, code=otp_code)
+    expiration_time = timezone.now() + timedelta(minutes=3)
+    OneTimePassword.objects.create(user=user, code=otp_code, expires_at=expiration_time)
     
     d_email = EmailMessage(subject=Subject, body=email_body, from_email=from_email, to=[email])
     d_email.content_subtype = "html"  # Main content is now text/html
     d_email.send(fail_silently=True)
+
+    return otp_code, expiration_time  # Return the OTP code and expiration time
 
 def send_normal_email(data):
     email = EmailMessage(

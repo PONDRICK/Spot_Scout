@@ -74,4 +74,10 @@
   .wrong-number:hover {
     text-decoration: underline;
   }
+
+  .countdown-timer {
+    margin-top: 15px; /* Add space above the countdown timer */
+    color: #333;
+  }
+  
   
