@@ -14,8 +14,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./otp-verification.component.css'],
 })
 export class OTPVerificationComponent implements OnInit {
-  otp = '';
-  email = ''; // Add this line to store email
+  otp: string[] = ['', '', '', '', '', ''];
+  email = '';
   errorMessage = '';
   successMessage = '';
 
@@ -26,7 +26,8 @@ export class OTPVerificationComponent implements OnInit {
   }
 
   verifyOTP() {
-    this.apiService.verifyOTP({ otp: this.otp }).subscribe(
+    const otp = this.otp.join('');
+    this.apiService.verifyOTP({ otp }).subscribe(
       (response) => {
         console.log('OTP verification successful', response);
         Swal.fire({
@@ -39,8 +40,7 @@ export class OTPVerificationComponent implements OnInit {
       },
       (error) => {
         console.error('OTP verification failed', error);
-        this.errorMessage =
-          'OTP verification failed. Please check your OTP code.';
+        this.errorMessage = 'OTP verification failed. Please check your OTP code.';
       }
     );
   }
@@ -56,5 +56,56 @@ export class OTPVerificationComponent implements OnInit {
         this.errorMessage = 'Resend OTP failed. Please try again.';
       }
     );
+  }
+
+  moveToNext(event: Event, currentIndex: number, nextIndex: number | null, prevIndex: number | null) {
+    const input = event.target as HTMLInputElement;
+    if (input.value.length === 1 && nextIndex !== null) {
+      setTimeout(() => {
+        const nextInput = document.getElementsByName(`otp${nextIndex}`)[0] as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }, 10);
+    } else if (input.value.length === 0 && prevIndex !== null) {
+      setTimeout(() => {
+        const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+        if (prevInput) {
+          prevInput.focus();
+        }
+      }, 10);
+    }
+  }
+
+  handleBackspace(event: KeyboardEvent, currentIndex: number, prevIndex: number | null) {
+    const input = event.target as HTMLInputElement;
+    if (event.key === 'Backspace' && input.value.length === 0 && prevIndex !== null) {
+      const prevInput = document.getElementsByName(`otp${prevIndex}`)[0] as HTMLInputElement;
+      if (prevInput) {
+        prevInput.focus();
+      }
+    }
+  }
+
+  handlePaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const clipboardData = event.clipboardData?.getData('text') || '';
+    if (clipboardData.length === 6 && /^\d+$/.test(clipboardData)) {
+      for (let i = 0; i < 6; i++) {
+        this.otp[i] = clipboardData[i];
+      }
+      // Move focus to the last input
+      const lastInput = document.getElementsByName('otp5')[0] as HTMLInputElement;
+      if (lastInput) {
+        lastInput.focus();
+      }
+    }
+  }
+
+  restrictToNumbers(event: KeyboardEvent) {
+    const inputChar = String.fromCharCode(event.keyCode);
+    if (!/[0-9]/.test(inputChar)) {
+      event.preventDefault();
+    }
   }
 }

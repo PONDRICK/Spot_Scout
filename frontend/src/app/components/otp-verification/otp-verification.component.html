@@ -1,24 +1,79 @@
-<div class="max-w-md mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
-  <h2 class="text-2xl font-bold mb-6">Verify OTP</h2>
+<div class="otp-container">
+  <h2>Please enter the One-Time Password to verify your account</h2>
+  <p>A One-Time Password has been sent to {{ email }}</p>
   <form (ngSubmit)="verifyOTP()">
-    <div class="mb-4">
-      <label for="otp" class="block text-sm font-medium text-gray-700">OTP Code</label>
+    <div class="otp-inputs" (paste)="handlePaste($event)">
       <input
-        [(ngModel)]="otp"
-        name="otp"
+        [(ngModel)]="otp[0]"
+        name="otp0"
         type="text"
-        class="mt-1 p-2 border rounded-md w-full"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 0, 1, null)"
+        (keydown)="handleBackspace($event, 0, null)"
+        (keypress)="restrictToNumbers($event)"
+        required
+      />
+      <input
+        [(ngModel)]="otp[1]"
+        name="otp1"
+        type="text"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 1, 2, 0)"
+        (keydown)="handleBackspace($event, 1, 0)"
+        (keypress)="restrictToNumbers($event)"
+        required
+      />
+      <input
+        [(ngModel)]="otp[2]"
+        name="otp2"
+        type="text"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 2, 3, 1)"
+        (keydown)="handleBackspace($event, 2, 1)"
+        (keypress)="restrictToNumbers($event)"
+        required
+      />
+      <input
+        [(ngModel)]="otp[3]"
+        name="otp3"
+        type="text"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 3, 4, 2)"
+        (keydown)="handleBackspace($event, 3, 2)"
+        (keypress)="restrictToNumbers($event)"
+        required
+      />
+      <input
+        [(ngModel)]="otp[4]"
+        name="otp4"
+        type="text"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 4, 5, 3)"
+        (keydown)="handleBackspace($event, 4, 3)"
+        (keypress)="restrictToNumbers($event)"
+        required
+      />
+      <input
+        [(ngModel)]="otp[5]"
+        name="otp5"
+        type="text"
+        maxlength="1"
+        class="otp-input"
+        (input)="moveToNext($event, 5, null, 4)"
+        (keydown)="handleBackspace($event, 5, 4)"
+        (keypress)="restrictToNumbers($event)"
         required
       />
     </div>
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Verify</button>
+    <button type="submit" class="validate-button">Validate</button>
   </form>
-  <button
-    (click)="resendOTP()"
-    class="bg-gray-500 text-white px-4 py-2 rounded-md mt-4"
-  >
-    Resend OTP
-  </button>
-  <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="text-green-500 mt-4">{{ successMessage }}</p>
+  <button (click)="resendOTP()" class="resend-button">Resend One-Time Password</button>
+  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+  <a routerLink="/login" class="wrong-number">Entered a wrong number?</a>
 </div>
