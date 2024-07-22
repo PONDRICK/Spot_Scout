@@ -4,7 +4,7 @@ from .serializers import UserRegisterSerializer,ActivityLogSerializer ,LoginSeri
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .utils import send_code_to_user,log_activity
+from .utils import send_code_to_user,log_activity,generate_verification_token
 from .models import OneTimePassword, User, ActivityLog
 from django.contrib.auth.models import Permission
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -19,7 +19,9 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.exceptions import AuthenticationFailed
 import json
 import logging
+import jwt
 from django.utils import timezone
+from spotscout import settings
 
 
 logger = logging.getLogger(__name__)
@@ -134,21 +136,23 @@ class RegisterUserView(GenericAPIView):
         serializer = self.serializer_class(data=user_data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            otp_code, expiration_time = send_code_to_user(user.email)
+            otp_code, expiration_time, token = send_code_to_user(user.email)
             log_activity(user, "registered")
             return Response({
                 'data': serializer.data,
                 'message': 'Thanks for signing up!',
-                'expiration_time': expiration_time
+                'expiration_time': expiration_time,
+                'token': token  # Include the token in the response
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyUserEmail(GenericAPIView):
-    def post(self, request):
+    def post(self, request, token):
         otpcode = request.data.get('otp')
         try:
-            user_code_obj = OneTimePassword.objects.get(code=otpcode)
-            user = user_code_obj.user
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user = User.objects.get(id=payload['user_id'], email=payload['email'])
+            user_code_obj = OneTimePassword.objects.get(user=user, code=otpcode)
 
             if user_code_obj.expires_at < timezone.now():
                 return Response({'message': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
@@ -165,9 +169,8 @@ class VerifyUserEmail(GenericAPIView):
                 'message': 'Code is invalid, user already verified'
             }, status=status.HTTP_204_NO_CONTENT)
 
-        except OneTimePassword.DoesNotExist:
-            return Response({'message': 'Passcode not provided'}, status=status.HTTP_404_NOT_FOUND)
-        
+        except (jwt.ExpiredSignatureError, jwt.DecodeError, User.DoesNotExist, OneTimePassword.DoesNotExist):
+            return Response({'message': 'Invalid token or OTP'}, status=status.HTTP_400_BAD_REQUEST)        
 
 class LoginUserView(GenericAPIView):
     serializer_class = LoginSerializer

@@ -28,8 +28,8 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}password-reset/`, email);
   }
 
-  verifyOTP(otpData: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}verify-email/`, otpData);
+  verifyOTP(otpData: any, token: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}verify-email/${token}/`, otpData);
   }
 
   resendOTP(email: any): Observable<any> {
