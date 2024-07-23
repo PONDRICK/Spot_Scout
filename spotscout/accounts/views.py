@@ -248,25 +248,26 @@ class LogoutUserView(GenericAPIView):
 
 class ResendOTPView(APIView):
     def post(self, request):
-        email = request.data.get('email')
-        logger.debug(f"Resend OTP requested for email: {email}")
+        token = request.data.get('token')
         try:
-            user = User.objects.get(email=email)
-            logger.debug(f"User found: {user.email}")
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = decoded_token['user_id']
+            user = User.objects.get(id=user_id)
             # Delete old OTP
             OneTimePassword.objects.filter(user=user).delete()
-            logger.debug(f"Old OTP deleted for user: {user.email}")
             # Generate and send new OTP
-            otp_code, expiration_time, token = send_code_to_user(email)
+            otp_code, expiration_time, new_token = send_code_to_user(user.email)
             log_activity(user, "resent_otp")
-            logger.debug(f"New OTP sent to user: {user.email}")
             return Response({
                 'message': 'OTP has been resent',
                 'expiration_time': expiration_time,
-                'token': token
+                'token': new_token
             }, status=status.HTTP_200_OK)
+        except jwt.ExpiredSignatureError:
+            return Response({'message': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.InvalidTokenError:
+            return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
-            logger.error(f"User with email {email} does not exist")
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(f"An error occurred: {str(e)}")

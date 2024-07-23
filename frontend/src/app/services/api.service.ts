@@ -31,11 +31,11 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}verify-email/${token}/`, otpData);
   }
 
-  resendOTP(email: any): Observable<any> {
+  resendOTP(data: any): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-    return this.http.post(`${this.baseUrl}resend-otp/`, JSON.stringify({ email }), { headers });
+    return this.http.post(`${this.baseUrl}resend-otp/`, JSON.stringify(data), { headers });
   }
 
   getOTPExpiration(token: string): Observable<any> {

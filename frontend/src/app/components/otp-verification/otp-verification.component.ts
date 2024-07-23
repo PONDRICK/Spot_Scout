@@ -99,7 +99,7 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   }
 
   resendOTP() {
-    this.apiService.resendOTP(this.email).subscribe(
+    this.apiService.resendOTP({ token: this.token }).subscribe(
       (response) => {
         console.log('OTP resent successfully', response);
         this.successMessage = 'OTP has been resent. Please check your email.';
