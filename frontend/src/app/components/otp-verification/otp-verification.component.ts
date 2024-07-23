@@ -1,5 +1,3 @@
-// otp-verification.component.ts
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -35,36 +33,47 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.email = history.state.email; // Get the email from the router state
 
-    // Retrieve expiration time from state
-    if (history.state.expirationTime) {
-      this.expirationTime = new Date(history.state.expirationTime);
-      this.startCountdown();
-    }
-
     // Get the token from the route parameters
     this.route.params.subscribe((params) => {
       this.token = params['token'];
+      // Fetch OTP expiration time
+      this.apiService.getOTPExpiration(this.token).subscribe(
+        (response) => {
+          this.expirationTime = new Date(response.expiration_time);
+          this.startCountdown();
+        },
+        (error) => {
+          this.errorMessage = 'Failed to fetch OTP expiration time';
+          console.error('Failed to fetch OTP expiration time', error);
+        }
+      );
     });
   }
 
   ngOnDestroy() {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
+    this.clearCountdown();
   }
 
   startCountdown() {
+    this.clearCountdown();
     if (this.expirationTime) {
       this.timeLeft = Math.floor(
         (this.expirationTime.getTime() - new Date().getTime()) / 1000
       );
       this.timerSubscription = interval(1000).subscribe(() => {
         this.timeLeft--;
-        if (this.timeLeft <= 0 && this.timerSubscription) {
-          this.timerSubscription.unsubscribe();
+        if (this.timeLeft <= 0) {
+          this.clearCountdown();
           this.errorMessage = 'OTP has expired. Please request a new one.';
         }
       });
+    }
+  }
+
+  clearCountdown() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
     }
   }
 
@@ -96,7 +105,7 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   }
 
   resendOTP() {
-    this.apiService.resendOTP(this.email).subscribe(
+    this.apiService.resendOTP({ token: this.token }).subscribe(
       (response) => {
         console.log('OTP resent successfully', response);
         this.successMessage = 'OTP has been resent. Please check your email.';
@@ -104,6 +113,13 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
         if (response.expiration_time) {
           this.expirationTime = new Date(response.expiration_time);
           this.startCountdown();
+        }
+        // Update the token if it's included in the response
+        if (response.token) {
+          this.token = response.token;
+          // Update the URL with the new token without navigating
+          const newUrl = `${location.protocol}//${location.host}${location.pathname.replace(/\/[^\/]*$/, '')}/${this.token}`;
+          window.history.replaceState({ path: newUrl }, '', newUrl);
         }
       },
       (error) => {

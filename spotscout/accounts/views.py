@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .utils import send_code_to_user,log_activity,generate_verification_token
 from .models import OneTimePassword, User, ActivityLog
 from django.contrib.auth.models import Permission
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, UntypedToken
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import smart_str , DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -22,6 +22,10 @@ import logging
 import jwt
 from django.utils import timezone
 from spotscout import settings
+from rest_framework_simplejwt.settings import api_settings
+from jwt.exceptions import ExpiredSignatureError
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -243,32 +247,45 @@ class LogoutUserView(GenericAPIView):
         log_activity(request.user, "logged_out")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class ResendOTPView(GenericAPIView):
+class ResendOTPView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        token = request.data.get('token')
         try:
-            user = User.objects.get(email=email)
+            # Decode the token without verification to get user info
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
+            user_id = decoded_token['user_id']
+            user = User.objects.get(id=user_id)
             # Delete old OTP
             OneTimePassword.objects.filter(user=user).delete()
             # Generate and send new OTP
-            otp_code, expiration_time = send_code_to_user(email)
+            otp_code, expiration_time, new_token = send_code_to_user(user.email)
             log_activity(user, "resent_otp")
-            return Response({'message': 'OTP has been resent', 'expiration_time': expiration_time}, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'OTP has been resent',
+                'expiration_time': expiration_time,
+                'token': new_token
+            }, status=status.HTTP_200_OK)
+        except jwt.InvalidTokenError:
+            return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"An error occurred: {str(e)}")
+            return Response({'message': 'An error occurred while resending OTP'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class GetOTPExpirationView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        token = request.data.get('token')
         try:
-            user = User.objects.get(email=email)
-            otp = OneTimePassword.objects.get(user=user)
-            expiration_time = otp.expires_at
-            return Response({'expiration_time': expiration_time}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        except OneTimePassword.DoesNotExist:
-            return Response({'message': 'OTP not found for this user'}, status=status.HTTP_404_NOT_FOUND)
+            # Decode the token without verification to get the expiration time
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
+            expiration_time = decoded_token.get('exp')
+            expiration_datetime = datetime.utcfromtimestamp(expiration_time).replace(tzinfo=timezone.utc)
+            return Response({'expiration_time': expiration_datetime}, status=status.HTTP_200_OK)
+        except jwt.InvalidTokenError:
+            return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            return Response({'message': 'Token has no expiration time'}, status=status.HTTP_400_BAD_REQUEST)
 
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):

@@ -5,7 +5,7 @@ from spotscout import settings
 from .models import User, OneTimePassword
 from .models import ActivityLog
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime, timedelta
 import jwt
 
 def generateOtp():
@@ -15,20 +15,23 @@ def generateOtp():
     return otp
 
 def generate_verification_token(user):
+    otp_code = generateOtp()
+    expiration_time = timezone.now() + timedelta(minutes=3)
+    otp_record = OneTimePassword.objects.create(user=user, code=otp_code, expires_at=expiration_time)
+    
     payload = {
         'user_id': user.id,
-        'email': user.email
+        'email': user.email,
+        'exp': expiration_time.timestamp()  # Use timestamp for 'exp'
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-    return token
+    return token, expiration_time, otp_code
 
 def send_code_to_user(email):
     Subject = "One time passcode for Email verification"
-    otp_code = generateOtp()
-    print(otp_code)
     user = User.objects.get(email=email)
     current_site = "Spotscout.com"
-    token = generate_verification_token(user)
+    token, expiration_time, otp_code = generate_verification_token(user)
     verification_link = f"http://localhost:4200/verify-otp/{token}/"
 
     email_body = format_html(
@@ -54,8 +57,6 @@ def send_code_to_user(email):
     )
 
     from_email = settings.DEFAULT_FROM_EMAIL
-    expiration_time = timezone.now() + timedelta(minutes=3)
-    OneTimePassword.objects.create(user=user, code=otp_code, expires_at=expiration_time)
     
     d_email = EmailMessage(subject=Subject, body=email_body, from_email=from_email, to=[email])
     d_email.content_subtype = "html"  # Main content is now text/html
