@@ -51,23 +51,29 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
+    this.clearCountdown();
   }
 
   startCountdown() {
+    this.clearCountdown();
     if (this.expirationTime) {
       this.timeLeft = Math.floor(
         (this.expirationTime.getTime() - new Date().getTime()) / 1000
       );
       this.timerSubscription = interval(1000).subscribe(() => {
         this.timeLeft--;
-        if (this.timeLeft <= 0 && this.timerSubscription) {
-          this.timerSubscription.unsubscribe();
+        if (this.timeLeft <= 0) {
+          this.clearCountdown();
           this.errorMessage = 'OTP has expired. Please request a new one.';
         }
       });
+    }
+  }
+
+  clearCountdown() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
     }
   }
 
