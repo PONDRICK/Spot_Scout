@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .utils import send_code_to_user,log_activity,generate_verification_token
 from .models import OneTimePassword, User, ActivityLog
 from django.contrib.auth.models import Permission
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, UntypedToken
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import smart_str , DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -22,6 +22,9 @@ import logging
 import jwt
 from django.utils import timezone
 from spotscout import settings
+from rest_framework_simplejwt.settings import api_settings
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -271,16 +274,22 @@ class ResendOTPView(APIView):
         
 class GetOTPExpirationView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        token = request.data.get('token')
         try:
-            user = User.objects.get(email=email)
-            otp = OneTimePassword.objects.get(user=user)
-            expiration_time = otp.expires_at
-            return Response({'expiration_time': expiration_time}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = decoded_token['user_id']
+            otp_record = OneTimePassword.objects.get(user_id=user_id)
+            expiration_time = otp_record.expires_at.timestamp()
+            expiration_datetime = datetime.utcfromtimestamp(expiration_time).replace(tzinfo=timezone.utc)
+            return Response({'expiration_time': expiration_datetime}, status=status.HTTP_200_OK)
         except OneTimePassword.DoesNotExist:
-            return Response({'message': 'OTP not found for this user'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'OTP record not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.ExpiredSignatureError:
+            return Response({'message': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.InvalidTokenError:
+            return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            return Response({'message': 'Token has no expiration time'}, status=status.HTTP_400_BAD_REQUEST)
 
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):

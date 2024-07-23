@@ -1,4 +1,3 @@
-// api.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -39,8 +38,11 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}resend-otp/`, JSON.stringify({ email }), { headers });
   }
 
-  getOTPExpiration(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/get-otp-expiration/`, email);
+  getOTPExpiration(token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.baseUrl}get-otp-expiration/`, JSON.stringify({ token }), { headers });
   }
 
   logoutUser(refreshToken: string): Observable<any> {

@@ -33,15 +33,20 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.email = history.state.email; // Get the email from the router state
 
-    // Retrieve expiration time from state
-    if (history.state.expirationTime) {
-      this.expirationTime = new Date(history.state.expirationTime);
-      this.startCountdown();
-    }
-
     // Get the token from the route parameters
     this.route.params.subscribe((params) => {
       this.token = params['token'];
+      // Fetch OTP expiration time
+      this.apiService.getOTPExpiration(this.token).subscribe(
+        (response) => {
+          this.expirationTime = new Date(response.expiration_time);
+          this.startCountdown();
+        },
+        (error) => {
+          this.errorMessage = 'Failed to fetch OTP expiration time';
+          console.error('Failed to fetch OTP expiration time', error);
+        }
+      );
     });
   }
 

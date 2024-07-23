@@ -30,5 +30,5 @@ urlpatterns = [
     path('activity-logs/', AdminActivityLogView.as_view(), name='admin-activity-logs'),
     path('ban-user/', BanUserView.as_view(), name='ban-user'),
     path('unban-user/', UnbanUserView.as_view(), name='unban-user'),
-    path('api/get-otp-expiration/', GetOTPExpirationView.as_view(), name='get-otp-expiration'),
+    path('get-otp-expiration/', GetOTPExpirationView.as_view(), name='get-otp-expiration'),
 ]
