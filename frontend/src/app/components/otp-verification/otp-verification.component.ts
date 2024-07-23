@@ -1,5 +1,3 @@
-// otp-verification.component.ts
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -104,6 +102,10 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
         if (response.expiration_time) {
           this.expirationTime = new Date(response.expiration_time);
           this.startCountdown();
+        }
+        // Update the token if it's included in the response
+        if (response.token) {
+          this.token = response.token;
         }
       },
       (error) => {

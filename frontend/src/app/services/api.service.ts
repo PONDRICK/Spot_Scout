@@ -33,7 +33,10 @@ export class ApiService {
   }
 
   resendOTP(email: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}resend-otp/`, email);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.baseUrl}resend-otp/`, JSON.stringify({ email }), { headers });
   }
 
   getOTPExpiration(email: string): Observable<any> {
