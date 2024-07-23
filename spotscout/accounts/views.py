@@ -1,3 +1,4 @@
+import pytz
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView,DestroyAPIView
 from .serializers import UserRegisterSerializer,ActivityLogSerializer ,LoginSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer, LogoutUserSerializer,UserSerializer, RoleSerializer, PermissionSerializer
@@ -280,13 +281,13 @@ class GetOTPExpirationView(APIView):
             # Decode the token without verification to get the expiration time
             decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
             expiration_time = decoded_token.get('exp')
-            expiration_datetime = datetime.utcfromtimestamp(expiration_time).replace(tzinfo=timezone.utc)
+            expiration_datetime = datetime.utcfromtimestamp(expiration_time).replace(tzinfo=pytz.UTC)
             return Response({'expiration_time': expiration_datetime}, status=status.HTTP_200_OK)
         except jwt.InvalidTokenError:
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except KeyError:
             return Response({'message': 'Token has no expiration time'}, status=status.HTTP_400_BAD_REQUEST)
-
+        
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):
         try:
