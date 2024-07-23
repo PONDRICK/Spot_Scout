@@ -23,6 +23,7 @@ import jwt
 from django.utils import timezone
 from spotscout import settings
 from rest_framework_simplejwt.settings import api_settings
+from jwt.exceptions import ExpiredSignatureError
 
 
 
@@ -250,7 +251,8 @@ class ResendOTPView(APIView):
     def post(self, request):
         token = request.data.get('token')
         try:
-            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            # Decode the token without verification to get user info
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
             user_id = decoded_token['user_id']
             user = User.objects.get(id=user_id)
             # Delete old OTP
@@ -263,8 +265,6 @@ class ResendOTPView(APIView):
                 'expiration_time': expiration_time,
                 'token': new_token
             }, status=status.HTTP_200_OK)
-        except jwt.ExpiredSignatureError:
-            return Response({'message': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.InvalidTokenError:
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
@@ -277,16 +277,11 @@ class GetOTPExpirationView(APIView):
     def post(self, request):
         token = request.data.get('token')
         try:
-            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-            user_id = decoded_token['user_id']
-            otp_record = OneTimePassword.objects.get(user_id=user_id)
-            expiration_time = otp_record.expires_at.timestamp()
+            # Decode the token without verification to get the expiration time
+            decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
+            expiration_time = decoded_token.get('exp')
             expiration_datetime = datetime.utcfromtimestamp(expiration_time).replace(tzinfo=timezone.utc)
             return Response({'expiration_time': expiration_datetime}, status=status.HTTP_200_OK)
-        except OneTimePassword.DoesNotExist:
-            return Response({'message': 'OTP record not found'}, status=status.HTTP_400_BAD_REQUEST)
-        except jwt.ExpiredSignatureError:
-            return Response({'message': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.InvalidTokenError:
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except KeyError:
