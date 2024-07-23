@@ -111,6 +111,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
         // Update the token if it's included in the response
         if (response.token) {
           this.token = response.token;
+          // Update the URL with the new token without navigating
+          const newUrl = `${location.protocol}//${location.host}${location.pathname.replace(/\/[^\/]*$/, '')}/${this.token}`;
+          window.history.replaceState({ path: newUrl }, '', newUrl);
         }
       },
       (error) => {
