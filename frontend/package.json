@@ -23,6 +23,7 @@
     "@angular/ssr": "^18.0.3",
     "@geoman-io/leaflet-geoman-free": "^2.17.0",
     "chart.js": "^4.4.3",
+    "daisyui": "^4.12.10",
     "express": "^4.18.2",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
