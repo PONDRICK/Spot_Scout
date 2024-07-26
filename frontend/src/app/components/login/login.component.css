@@ -1,0 +1,13 @@
+/* src/app/components/login/login.component.css */
+.bg-green-100 {
+    background-color: #e6ffe6;
+  }
+  
+  .bg-opacity-30 {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .login-background {
+    background: url('/assets/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+  }
