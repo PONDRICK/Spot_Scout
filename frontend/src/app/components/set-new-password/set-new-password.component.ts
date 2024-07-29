@@ -4,6 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-set-new-password',
@@ -70,11 +71,13 @@ export class SetNewPasswordComponent {
       .subscribe(
         (response) => {
           console.log('Password reset successful', response);
-          this.successMessage =
-            'Password has been reset successfully. You can now login with your new password.';
-          setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Password Reset Successful',
+            text: 'You can now login with your new password.',
+          }).then(() => {
             this.router.navigate(['/login']);
-          }, 3000);
+          });
         },
         (error) => {
           console.error('Password reset failed', error);
