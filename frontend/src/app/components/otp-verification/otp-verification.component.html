@@ -1,79 +1,83 @@
-<div class="otp-container">
-  <h2>Please enter the One-Time Password to verify your account</h2>
-  <p>A One-Time Password has been sent to {{ email }}</p>
-  <form (ngSubmit)="verifyOTP()">
-    <div class="otp-inputs" (paste)="handlePaste($event)">
-      <input
-        [(ngModel)]="otp[0]"
-        name="otp0"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 0, 1, null)"
-        (keydown)="handleKeyDown($event, 0, null, 1)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-      <input
-        [(ngModel)]="otp[1]"
-        name="otp1"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 1, 2, 0)"
-        (keydown)="handleKeyDown($event, 1, 0, 2)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-      <input
-        [(ngModel)]="otp[2]"
-        name="otp2"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 2, 3, 1)"
-        (keydown)="handleKeyDown($event, 2, 1, 3)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-      <input
-        [(ngModel)]="otp[3]"
-        name="otp3"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 3, 4, 2)"
-        (keydown)="handleKeyDown($event, 3, 2, 4)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-      <input
-        [(ngModel)]="otp[4]"
-        name="otp4"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 4, 5, 3)"
-        (keydown)="handleKeyDown($event, 4, 3, 5)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-      <input
-        [(ngModel)]="otp[5]"
-        name="otp5"
-        type="text"
-        maxlength="1"
-        class="otp-input"
-        (input)="moveToNext($event, 5, null, 4)"
-        (keydown)="handleKeyDown($event, 5, 4, null)"
-        (keypress)="restrictToNumbers($event)"
-        required
-      />
-    </div>
-    <button type="submit" class="validate-button">Validate</button>
-  </form>
-  <button (click)="resendOTP()" class="resend-button">Resend One-Time Password</button>
-  <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
-  <p *ngIf="timeLeft > 0" class="countdown-timer">OTP will expire in: {{ formatTimeLeft() }}</p>
+<!-- OTP Page HTML -->
+<div class="min-h-screen flex items-center justify-center otp-background">
+  <div class="otp-container bg-black bg-opacity-50 rounded-lg shadow-md p-10">
+    <h2 class="text-2xl font-bold mb-4 text-white">Please enter the One-Time Password to verify your account</h2>
+    <p class="mb-6 text-gray-300" *ngIf="email">A One-Time Password has been sent to {{ email }}</p>
+    <p class="mb-6 text-gray-300" *ngIf="!email">A One-Time Password has been sent</p>
+    <form (ngSubmit)="verifyOTP()" class="space-y-4">
+      <div class="otp-inputs flex justify-center gap-2 mb-4" (paste)="handlePaste($event)">
+        <input
+          [(ngModel)]="otp[0]"
+          name="otp0"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 0, 1, null)"
+          (keydown)="handleKeyDown($event, 0, null, 1)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+        <input
+          [(ngModel)]="otp[1]"
+          name="otp1"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 1, 2, 0)"
+          (keydown)="handleKeyDown($event, 1, 0, 2)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+        <input
+          [(ngModel)]="otp[2]"
+          name="otp2"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 2, 3, 1)"
+          (keydown)="handleKeyDown($event, 2, 1, 3)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+        <input
+          [(ngModel)]="otp[3]"
+          name="otp3"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 3, 4, 2)"
+          (keydown)="handleKeyDown($event, 3, 2, 4)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+        <input
+          [(ngModel)]="otp[4]"
+          name="otp4"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 4, 5, 3)"
+          (keydown)="handleKeyDown($event, 4, 3, 5)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+        <input
+          [(ngModel)]="otp[5]"
+          name="otp5"
+          type="text"
+          maxlength="1"
+          class="otp-input w-10 h-10 text-xl text-center border border-gray-300 rounded-md"
+          (input)="moveToNext($event, 5, null, 4)"
+          (keydown)="handleKeyDown($event, 5, 4, null)"
+          (keypress)="restrictToNumbers($event)"
+          required
+        />
+      </div>
+      <button type="submit" class="validate-button bg-red-500 text-white px-4 py-2 rounded-md w-full">Validate</button>
+    </form>
+    <button (click)="resendOTP()" class="resend-button bg-gray-500 text-white px-4 py-2 rounded-md w-full mt-4">Resend One-Time Password</button>
+    <p *ngIf="errorMessage" class="error-message text-red-500 mt-4">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success-message text-green-500 mt-4">{{ successMessage }}</p>
+    <p *ngIf="timeLeft > 0" class="countdown-timer text-gray-300 mt-4">OTP will expire in: {{ formatTimeLeft() }}</p>
+  </div>
 </div>
