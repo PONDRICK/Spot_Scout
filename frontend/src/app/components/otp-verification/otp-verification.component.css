@@ -1,8 +1,4 @@
 /* src/app/components/otp/otp.component.css */
-.otp-background {
-  background: url('/assets/background.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
 
 .otp-container {
   max-width: 400px;
@@ -86,4 +82,8 @@
 .countdown-timer {
   margin-top: 15px; /* Add space above the countdown timer */
   color: #fff; /* White text color */
+}
+
+.main-container {
+  margin-bottom: 5rem; /* Adjust this value to move the container upwards */
 }
