@@ -1,5 +1,49 @@
-<div class="min-h-screen flex items-center justify-center login-background">
-  <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md max-w-4xl mx-auto my-10 p-10">
+<!-- src/app/components/login/login.component.html -->
+<div class="login-background">
+  <!-- Waves Container -->
+  <div>
+    <svg
+      class="waves"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 24 150 28"
+      preserveAspectRatio="none"
+      shape-rendering="auto"
+    >
+      <defs>
+        <path
+          id="gentle-wave"
+          d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+        />
+      </defs>
+      <g class="parallax">
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="0"
+          fill="rgba(255,255,255,0.7"
+        />
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="3"
+          fill="rgba(255,255,255,0.5)"
+        />
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="5"
+          fill="rgba(255,255,255,0.3)"
+        />
+        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- Login Form Container -->
+  <div
+    class="flex bg-black bg-opacity-50 rounded-lg shadow-md max-w-4xl mx-auto p-10"
+  >
     <div class="w-1/2 pr-10">
       <div class="flex flex-col items-center">
         <h2 class="text-3xl font-bold mb-6 text-white">Login</h2>
@@ -7,7 +51,9 @@
       </div>
       <form (ngSubmit)="login()" class="space-y-4">
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+          <label for="email" class="block text-sm font-medium text-gray-300"
+            >Email</label
+          >
           <input
             [(ngModel)]="credentials.email"
             name="email"
@@ -17,7 +63,9 @@
           />
         </div>
         <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+          <label for="password" class="block text-sm font-medium text-gray-300"
+            >Password</label
+          >
           <input
             [(ngModel)]="credentials.password"
             name="password"
@@ -27,7 +75,9 @@
           />
         </div>
         <div class="flex justify-between items-center">
-          <a routerLink="/reset-password" class="text-blue-500">Forgot Password?</a>
+          <a routerLink="/reset-password" class="text-blue-500"
+            >Forgot Password?</a
+          >
         </div>
         <div class="flex justify-center mt-4 space-x-10">
           <button
@@ -48,7 +98,10 @@
     </div>
     <div class="w-1/2 pl-10 text-white">
       <h3 class="text-2xl font-bold mb-4">Spot Scout</h3>
-      <p class="mb-6">Search and find your dream location is now easier than ever. Just analyze your favorite location.</p>
+      <p class="mb-6">
+        Search and find your dream location is now easier than ever. Just
+        analyze your favorite location.
+      </p>
       <p class="font-bold">Hello</p>
       <p class="mb-6">======================</p>
       <p class="mb-6">======================</p>
