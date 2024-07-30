@@ -1,38 +1,41 @@
-<div class="min-h-screen flex items-center justify-center register-background">
-  <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-2/6 mx-auto my-10 p-10">
-    <div class="w-full">
-      <div class="flex flex-col items-center">
-        <h2 class="text-3xl font-bold mb-6 text-white">Sign Up</h2>
+<div class="login-background">
+
+  <div class="flex items-center justify-center w-full h-full">
+    <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-2/6 mx-auto my-10 p-10">
+      <div class="w-full">
+        <div class="flex flex-col items-center">
+          <h2 class="text-3xl font-bold mb-6 text-white">Sign Up</h2>
+        </div>
+        <form (ngSubmit)="register()" class="space-y-4">
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+            <input [(ngModel)]="user.email" name="email" type="email" class="mt-1 p-2 border rounded-md w-full" required />
+          </div>
+          <div class="mb-4">
+            <label for="first_name" class="block text-sm font-medium text-gray-300">First Name</label>
+            <input [(ngModel)]="user.first_name" name="first_name" type="text" class="mt-1 p-2 border rounded-md w-full" required />
+          </div>
+          <div class="mb-4">
+            <label for="last_name" class="block text-sm font-medium text-gray-300">Last Name</label>
+            <input [(ngModel)]="user.last_name" name="last_name" type="text" class="mt-1 p-2 border rounded-md w-full" required />
+          </div>
+          <div class="mb-4">
+            <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+            <input [(ngModel)]="user.password" name="password" type="password" class="mt-1 p-2 border rounded-md w-full" required />
+          </div>
+          <div class="mb-4">
+            <label for="password2" class="block text-sm font-medium text-gray-300">Confirm Password</label>
+            <input [(ngModel)]="user.password2" name="password2" type="password" class="mt-1 p-2 border rounded-md w-full" required />
+          </div>
+          <div class="flex justify-center mt-4">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Sign Up</button>
+          </div>
+        </form>
+        <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
+        <p class="mt-4 text-gray-300">
+          Already have an account? <a routerLink="/login" class="text-blue-500">Login here</a>
+        </p>
       </div>
-      <form (ngSubmit)="register()" class="space-y-4">
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
-          <input [(ngModel)]="user.email" name="email" type="email" class="mt-1 p-2 border rounded-md w-full" required />
-        </div>
-        <div class="mb-4">
-          <label for="first_name" class="block text-sm font-medium text-gray-300">First Name</label>
-          <input [(ngModel)]="user.first_name" name="first_name" type="text" class="mt-1 p-2 border rounded-md w-full" required />
-        </div>
-        <div class="mb-4">
-          <label for="last_name" class="block text-sm font-medium text-gray-300">Last Name</label>
-          <input [(ngModel)]="user.last_name" name="last_name" type="text" class="mt-1 p-2 border rounded-md w-full" required />
-        </div>
-        <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-          <input [(ngModel)]="user.password" name="password" type="password" class="mt-1 p-2 border rounded-md w-full" required />
-        </div>
-        <div class="mb-4">
-          <label for="password2" class="block text-sm font-medium text-gray-300">Confirm Password</label>
-          <input [(ngModel)]="user.password2" name="password2" type="password" class="mt-1 p-2 border rounded-md w-full" required />
-        </div>
-        <div class="flex justify-center mt-4">
-          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Sign Up</button>
-        </div>
-      </form>
-      <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
-      <p class="mt-4 text-gray-300">
-        Already have an account? <a routerLink="/login" class="text-blue-500">Login here</a>
-      </p>
     </div>
   </div>
 </div>
