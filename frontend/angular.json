@@ -26,6 +26,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/leaflet-draw/dist/leaflet.draw.css",
               "node_modules/@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css",
@@ -93,6 +94,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/leaflet-draw/dist/leaflet.draw.css",
               "node_modules/@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css",

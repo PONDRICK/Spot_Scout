@@ -59,13 +59,15 @@ button {
   right: -350px; /* Adjust based on your sidebar width */
   width: 350px; /* Adjust based on your sidebar width */
   height: calc(100vh - 56px); /* Full height minus navbar height */
-  background-color: #f9f9f9;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
   transition: right 0.3s ease, background-color 0.3s ease;
   z-index: 1000;
   overflow-y: auto; /* Enable scrolling inside the sidebar */
   padding: 20px;
-  border-left: 5px solid #007bff; /* Add a colored border for accent */
+  border-left: 7px solid #046cdc; /* Add a colored border for accent */
+  border-right: 7px solid #046cdc; /* Add a colored border for accent */
+
 }
 
 .sidebar.open {
@@ -96,12 +98,12 @@ button {
 .sidebar-content h2 {
   margin-bottom: 10px;
   font-size: 1.5em;
-  color: #333;
+  color: #fff;
 }
 
 .sidebar-content label {
   margin-bottom: 5px;
-  color: #666;
+  color: #ccc;
 }
 
 .sidebar-content select,
@@ -110,11 +112,84 @@ button {
   margin-bottom: 10px;
 }
 
+.sidebar-content select {
+  width: 100%; /* Fill the container's width */
+  padding: 5px; /* Adjust the padding for a smaller height */
+  font-size: 14px; /* Adjust the font size */
+  color: #000; /* Text color */
+  background-color: #f0f0f0; /* Background color */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for the select box */
+  box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.sidebar-content select:focus {
+  border-color: #046cdc; /* Highlight color when focused */
+  outline: none; /* Remove default outline */
+}
+
+.custom-select {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  padding: 0 12px !important;
+  height: 36px !important; /* Adjust the height as needed */
+  align-items: center !important;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-infix {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-outline-start,
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-outline-end {
+  border: none !important;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-outline {
+  color: transparent !important;
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-outline-thick {
+  border-width: 0 !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-outline-thick {
+  border-width: 2px !important;
+  border-color: #046cdc !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-ripple {
+  background-color: #046cdc !important;
+}
+
+::ng-deep .mat-form-field-infix {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+::ng-deep .mat-input-element {
+  height: 28px !important; /* Adjust the input element height */
+  line-height: 28px !important; /* Match the line height to the input element height */
+  padding: 0 !important;
+}
+
+::ng-deep .mat-option {
+  padding: 8px !important;
+}
+
+
+
 .sidebar-content .confirm-button {
-  background-color: #007bff;
+  background-color: #046cdc;
   color: white;
   border: none;
   padding: 10px;
+  margin-top: 10px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -132,7 +207,7 @@ button {
   position: relative;
   padding: 16px;
   margin-bottom: 10px;
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 1 ); /* Semi-transparent white */
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -268,3 +343,4 @@ button {
 .suggestions .icon {
   margin-right: 10px;
 }
+

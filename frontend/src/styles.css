@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Chakra+Petch&family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
 
+@import "@angular/material/prebuilt-themes/azure-blue.css";
 /* Apply the font to the whole website */
 body,
 html {
@@ -130,3 +131,6 @@ html {
   padding: 0;
   margin: 0;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
