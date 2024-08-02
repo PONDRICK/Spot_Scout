@@ -13,6 +13,7 @@ import { routes } from './app/app.routes';
 import { AuthService } from './app/services/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthInterceptor } from './app/auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 const mergedConfig: ApplicationConfig = {
   providers: [
@@ -24,7 +25,7 @@ const mergedConfig: ApplicationConfig = {
       multi: true,
     },
     AuthService,
-    CookieService,
+    CookieService, provideAnimationsAsync(),
   ],
 };
 

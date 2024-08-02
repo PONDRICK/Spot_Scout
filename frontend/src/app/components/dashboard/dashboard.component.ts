@@ -11,22 +11,45 @@ import {
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { SharedService } from '../../services/shared.service'; // Import the shared service
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [
+    CommonModule, HttpClientModule, FormsModule,
+    MatAutocompleteModule, MatInputModule,
+    MatFormFieldModule,ReactiveFormsModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
+  searchControl = new FormControl();
+  filteredOptions!: Observable<string[]>;
+  amenities: string[] = [
+    'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty', 
+    'beverages','bus_stop', 'cafe', 'clinic', 'clothes', 'coffee', 
+    'college', 'convenience', 'crossing', 'department_store', 'dentist', 
+    'fast_food','fire_station', 'fuel', 'hairdresser','hamlet', 'hospital',
+    'hostel', 'hotel','information', 'laundry','library',  'mall', 
+    'massage', 'motel', 'museum','office', 'pharmacy', 'police', 
+    'post_office', 'resort', 'restaurant','school', 'station', 'supermarket', 
+    'townhall', 'tyres','university', 'village', 'zoo', 
+  ];
+
   private map: any;
   private marker: any;
   private polylines: any[] = [];
@@ -41,7 +64,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   isSidebarOpen = false;
   selectedFunction = 'nearest';
-  selectedAmenity = 'restaurant';
+  selectedAmenity = '';
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
@@ -65,6 +88,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     this.checkSession();
     this.startTokenCheck();
+
+    this.filteredOptions = this.searchControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
 
     const mapData = this.sharedService.getMapData();
     if (mapData) {
@@ -911,5 +939,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.loadMap(selectedMap);
       this.closeHistoryModal();
     }
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.amenities.filter(option => option.toLowerCase().includes(filterValue));
   }
 }
