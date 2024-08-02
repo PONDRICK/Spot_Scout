@@ -65,7 +65,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   isSidebarOpen = false;
   selectedFunction = 'nearest';
-  selectedAmenity = 'restaurant';
+  selectedAmenity = '';
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
