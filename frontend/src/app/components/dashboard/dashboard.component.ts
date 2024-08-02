@@ -61,10 +61,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
 
   isSidebarOpen = false;
   selectedFunction = 'nearest';
-  selectedAmenity = '';
+  selectedAmenity = 'restaurant';
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
@@ -121,6 +122,25 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.loadLeaflet();
+
+      // Add the event listener for keydown events to navigate the dropdown list
+      this.amenitySelect.nativeElement.addEventListener('keydown', this.onKeyDown.bind(this));
+    }
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.amenities.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    const key = event.key.toLowerCase();
+    const options = Array.from(this.amenitySelect.nativeElement.options);
+    const index = options.findIndex(option => option.value.toLowerCase().startsWith(key));
+
+    if (index !== -1) {
+      this.amenitySelect.nativeElement.selectedIndex = index;
+      this.selectedAmenity = this.amenities[index];
     }
   }
 
@@ -941,8 +961,4 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.amenities.filter(option => option.toLowerCase().includes(filterValue));
-  }
 }
