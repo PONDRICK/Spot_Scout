@@ -69,6 +69,12 @@
     <!-- Conditionally display the amenity selection based on the selected function -->
     <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
       <label for="amenity">Select Amenity:</label>
+      <select id="amenity" [(ngModel)]="selectedAmenity">
+        <option *ngFor="let option of filteredOptions | async" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+    <!-- <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
+      <label for="amenity">Select Amenity:</label>
       <mat-form-field appearance="fill" class="custom-select">
         <mat-label>Select Amenity</mat-label>
         <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto">
@@ -78,7 +84,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-    </div>
+    </div> -->
 
     <!-- Add distance input for Count and Population -->
     <div
