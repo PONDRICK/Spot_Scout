@@ -10,3 +10,40 @@
 .main-container {
   margin-bottom: 5rem; /* Adjust this value to move the container upwards */
 }
+
+.spotscout-title {
+  color: #ec342c;
+  font-weight: 500;
+  text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000, 0.5px 0.5px 0 #000;
+}
+
+.text-container {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 300px; /* Adjust this width as needed */
+}
+
+.text-container p {
+  text-align: left;
+}
+
+.pr-10 {
+  padding-right: 1rem; /* Adjust this value as needed */
+}
+
+.pl-10 {
+  padding-left: 1rem; /* Adjust this value as needed */
+}
+
+/* Add this CSS rule to align the labels to the left and add padding */
+.label-padding {
+  padding-left: 0.5rem; /* Adjust this value as needed */
+}
+
+/* Add this CSS rule to increase the container width */
+.max-w-6xl {
+  max-width: 55%; /* Adjust this value as needed */
+}
+

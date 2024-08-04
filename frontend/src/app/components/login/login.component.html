@@ -1,6 +1,4 @@
-<!-- src/app/components/login/login.component.html -->
 <div class="login-background">
-
   <!-- Waves Container -->
   <div>
     <svg
@@ -42,19 +40,15 @@
   </div>
   
   <!-- Login Form Container -->
-  <div
-    class="flex bg-black bg-opacity-50 rounded-lg shadow-md max-w-4xl mx-auto p-10 main-container" 
-  >
+  <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-6xl mx-auto p-10 main-container">
     <div class="w-1/2 pr-10">
       <div class="flex flex-col items-center">
-        <h2 class="text-3xl font-bold mb-6 text-white">Login</h2>
+        <h3 class="text-3xl font-bold mb-6 text-white">Sign In</h3>
         <p class="mb-4 text-gray-300">Please Enter your Account details</p>
       </div>
       <form (ngSubmit)="login()" class="space-y-4">
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-300"
-            >Email</label
-          >
+          <label for="email" class="block text-sm font-medium text-gray-300 text-left label-padding">Email</label>
           <input
             [(ngModel)]="credentials.email"
             name="email"
@@ -64,9 +58,7 @@
           />
         </div>
         <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-300"
-            >Password</label
-          >
+          <label for="password" class="block text-sm font-medium text-gray-300 text-left label-padding">Password</label>
           <input
             [(ngModel)]="credentials.password"
             name="password"
@@ -76,9 +68,7 @@
           />
         </div>
         <div class="flex justify-between items-center">
-          <a routerLink="/reset-password" class="text-blue-500"
-            >Forgot Password?</a
-          >
+          <a routerLink="/reset-password" class="text-blue-500">Forgot Password?</a>
         </div>
         <div class="flex justify-center mt-4 space-x-10">
           <button
@@ -97,20 +87,17 @@
         </div>
       </form>
     </div>
-    <div class="w-1/2 pl-10 text-white">
-      <h3 class="text-2xl font-bold mb-4">Spot Scout</h3>
-      <p class="mb-6">
-        Search and find your dream location is now easier than ever. Just
-        analyze your favorite location.
-      </p>
-      <p class="font-bold">Hello</p>
-      <p class="mb-6">======================</p>
-      <p class="mb-6">======================</p>
-      <p class="mb-6">======================</p>
-      <p class="mb-6">======================</p>
-      <div class="flex justify-between">
-        <button class="bg-pink-500 px-4 py-2 rounded-md">Back</button>
-        <button class="bg-green-500 px-4 py-2 rounded-md">Next</button>
+    <div class="w-1/2 pl-10 text-white flex flex-col items-center">
+      <div style="display: flex; justify-content: center;">
+        <img src="assets/spotscout_logo.png" alt="Spot Scout Logo" style="width: 200px; height: auto;" />
+      </div>
+      <h5 class="text-2xl font-bold mb-4 spotscout-title">SpotScout</h5>
+      <div class="text-container">
+        <p>
+          Search and find your dream location
+          is now easier than ever. Just analyze
+          your favorite location.
+        </p>
       </div>
     </div>
   </div>
