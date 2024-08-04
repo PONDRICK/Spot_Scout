@@ -40,14 +40,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   searchControl = new FormControl();
   filteredOptions!: Observable<string[]>;
   amenities: string[] = [
-    'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty', 
-    'beverages','bus_stop', 'cafe', 'clinic', 'clothes', 'coffee', 
+    'alcohol', 'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty', 
+    'beverages','bus_stop', 'cafe', 'car', 'clinic', 'clothes', 'computer', 'coffee', 
     'college', 'convenience', 'crossing', 'department_store', 'dentist', 
-    'fast_food','fire_station', 'fuel', 'hairdresser','hamlet', 'hospital',
-    'hostel', 'hotel','information', 'laundry','library',  'mall', 
-    'massage', 'motel', 'museum','office', 'pharmacy', 'police', 
-    'post_office', 'resort', 'restaurant','school', 'station', 'supermarket', 
-    'townhall', 'tyres','university', 'village', 'zoo', 
+    'fast_food','fire_station', 'florist', 'fuel', 'hairdresser','hamlet', 'hospital',
+    'hostel', 'hotel','information','jewelry', 'kiosk', 'laundry','library', 
+    'mall', 'massage', 'mobile_phone','motel', 'motorcycle', 'museum', 'musical_instrument', 'office', 'outdoor',  'pharmacy', 'police', 
+    'post_office', 'resort', 'restaurant','school', 'shoes', 'sports','station', 'supermarket', 
+    'townhall', 'tyres','university', 'village', 'zoo', 'restroom'
   ];
 
   private map: any;
@@ -65,7 +65,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   isSidebarOpen = false;
   selectedFunction = 'nearest';
-  selectedAmenity = '';
+  selectedAmenity = 'restaurant';
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
