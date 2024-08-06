@@ -24,14 +24,13 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule, HttpClientModule, FormsModule,
     MatAutocompleteModule, MatInputModule,
-    MatFormFieldModule,ReactiveFormsModule,
+    MatFormFieldModule, ReactiveFormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -40,14 +39,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   searchControl = new FormControl();
   filteredOptions!: Observable<string[]>;
   amenities: string[] = [
-    'alcohol', 'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty', 
-    'beverages','bus_stop', 'cafe', 'car', 'clinic', 'clothes', 'computer', 'coffee', 
-    'college', 'convenience', 'crossing', 'department_store', 'dentist', 
-    'fast_food','fire_station', 'florist', 'fuel', 'hairdresser','hamlet', 'hospital',
-    'hostel', 'hotel','information','jewelry', 'kiosk', 'laundry','library', 
-    'mall', 'massage', 'mobile_phone','motel', 'motorcycle', 'museum', 'musical_instrument', 'office', 'outdoor',  'pharmacy', 'police', 
-    'post_office', 'resort', 'restaurant','school', 'shoes', 'sports','station', 'supermarket', 
-    'townhall', 'tyres','university', 'village', 'zoo', 'restroom'
+    'alcohol', 'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty',
+    'beverages', 'bus_stop', 'cafe', 'car', 'clinic', 'clothes', 'computer', 'coffee',
+    'college', 'convenience', 'crossing', 'department_store', 'dentist',
+    'fast_food', 'fire_station', 'florist', 'fuel', 'hairdresser', 'hamlet', 'hospital',
+    'hostel', 'hotel', 'information', 'jewelry', 'kiosk', 'laundry', 'library',
+    'mall', 'massage', 'mobile_phone', 'motel', 'motorcycle', 'museum', 'musical_instrument', 'office', 'outdoor', 'pharmacy', 'police',
+    'post_office', 'resort', 'restaurant', 'school', 'shoes', 'sports', 'station', 'supermarket',
+    'townhall', 'tyres', 'university', 'village', 'zoo', 'restroom'
   ];
 
   private map: any;
@@ -223,18 +222,22 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (this.isSidebarOpen && !this.isMarkerLocked) {
         const lat = e.latlng.lat.toFixed(4);
         const lon = e.latlng.lng.toFixed(4);
-        this.latInput.nativeElement.value = lat;
-        this.lonInput.nativeElement.value = lon;
-
-        this.clearOutputsAndOverlays();
-
-        if (this.marker) {
-          this.marker.setLatLng(e.latlng);
+        if (this.outputs.length > 0) {
+          Swal.fire({
+            title: 'Change Location?',
+            text: 'Do you want to change the location? Unsaved progress will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.clearOutputsAndOverlays();
+              this.updateLocation(lat, lon, e.latlng);
+            }
+          });
         } else {
-          this.marker = L.marker(e.latlng, { icon: this.redIcon }).addTo(
-            this.map
-          );
-          (this.marker as any).isOutputLayer = true;
+          this.updateLocation(lat, lon, e.latlng);
         }
       }
     });
@@ -275,6 +278,20 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  private updateLocation(lat: string, lon: string, latlng: any): void {
+    this.latInput.nativeElement.value = lat;
+    this.lonInput.nativeElement.value = lon;
+
+    if (this.marker) {
+      this.marker.setLatLng(latlng);
+    } else {
+      import('leaflet').then((L) => {
+        this.marker = L.marker(latlng, { icon: this.redIcon }).addTo(this.map);
+        (this.marker as any).isOutputLayer = true;
+      });
+    }
+  }
+
   private clearOutputsAndOverlays() {
     this.outputs = [];
     this.polylines.forEach((polyline) => polyline.remove());
@@ -310,7 +327,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const refreshToken = this.cookieService.get('refresh_token');
     if (!accessToken && refreshToken) {
       this.apiService.refreshToken().subscribe({
-        next: () => {},
+        next: () => { },
         error: () => {
           this.router.navigate(['/login']);
         },
@@ -324,7 +341,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.tokenCheckInterval = setInterval(() => {
       if (this.authService.isAccessTokenExpired()) {
         this.apiService.refreshToken().subscribe({
-          next: () => {},
+          next: () => { },
           error: () => {
             if (this.authService.isRefreshTokenExpired()) {
               this.showSessionExpiredAlert();
@@ -590,7 +607,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
               const popupContent = `
                             <div class="predict-info-box">
-                                <h3>Predicted Amenity Category:</h3>
+                                <p>Predicted Amenity Category:</p>
                                 <p>${top3Predictions[0].category}</p>
                             </div>`;
 
@@ -917,7 +934,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
-            <h3>Predicted Amenity Category:</h3>
+            <p>Predicted Amenity Category:</p>
             <p>${output.predicted_amenity_category}</p>
           </div>`;
           if (output.redMarker) {
@@ -960,5 +977,4 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.closeHistoryModal();
     }
   }
-
 }
