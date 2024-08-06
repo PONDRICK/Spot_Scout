@@ -225,7 +225,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.outputs.length > 0) {
           Swal.fire({
             title: 'Change Location?',
-            text: 'Do you want to change the location? Unsaved progress will be lost.',
+            html: 'Do you want to change the location?<br>Unsaved progress will be lost.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes',
