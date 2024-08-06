@@ -590,7 +590,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
               const popupContent = `
                             <div class="predict-info-box">
-                                <h3>Predicted Amenity Category:</h3>
+                                <p>Predicted Amenity Category:</p>
                                 <p>${top3Predictions[0].category}</p>
                             </div>`;
 
@@ -917,7 +917,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
-            <h3>Predicted Amenity Category:</h3>
+            <p>Predicted Amenity Category:</p>
             <p>${output.predicted_amenity_category}</p>
           </div>`;
           if (output.redMarker) {

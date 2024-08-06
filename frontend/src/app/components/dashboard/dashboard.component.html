@@ -237,7 +237,7 @@
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
         </button>
-        <h3>Population:</h3>
+        <p>Population:</p>
         <p>Distance: {{ place.distance }} meters</p>
         <p>Population: {{ place.population }}</p>
       </div>
@@ -265,7 +265,7 @@
         <button (click)="toggleVisibility(place)" class="toggle-button">
           {{ place.visible ? "Hide" : "Show" }}
         </button>
-        <h3>Prediction Results:</h3>
+        <p>Prediction Results:</p>
         <p>Most Suitable Amenity</p>
         <p *ngFor="let pred of place.top_predictions">
           {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
