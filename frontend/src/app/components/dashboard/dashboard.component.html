@@ -57,7 +57,7 @@
     <div class="checkbox-container flex items-center space-x-2 mt-1">
       <label class="relative inline-flex items-center cursor-pointer">
         <input class="sr-only peer" type="checkbox" [(ngModel)]="isMarkerLocked">
-        <div class="group peer ring-0 bg-gradient-to-r from-emerald-400 to-emerald-900 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-red-900 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95">
+        <div class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95">
           <svg class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5" height="50" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100" width="50" x="0" xmlns="http://www.w3.org/2000/svg" y="0">
             <path class="svg-fill-primary" d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"></path>
           </svg>
@@ -66,7 +66,7 @@
           </svg>
         </div>
       </label>
-      <span class="text-white">Lock Location</span>
+      <label class="text-white">Lock Location</label>
     </div>
     <label for="function">Select Function:</label>
     <select id="function" [(ngModel)]="selectedFunction">
