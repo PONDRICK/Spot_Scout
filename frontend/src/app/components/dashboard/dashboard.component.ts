@@ -631,6 +631,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  private isOutputRemoved(output: any): boolean {
+    return !this.outputs.includes(output);
+  }
+
   validateDistance() {
     if (this.selectedFunction === 'count' && this.distance > 10000) {
       this.distance = 10000;
@@ -701,6 +705,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .getNearestPlace(lat, lon, this.selectedAmenity)
         .subscribe({
           next: (response) => {
+            if (this.isOutputRemoved(loadingOutput)) return;
             import('leaflet').then((L) => {
               const polyline = L.polyline(
                 [
@@ -744,6 +749,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
         .subscribe({
           next: (response) => {
+            if (this.isOutputRemoved(loadingOutput)) return;
             import('leaflet').then((L) => {
               const circle = L.circle([lat, lon], {
                 radius: this.distance,
@@ -787,6 +793,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'population') {
       this.apiService.getPopulation(lat, lon, this.distance).subscribe({
         next: (response) => {
+          if (this.isOutputRemoved(loadingOutput)) return;
           loadingOutput.loading = false;
           Object.assign(loadingOutput, {
             population: response.population,
@@ -798,6 +805,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
+          if (this.isOutputRemoved(loadingOutput)) return;
           import('leaflet').then((L) => {
             if (
               response &&
@@ -848,11 +856,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 remaining_score: remainingScore,
                 marker: this.marker,
                 popupContent: popupContent, // Save popup content to output
-              });
-
-              // Add event listeners for dragging
-              this.marker.on('pm:dragend', () => {
-                this.redrawOutput(loadingOutput);
               });
             } else {
               console.error('Invalid response format:', response);
