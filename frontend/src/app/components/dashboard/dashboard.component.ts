@@ -472,7 +472,20 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       import('leaflet').then((L) => {
         this.marker = L.marker(latlng, { icon: this.redIcon }).addTo(this.map);
         (this.marker as any).isOutputLayer = true;
+
+        // Add event listener to the red marker
+        this.marker.on('pm:dragend', () => {
+          this.redrawMarker();
+        });
       });
+    }
+  }
+
+  private redrawMarker() {
+    const lat = parseFloat(this.latInput.nativeElement.value);
+    const lon = parseFloat(this.lonInput.nativeElement.value);
+    if (this.marker) {
+      this.marker.setLatLng([lat, lon]);
     }
   }
 
@@ -618,6 +631,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
+  private isOutputRemoved(output: any): boolean {
+    return !this.outputs.includes(output);
+  }
+
   validateDistance() {
     if (this.selectedFunction === 'count' && this.distance > 10000) {
       this.distance = 10000;
@@ -645,6 +662,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.map
         );
         (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+
+        // Add event listener to the red marker
+        this.marker.on('pm:dragend', () => {
+          this.redrawMarker();
+        });
       });
     }
 
@@ -683,6 +705,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .getNearestPlace(lat, lon, this.selectedAmenity)
         .subscribe({
           next: (response) => {
+            if (this.isOutputRemoved(loadingOutput)) return;
             import('leaflet').then((L) => {
               const polyline = L.polyline(
                 [
@@ -704,6 +727,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 startLat: lat, // Save the starting lat
                 startLon: lon, // Save the starting lon
               });
+
+              // Add event listeners for dragging and cutting
+              polyline.on('pm:dragend', () => {
+                this.redrawOutput(loadingOutput);
+              });
+
+              polyline.on('pm:cut', (e: any) => {
+                e.layer.remove();
+                this.polylines = this.polylines.filter(p => p !== e.layer);
+                this.redrawOutput(loadingOutput);
+                polyline.addTo(this.map); // Ensure the original polyline is shown
+              });
             });
           },
           error: (error) =>
@@ -714,6 +749,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         .countAmenities(lat, lon, this.selectedAmenity, this.distance)
         .subscribe({
           next: (response) => {
+            if (this.isOutputRemoved(loadingOutput)) return;
             import('leaflet').then((L) => {
               const circle = L.circle([lat, lon], {
                 radius: this.distance,
@@ -739,6 +775,17 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 circle: circle,
                 markers: markers,
               });
+
+              // Add event listeners for dragging
+              circle.on('pm:dragend', () => {
+                this.redrawOutput(loadingOutput);
+              });
+
+              markers.forEach((marker: any) => {
+                marker.on('pm:dragend', () => {
+                  this.redrawOutput(loadingOutput);
+                });
+              });
             });
           },
           error: (error) => console.error('Error counting amenities:', error),
@@ -746,6 +793,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'population') {
       this.apiService.getPopulation(lat, lon, this.distance).subscribe({
         next: (response) => {
+          if (this.isOutputRemoved(loadingOutput)) return;
           loadingOutput.loading = false;
           Object.assign(loadingOutput, {
             population: response.population,
@@ -757,6 +805,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
+          if (this.isOutputRemoved(loadingOutput)) return;
           import('leaflet').then((L) => {
             if (
               response &&
@@ -815,6 +864,29 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         },
         error: (error) => console.error('Error predicting model:', error),
       });
+    }
+  }
+
+  private redrawOutput(output: any) {
+    if (output.polyline) {
+      const polyline = output.polyline;
+      polyline.setLatLngs([
+        [output.startLat, output.startLon],
+        [output.lat, output.lon],
+      ]);
+    }
+    if (output.circle) {
+      const circle = output.circle;
+      circle.setLatLng([output.startLat, output.startLon]);
+      circle.setRadius(output.distance);
+    }
+    if (output.markers) {
+      output.markers.forEach((marker: any, index: number) => {
+        marker.setLatLng([output.locations[index].lat, output.locations[index].lon]);
+      });
+    }
+    if (output.redMarker) {
+      output.redMarker.setLatLng([output.startLat, output.startLon]);
     }
   }
 
@@ -907,6 +979,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.map
         );
         (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+
+        // Add event listener to the red marker
+        this.marker.on('pm:dragend', () => {
+          this.redrawMarker();
+        });
       });
     }
     this.suggestions = []; // Clear the suggestions array
@@ -1061,6 +1138,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           polyline.isOutputLayer = true; // Mark as output layer
           this.polylines.push(polyline);
           output.polyline = polyline;
+
+          // Add event listeners for dragging and cutting
+          polyline.on('pm:dragend', () => {
+            this.redrawOutput(output);
+          });
+
+          polyline.on('pm:cut', (e: any) => {
+            e.layer.remove();
+            this.polylines = this.polylines.filter(p => p !== e.layer);
+            this.redrawOutput(output);
+            polyline.addTo(this.map); // Ensure the original polyline is shown
+          });
         });
       }
       if (output.circle) {
@@ -1074,6 +1163,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           circle.isOutputLayer = true; // Mark as output layer
           this.circles.push(circle);
           output.circle = circle;
+
+          // Add event listeners for dragging
+          circle.on('pm:dragend', () => {
+            this.redrawOutput(output);
+          });
         });
       }
       if (output.markers) {
@@ -1084,6 +1178,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             }).addTo(this.map);
             marker.isOutputLayer = true; // Mark as output layer
             this.markers.push(marker);
+
+            // Add event listeners for dragging
+            marker.on('pm:dragend', () => {
+              this.redrawOutput(output);
+            });
+
             return marker;
           });
         });
@@ -1101,6 +1201,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.startLat;
           this.lonInput.nativeElement.value = output.startLon;
+
+          // Add event listener to the red marker
+          redMarker.on('pm:dragend', () => {
+            this.redrawMarker();
+          });
         });
       } else {
         import('leaflet').then((L) => {
@@ -1112,6 +1217,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.lat;
           this.lonInput.nativeElement.value = output.lon;
+
+          // Add event listener to the red marker
+          redMarker.on('pm:dragend', () => {
+            this.redrawMarker();
+          });
         });
       }
 
