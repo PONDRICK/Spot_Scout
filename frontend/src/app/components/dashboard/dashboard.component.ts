@@ -28,9 +28,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, HttpClientModule, FormsModule,
-    MatAutocompleteModule, MatInputModule,
-    MatFormFieldModule, ReactiveFormsModule,
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    MatAutocompleteModule,
+    MatInputModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -39,14 +43,66 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   searchControl = new FormControl();
   filteredOptions!: Observable<string[]>;
   amenities: string[] = [
-    'alcohol', 'apartment', 'artwork', 'atm', 'bakery', 'bank', 'bar', 'beauty',
-    'beverages', 'bus_stop', 'cafe', 'car', 'clinic', 'clothes', 'computer', 'coffee',
-    'college', 'convenience', 'crossing', 'department_store', 'dentist',
-    'fast_food', 'fire_station', 'florist', 'fuel', 'hairdresser', 'hamlet', 'hospital',
-    'hostel', 'hotel', 'information', 'jewelry', 'kiosk', 'laundry', 'library',
-    'mall', 'massage', 'mobile_phone', 'motel', 'motorcycle', 'museum', 'musical_instrument', 'office', 'outdoor', 'pharmacy', 'police',
-    'post_office', 'resort', 'restaurant', 'school', 'shoes', 'sports', 'station', 'supermarket',
-    'townhall', 'tyres', 'university', 'village', 'zoo', 'restroom'
+    'alcohol',
+    'apartment',
+    'artwork',
+    'atm',
+    'bakery',
+    'bank',
+    'bar',
+    'beauty',
+    'beverages',
+    'bus_stop',
+    'cafe',
+    'car',
+    'clinic',
+    'clothes',
+    'computer',
+    'coffee',
+    'college',
+    'convenience',
+    'crossing',
+    'department_store',
+    'dentist',
+    'fast_food',
+    'fire_station',
+    'florist',
+    'fuel',
+    'hairdresser',
+    'hamlet',
+    'hospital',
+    'hostel',
+    'hotel',
+    'information',
+    'jewelry',
+    'kiosk',
+    'laundry',
+    'library',
+    'mall',
+    'massage',
+    'mobile_phone',
+    'motel',
+    'motorcycle',
+    'museum',
+    'musical_instrument',
+    'office',
+    'outdoor',
+    'pharmacy',
+    'police',
+    'post_office',
+    'resort',
+    'restaurant',
+    'school',
+    'shoes',
+    'sports',
+    'station',
+    'supermarket',
+    'townhall',
+    'tyres',
+    'university',
+    'village',
+    'zoo',
+    'restroom',
   ];
 
   private map: any;
@@ -91,7 +147,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.filteredOptions = this.searchControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value))
+      map((value) => this._filter(value))
     );
 
     const mapData = this.sharedService.getMapData();
@@ -123,19 +179,26 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.loadLeaflet();
 
       // Add the event listener for keydown events to navigate the dropdown list
-      this.amenitySelect.nativeElement.addEventListener('keydown', this.onKeyDown.bind(this));
+      this.amenitySelect.nativeElement.addEventListener(
+        'keydown',
+        this.onKeyDown.bind(this)
+      );
     }
   }
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.amenities.filter(option => option.toLowerCase().includes(filterValue));
+    return this.amenities.filter((option) =>
+      option.toLowerCase().includes(filterValue)
+    );
   }
 
   onKeyDown(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
     const options = Array.from(this.amenitySelect.nativeElement.options);
-    const index = options.findIndex(option => option.value.toLowerCase().startsWith(key));
+    const index = options.findIndex((option) =>
+      option.value.toLowerCase().startsWith(key)
+    );
 
     if (index !== -1) {
       this.amenitySelect.nativeElement.selectedIndex = index;
@@ -255,6 +318,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       dragMode: true,
       cutPolygon: true,
       removalMode: true,
+      rotateMode: true,
     });
 
     this.map.on('pm:create', (e: any) => {
@@ -274,6 +338,126 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       if ((e.layer as any).isOutputLayer) {
         console.log('Attempted to remove protected layer, action prevented.');
         e.layer.addTo(this.map);
+      }
+    });
+
+    this.map.on('pm:globaleditmodetoggled', (e: any) => {
+      const { enabled } = e;
+      if (enabled) {
+        this.disableEditModeForOutputs();
+      }
+    });
+
+    this.map.on('pm:globaldragmodetoggled', (e: any) => {
+      const { enabled } = e;
+      if (enabled) {
+        this.disableDragModeForOutputs();
+      }
+    });
+
+    this.map.on('pm:globalcutmodetoggled', (e: any) => {
+      const { enabled } = e;
+      if (enabled) {
+        this.disableCutModeForOutputs();
+      }
+    });
+
+    this.map.on('pm:globalremovalmodetoggled', (e: any) => {
+      const { enabled } = e;
+      if (enabled) {
+        this.disableRemovalModeForOutputs();
+      }
+    });
+
+    this.map.on('pm:globalrotatemodetoggled', (e: any) => {
+      const { enabled } = e;
+      if (enabled) {
+        this.disableRotateModeForOutputs();
+      }
+    });
+  }
+
+  private disableEditModeForOutputs() {
+    this.outputs.forEach((output) => {
+      if (output.polyline) {
+        output.polyline.pm.disable();
+      }
+      if (output.circle) {
+        output.circle.pm.disable();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => marker.pm.disable());
+      }
+      if (output.redMarker) {
+        output.redMarker.pm.disable();
+      }
+    });
+  }
+
+  private disableDragModeForOutputs() {
+    this.outputs.forEach((output) => {
+      if (output.polyline) {
+        output.polyline.pm.disable();
+      }
+      if (output.circle) {
+        output.circle.pm.disable();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => marker.pm.disable());
+      }
+      if (output.redMarker) {
+        output.redMarker.pm.disable();
+      }
+    });
+  }
+
+  private disableCutModeForOutputs() {
+    this.outputs.forEach((output) => {
+      if (output.polyline) {
+        output.polyline.pm.disable();
+      }
+      if (output.circle) {
+        output.circle.pm.disable();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => marker.pm.disable());
+      }
+      if (output.redMarker) {
+        output.redMarker.pm.disable();
+      }
+    });
+  }
+
+  private disableRemovalModeForOutputs() {
+    this.outputs.forEach((output) => {
+      if (output.polyline) {
+        output.polyline.pm.disable();
+      }
+      if (output.circle) {
+        output.circle.pm.disable();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => marker.pm.disable());
+      }
+      if (output.redMarker) {
+        output.redMarker.pm.disable();
+      }
+    });
+  }
+
+  private disableRotateModeForOutputs() {
+    this.outputs.forEach((output) => {
+      if (output.polyline) {
+        output.polyline.pm.disableRotate();
+      }
+      if (output.circle) {
+        output.circle.pm.disableRotate();
+      }
+      if (output.markers) {
+        output.markers.forEach((marker: any) => marker.pm.disableRotate());
+      }
+      if (output.redMarker) {
+        output.redMarker.pm.disableRotate();
       }
     });
   }
@@ -327,7 +511,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const refreshToken = this.cookieService.get('refresh_token');
     if (!accessToken && refreshToken) {
       this.apiService.refreshToken().subscribe({
-        next: () => { },
+        next: () => {},
         error: () => {
           this.router.navigate(['/login']);
         },
@@ -341,7 +525,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.tokenCheckInterval = setInterval(() => {
       if (this.authService.isAccessTokenExpired()) {
         this.apiService.refreshToken().subscribe({
-          next: () => { },
+          next: () => {},
           error: () => {
             if (this.authService.isRefreshTokenExpired()) {
               this.showSessionExpiredAlert();
