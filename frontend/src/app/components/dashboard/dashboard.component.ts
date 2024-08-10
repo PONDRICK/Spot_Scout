@@ -23,6 +23,13 @@ import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import HistoryIcon from '@mui/icons-material/History';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { MatIconModule } from '@angular/material/icon';
+
+  
+
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +42,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
+    MatIconModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -127,6 +135,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private greenIcon: any; // Add green icon
   private blueIcon: any; // Add blue icon
   isMarkerLocked = false;
+  isMenuOpen = false;
+  saveIcon = SaveAltIcon;
+  historyIcon = HistoryIcon;
+  logoutIcon = LogoutIcon;
 
   showHistoryModal = false;
   savedMaps: any[] = [];
@@ -564,6 +576,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   logout() {
+    this.isMenuOpen = false;
     if (this.tokenCheckInterval) {
       clearInterval(this.tokenCheckInterval);
     }
@@ -989,9 +1002,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.suggestions = []; // Clear the suggestions array
   }
 
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
   // Save and Load Map Functions
   saveMap() {
     // Gather only user-drawn layers from the map
+    this.isMenuOpen = false;
     const drawnLayers: any[] = [];
     this.map.eachLayer((layer: any) => {
       if (layer.pm && layer.pm.getShape && !layer.isOutputLayer) {
@@ -1257,9 +1275,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   viewHistory() {
+    this.isMenuOpen = false;
     this.router.navigate(['/history']);
   }
-
+  
   closeHistoryModal() {
     this.showHistoryModal = false;
   }
@@ -1270,5 +1289,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.loadMap(selectedMap);
       this.closeHistoryModal();
     }
+    
   }
+
 }

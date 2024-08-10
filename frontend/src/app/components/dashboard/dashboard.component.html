@@ -1,7 +1,8 @@
+<!-- Navbar -->
 <nav class="navbar">
   <div class="navbar-content">
     <div class="navbar-left">
-      <span class="navbar-title">Spotscout</span>
+      <span class="navbar-title">SpotScout</span>
     </div>
     <div class="navbar-right">
       <button
@@ -10,24 +11,33 @@
       >
         Select
       </button>
-      <button
-        (click)="saveMap()"
-        class="bg-green-500 text-white px-4 py-2 rounded-md"
-      >
-        Save
+      <!-- Hamburger Menu Button -->
+      <button (click)="toggleMenu()" class="hamburger-menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
       </button>
-      <button
-        (click)="viewHistory()"
-        class="bg-yellow-500 text-white px-4 py-2 rounded-md"
-      >
-        History
-      </button>
-      <button
-        (click)="logout()"
-        class="bg-red-500 text-white px-4 py-2 rounded-md"
-      >
-        Logout
-      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isMenuOpen" class="dropdown-menu">
+        <ul>
+          <li (click)="saveMap()">
+            <mat-icon class="icon">save_alt</mat-icon>
+            Save
+          </li>
+          <li (click)="viewHistory()">
+            <mat-icon class="icon">history</mat-icon>
+            History
+          </li>
+          <li (click)="logout()">
+            <mat-icon class="icon">logout</mat-icon>
+            Logout
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </nav>

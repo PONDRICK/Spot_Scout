@@ -344,3 +344,49 @@ button {
   margin-right: 10px;
 }
 
+/* Hamburger Menu Styles */
+.hamburger-menu {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px; /* Adjust this value based on your navbar height */
+  right: 10px; /* Align with the right edge of the navbar */
+  background-color: #333; /* Dark background */
+  color: white; /* White text */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 10px;
+  width: 200px; /* Adjust this value to control the width */
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-menu li {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px 10px 15px; /* Adjust this value to add padding on the right */
+  cursor: pointer;
+  border-bottom: 1px solid #555;
+}
+
+.dropdown-menu li:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu li:hover {
+  background-color: #444;
+}
+
+.mat-icon.icon {
+  margin-right: 0.5rem; /* Adjust this value to control the spacing */
+}
