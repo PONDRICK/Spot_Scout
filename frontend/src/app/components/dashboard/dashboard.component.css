@@ -7,6 +7,11 @@
   background-color: #333;
   color: white;
   padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100; /* Ensure the navbar is above the sidebar */
 }
 
 .navbar-content {
@@ -39,8 +44,9 @@ html {
 }
 
 #map {
-  height: calc(100vh - 56px);
+  height: calc(100vh - 56px); /* ลดความสูงของแผนที่โดยคำนวณจากความสูงของ navbar */
   width: 100%;
+  margin-top: 56px; /* เพิ่มระยะห่างจากด้านบนเพื่อให้แผนที่ไม่ถูกบัง */
 }
 
 input {
@@ -60,14 +66,14 @@ button {
   width: 350px; /* Adjust based on your sidebar width */
   height: calc(100vh - 56px); /* Full height minus navbar height */
   background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+  backdrop-filter: blur(10px); /* Apply the blur effect */
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
   transition: right 0.3s ease, background-color 0.3s ease;
-  z-index: 1000;
+  z-index: 1000; /* Ensure it is lower than the navbar */
   overflow-y: auto; /* Enable scrolling inside the sidebar */
   padding: 20px;
   border-left: 7px solid #046cdc; /* Add a colored border for accent */
   border-right: 7px solid #046cdc; /* Add a colored border for accent */
-
 }
 
 .sidebar.open {
@@ -344,3 +350,49 @@ button {
   margin-right: 10px;
 }
 
+/* Hamburger Menu Styles */
+.hamburger-menu {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px; /* Adjust this value based on your navbar height */
+  right: 10px; /* Align with the right edge of the navbar */
+  background-color: #333; /* Dark background */
+  color: white; /* White text */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 10px;
+  width: 200px; /* Adjust this value to control the width */
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-menu li {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px 10px 15px; /* Adjust this value to add padding on the right */
+  cursor: pointer;
+  border-bottom: 1px solid #555;
+}
+
+.dropdown-menu li:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu li:hover {
+  background-color: #444;
+}
+
+.mat-icon.icon {
+  margin-right: 0.5rem; /* Adjust this value to control the spacing */
+}
