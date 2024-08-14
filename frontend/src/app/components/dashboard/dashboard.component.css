@@ -466,7 +466,6 @@ button {
   position: relative;
   display: flex;
   align-items: center;
-  margin-top: 10px;
 }
 
 .distance-input {
