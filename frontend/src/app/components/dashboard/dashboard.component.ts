@@ -129,6 +129,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
   
+  
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;

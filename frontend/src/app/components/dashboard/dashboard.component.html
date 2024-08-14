@@ -112,14 +112,17 @@
     <!-- Add distance input for Count and Population -->
     <div *ngIf="selectedFunction === 'count' || selectedFunction === 'population'">
       <label for="distance">Distance:</label>
-      <input
-        type="number"
-        id="distance"
-        [(ngModel)]="distance"
-        min="100"
-        step="100"
-        (change)="validateDistance()"
-      />
+      <div class="input-container">
+        <input
+          type="number"
+          id="distance"
+          [(ngModel)]="distance"
+          min="100"
+          step="100"
+          (change)="validateDistance()"
+          class="distance-input"
+        />
+      </div>
     </div>
 
     <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
