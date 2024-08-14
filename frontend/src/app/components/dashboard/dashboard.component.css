@@ -439,7 +439,7 @@ button {
 
 .dropdown-option:hover {
   background-color: #72bfff;
-}
+} 
 
 /* Custom scrollbar styles */
 .dropdown-options::-webkit-scrollbar {
@@ -460,4 +460,36 @@ button {
 .selected-option {
   font-size: 16px;
   color: #fff;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.distance-input {
+  background-color: #333; /* Darker background */
+  color: #ffffff; /* White text */
+  border: 1px solid #666;
+  padding: 10px 15px; /* Add some padding */
+  border-radius: 0.375rem; /* Rounded corners */
+  width: 100%; /* Full width */
+  font-size: 16px; /* Match font size */
+  outline: none; /* Remove default outline */
+}
+
+.distance-input:focus {
+  border-color: #3b82f6; /* Blue border on focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Add a subtle shadow */
+}
+
+.distance-input::placeholder {
+  color: #9ca3af; /* Placeholder color */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
