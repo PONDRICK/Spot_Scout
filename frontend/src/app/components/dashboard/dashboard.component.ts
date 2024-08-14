@@ -7,6 +7,7 @@ import {
   OnDestroy,
   Inject,
   PLATFORM_ID,
+  HostListener,
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -17,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { SharedService } from '../../services/shared.service'; // Import the shared service
+import { SharedService } from '../../services/shared.service';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -27,8 +28,6 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MatIconModule } from '@angular/material/icon';
-
-  
 
 
 @Component({
@@ -113,6 +112,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     'restroom',
   ];
 
+  functions: string[] = ['nearest', 'count', 'population', 'predict'];
+
   private map: any;
   private marker: any;
   private polylines: any[] = [];
@@ -125,7 +126,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
+  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  
 
+  dropdownOpen = false;
+  dropdownAmenityOpen = false;
   isSidebarOpen = false;
   selectedFunction = 'nearest';
   selectedAmenity = 'restaurant';
@@ -149,7 +155,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     private router: Router,
     private cookieService: CookieService,
     private http: HttpClient,
-    private sharedService: SharedService, // Inject the shared service
+    private sharedService: SharedService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -165,10 +171,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const mapData = this.sharedService.getMapData();
     if (mapData) {
       console.log('Received map data in ngOnInit:', mapData);
-      // Initialize or reinitialize map and ensure it's complete before loading map data
       this.initOrReinitMap().then(() => {
         this.loadMap(mapData);
-        this.sharedService.clearMapData(); // Clear the map data after loading
+        this.sharedService.clearMapData();
       });
     }
     this.navigationSubscription = this.router.events.subscribe((event) => {
@@ -189,8 +194,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.loadLeaflet();
-
-      // Add the event listener for keydown events to navigate the dropdown list
       this.amenitySelect.nativeElement.addEventListener(
         'keydown',
         this.onKeyDown.bind(this)
@@ -485,7 +488,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.marker = L.marker(latlng, { icon: this.redIcon }).addTo(this.map);
         (this.marker as any).isOutputLayer = true;
 
-        // Add event listener to the red marker
         this.marker.on('pm:dragend', () => {
           this.redrawMarker();
         });
@@ -608,6 +610,42 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
 
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+  
+  toggleAmenityDropdown(event: Event) {
+    event.stopPropagation();
+    this.dropdownAmenityOpen = !this.dropdownAmenityOpen;
+  }
+
+  selectFunction(selectedFunction: string, event: Event) {
+    event.stopPropagation();  // ป้องกันการกระจาย event ต่อไป
+    console.log("Function selected:", selectedFunction);
+    this.selectedFunction = selectedFunction;
+    this.dropdownOpen = false;
+    console.log("Dropdown should be closed:", this.dropdownOpen);
+}
+
+selectAmenity(amenity: string, event: Event) {
+    event.stopPropagation();  // ป้องกันการกระจาย event ต่อไป
+    console.log("Amenity selected:", amenity);
+    this.selectedAmenity = amenity;
+    this.dropdownAmenityOpen = false;
+    console.log("Dropdown should be closed:", this.dropdownAmenityOpen);
+}
+
+@HostListener('document:click', ['$event'])
+onClickOutside(event: Event) {
+  if (!this.functionDropdownContainer.nativeElement.contains(event.target as Node)) {
+    this.dropdownOpen = false;
+  }
+  if (!this.amenityDropdownContainer.nativeElement.contains(event.target as Node)) {
+    this.dropdownAmenityOpen = false;
+  }
+}
+
   private outputExists(
     lat: number,
     lon: number,
@@ -674,9 +712,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
           this.map
         );
-        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+        (this.marker as any).isOutputLayer = true;
 
-        // Add event listener to the red marker
         this.marker.on('pm:dragend', () => {
           this.redrawMarker();
         });
@@ -708,8 +745,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       lon: lon,
       amenity: this.selectedAmenity,
       distance: this.distance,
-      startLat: lat, // Save the starting lat
-      startLon: lon, // Save the starting lon
+      startLat: lat,
+      startLon: lon,
     };
     this.outputs.unshift(loadingOutput);
 
@@ -725,9 +762,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                   [lat, lon],
                   [response.lat, response.lon],
                 ],
-                { color: 'black', dashArray: '5, 10' } // Dashed line pattern
+                { color: 'black', dashArray: '5, 10' }
               ).addTo(this.map);
-              (polyline as any).isOutputLayer = true; // Mark as output layer
+              (polyline as any).isOutputLayer = true;
               this.polylines.push(polyline);
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
@@ -737,11 +774,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 lat: response.lat,
                 lon: response.lon,
                 polyline: polyline,
-                startLat: lat, // Save the starting lat
-                startLon: lon, // Save the starting lon
+                startLat: lat,
+                startLon: lon,
               });
 
-              // Add event listeners for dragging and cutting
               polyline.on('pm:dragend', () => {
                 this.redrawOutput(loadingOutput);
               });
@@ -750,7 +786,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 e.layer.remove();
                 this.polylines = this.polylines.filter(p => p !== e.layer);
                 this.redrawOutput(loadingOutput);
-                polyline.addTo(this.map); // Ensure the original polyline is shown
+                polyline.addTo(this.map);
               });
             });
           },
@@ -770,13 +806,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 fillColor: '#30f',
                 fillOpacity: 0.2,
               }).addTo(this.map);
-              (circle as any).isOutputLayer = true; // Mark as output layer
+              (circle as any).isOutputLayer = true;
               this.circles.push(circle);
               const markers = response.locations.map((location: any) => {
                 const marker = L.marker([location.lat, location.lon], {
                   icon: this.greenIcon,
                 }).addTo(this.map);
-                (marker as any).isOutputLayer = true; // Mark as output layer
+                (marker as any).isOutputLayer = true;
                 this.markers.push(marker);
                 return marker;
               });
@@ -789,7 +825,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 markers: markers,
               });
 
-              // Add event listeners for dragging
               circle.on('pm:dragend', () => {
                 this.redrawOutput(loadingOutput);
               });
@@ -837,12 +872,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                     0
                   ) * 100;
 
-              // Debugging: Log top3Predictions to ensure it's correctly formatted
               console.log('Top 3 Predictions:', top3Predictions);
 
               const predictionHtml = top3Predictions
                 .map((pred: { category: string; score: number }) => {
-                  // Safeguard against undefined properties
                   const category = pred.category ? pred.category : 'Unknown';
                   const score = pred.score
                     ? (pred.score * 100).toFixed(2)
@@ -868,7 +901,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 top_predictions: top3Predictions,
                 remaining_score: remainingScore,
                 marker: this.marker,
-                popupContent: popupContent, // Save popup content to output
+                popupContent: popupContent,
               });
             } else {
               console.error('Invalid response format:', response);
@@ -991,24 +1024,21 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
           this.map
         );
-        (this.marker as any).isOutputLayer = true; // Ensure the marker has the unique identifier
+        (this.marker as any).isOutputLayer = true;
 
-        // Add event listener to the red marker
         this.marker.on('pm:dragend', () => {
           this.redrawMarker();
         });
       });
     }
-    this.suggestions = []; // Clear the suggestions array
+    this.suggestions = [];
   }
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  // Save and Load Map Functions
   saveMap() {
-    // Gather only user-drawn layers from the map
     this.isMenuOpen = false;
     const drawnLayers: any[] = [];
     this.map.eachLayer((layer: any) => {
@@ -1018,13 +1048,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           type: layer.pm.getShape(),
           color: layer.options.color,
           radius: layer.getRadius ? layer.getRadius() : null,
-          text: layer.options.text ? layer.options.text : null, // Save the text content
+          text: layer.options.text ? layer.options.text : null,
         };
         drawnLayers.push(geoJson);
       }
     });
 
-    // Combine outputs from the current session and loaded outputs
     const combinedOutputs = [...this.outputs].map((output) => {
       const serializedOutput = { ...output };
       if (output.polyline) {
@@ -1044,7 +1073,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           lon: marker.getLatLng().lng,
         }));
       }
-      // Remove the marker reference to avoid circular reference
       delete serializedOutput.marker;
       delete serializedOutput.redMarker;
       return serializedOutput;
@@ -1138,9 +1166,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         if (layer) {
-          layer.isUserDrawn = true; // Mark this layer as user-drawn
+          layer.isUserDrawn = true;
           this.markers.push(layer);
-          console.log('Created new layer', layer); // Log layer creation
+          console.log('Created new layer', layer);
         }
       });
     });
@@ -1153,11 +1181,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             color: 'black',
             dashArray: '5, 10',
           }).addTo(this.map);
-          polyline.isOutputLayer = true; // Mark as output layer
+          polyline.isOutputLayer = true;
           this.polylines.push(polyline);
           output.polyline = polyline;
 
-          // Add event listeners for dragging and cutting
           polyline.on('pm:dragend', () => {
             this.redrawOutput(output);
           });
@@ -1166,7 +1193,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             e.layer.remove();
             this.polylines = this.polylines.filter(p => p !== e.layer);
             this.redrawOutput(output);
-            polyline.addTo(this.map); // Ensure the original polyline is shown
+            polyline.addTo(this.map);
           });
         });
       }
@@ -1178,11 +1205,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             fillColor: '#30f',
             fillOpacity: 0.2,
           }).addTo(this.map);
-          circle.isOutputLayer = true; // Mark as output layer
+          circle.isOutputLayer = true;
           this.circles.push(circle);
           output.circle = circle;
 
-          // Add event listeners for dragging
           circle.on('pm:dragend', () => {
             this.redrawOutput(output);
           });
@@ -1194,10 +1220,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             const marker = L.marker([markerData.lat, markerData.lon], {
               icon: this.greenIcon,
             }).addTo(this.map);
-            marker.isOutputLayer = true; // Mark as output layer
+            marker.isOutputLayer = true;
             this.markers.push(marker);
 
-            // Add event listeners for dragging
             marker.on('pm:dragend', () => {
               this.redrawOutput(output);
             });
@@ -1214,13 +1239,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           const redMarker = L.marker([output.startLat, output.startLon], {
             icon: this.redIcon,
           }).addTo(this.map);
-          redMarker.isOutputLayer = true; // Mark as output layer
+          redMarker.isOutputLayer = true;
           this.markers.push(redMarker);
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.startLat;
           this.lonInput.nativeElement.value = output.startLon;
 
-          // Add event listener to the red marker
           redMarker.on('pm:dragend', () => {
             this.redrawMarker();
           });
@@ -1230,13 +1254,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           const redMarker = L.marker([output.lat, output.lon], {
             icon: this.redIcon,
           }).addTo(this.map);
-          redMarker.isOutputLayer = true; // Mark as output layer
+          redMarker.isOutputLayer = true;
           this.markers.push(redMarker);
           output.redMarker = redMarker;
           this.latInput.nativeElement.value = output.lat;
           this.lonInput.nativeElement.value = output.lon;
 
-          // Add event listener to the red marker
           redMarker.on('pm:dragend', () => {
             this.redrawMarker();
           });
@@ -1262,7 +1285,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             })
               .addTo(this.map)
               .bindPopup(output.popupContent, { className: 'custom-popup' });
-            redMarker.isOutputLayer = true; // Mark as output layer
+            redMarker.isOutputLayer = true;
             this.markers.push(redMarker);
             output.redMarker = redMarker;
             if (output.visible) {
@@ -1278,7 +1301,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isMenuOpen = false;
     this.router.navigate(['/history']);
   }
-  
+
   closeHistoryModal() {
     this.showHistoryModal = false;
   }
@@ -1289,7 +1312,5 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.loadMap(selectedMap);
       this.closeHistoryModal();
     }
-    
   }
-
 }

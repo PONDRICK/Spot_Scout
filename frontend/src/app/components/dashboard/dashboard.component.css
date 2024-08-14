@@ -396,3 +396,68 @@ button {
 .mat-icon.icon {
   margin-right: 0.5rem; /* Adjust this value to control the spacing */
 }
+
+
+/* Styles for Custom Dropdown */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #333;
+  border: 1px solid #666;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  margin-bottom: 0.3rem;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  border: 1px solid #666;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow-y: auto;  /* เปิดการเลื่อน scrollbar ในแนวตั้ง */
+  max-height: 226px; /* ความสูงสูงสุดที่จะเห็นได้ (7 อัน อันละ 30px) */
+
+}
+
+.dropdown-option {
+  padding: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #333;
+  border-bottom: 1px solid #444;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-option:hover {
+  background-color: #72bfff;
+}
+
+/* Custom scrollbar styles */
+.dropdown-options::-webkit-scrollbar {
+  width: 6px;
+  background-color: #333; /* Background color of the scrollbar track */
+}
+
+.dropdown-options::-webkit-scrollbar-thumb {
+  background-color: #72bfff; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Make scrollbar thumb rounded */
+}
+
+/* Optional: Adjust scrollbar thumb on hover */
+.dropdown-options::-webkit-scrollbar-thumb:hover {
+  background-color: #42a1ff; /* Darker color on hover */
+}
+
+.selected-option {
+  font-size: 16px;
+  color: #fff;
+}
