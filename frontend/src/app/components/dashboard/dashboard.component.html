@@ -79,39 +79,38 @@
       <label class="text-white">Lock Location</label>
     </div>
     <label for="function">Select Function:</label>
-    <select id="function" [(ngModel)]="selectedFunction">
-      <option value="nearest">Nearest Place</option>
-      <option value="count">Count Amenities</option>
-      <option value="population">Population</option>
-      <option value="predict">Predict Location</option>
-    </select>
+    <div class="dropdown-container" #functionDropdownContainer (click)="toggleDropdown($event)">
+      <div class="selected-option">{{ selectedFunction }}</div>
+      <div class="dropdown-options" *ngIf="dropdownOpen">
+        <div
+          *ngFor="let function of functions"
+          class="dropdown-option"
+          (click)="selectFunction(function, $event)"
+        >
+          {{ function }}
+        </div>
+      </div>
+    </div>
 
     <!-- Conditionally display the amenity selection based on the selected function -->
     <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
       <label for="amenity">Select Amenity:</label>
-      <select id="amenity" [(ngModel)]="selectedAmenity">
-        <option *ngFor="let option of filteredOptions | async" [value]="option">
-          {{ option }}
-        </option>
-      </select>
+      <div class="dropdown-container" #amenityDropdownContainer (click)="toggleAmenityDropdown($event)">
+        <div class="selected-option">{{ selectedAmenity }}</div>
+        <div class="dropdown-options" *ngIf="dropdownAmenityOpen">
+          <div
+            *ngFor="let amenity of amenities"
+            class="dropdown-option"
+            (click)="selectAmenity(amenity, $event)"
+          >
+            {{ amenity }}
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
-      <label for="amenity">Select Amenity:</label>
-      <mat-form-field appearance="fill" class="custom-select">
-        <mat-label>Select Amenity</mat-label>
-        <input type="text" matInput [formControl]="searchControl" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{ option }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-    </div> -->
 
     <!-- Add distance input for Count and Population -->
-    <div
-      *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
-    >
+    <div *ngIf="selectedFunction === 'count' || selectedFunction === 'population'">
       <label for="distance">Distance:</label>
       <input
         type="number"
