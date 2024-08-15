@@ -213,17 +213,19 @@ button {
   position: relative;
   padding: 16px;
   margin-bottom: 10px;
-  background-color: rgba(255, 255, 255, 1 ); /* Semi-transparent white */
+  background-color: rgba(51, 51, 51, 0.9); /* Dark semi-transparent background */
+  color: #ffffff; /* White text color */
   border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Slightly darker shadow */
 }
+
 
 .nearest-place-info h3,
 .amenities-count-info h3,
 .population-info h3,
 .predict-info h3 {
   margin-bottom: 10px;
-  color: #333;
+  color: #ffffff; /* White text color */
 }
 
 .nearest-place-info p,
@@ -232,7 +234,7 @@ button {
 .population-info p,
 .predict-info p {
   margin-bottom: 5px;
-  color: #666;
+  color: #cccccc; /* Light grey text color */
 }
 
 .output-info .delete-button {
@@ -249,8 +251,9 @@ button {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: #ffffff;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff; /* Darker background for delete button */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Slight shadow */
+  color: #444444; /* White icon color */
 }
 
 .toggle-button {
@@ -259,7 +262,7 @@ button {
   cursor: pointer;
   padding: 0;
   margin: 0 5px;
-  color: #007bff;
+  color: #72bfff; /* Light blue color for toggle */
   font-size: 14px;
   text-decoration: underline;
 }
@@ -268,7 +271,7 @@ button {
   position: relative;
   padding: 16px;
   margin-bottom: 10px;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -493,3 +496,25 @@ input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.latlon-input {
+  background-color: #333; /* Dark background */
+  color: #ffffff; /* White text */
+  border: 1px solid #666; /* Border color */
+  padding: 10px 15px; /* Add some padding */
+  border-radius: 0.375rem; /* Rounded corners */
+  width: 100%; /* Full width */
+  font-size: 16px; /* Match font size */
+  outline: none; /* Remove default outline */
+  box-sizing: border-box; /* Include padding and border in element's width and height */
+}
+
+.latlon-input:focus {
+  border-color: #3b82f6; /* Blue border on focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Add a subtle shadow */
+}
+
+.latlon-input::placeholder {
+  color: #9ca3af; /* Placeholder color */
+}
+
