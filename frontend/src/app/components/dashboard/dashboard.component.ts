@@ -515,6 +515,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.marker.remove();
       this.marker = null;
     }
+    this.map.eachLayer((layer: any) => {
+      if (layer.pm && !layer.isOutputLayer) {
+        layer.remove();
+      }
+    });
   }
 
   private cleanupMap() {

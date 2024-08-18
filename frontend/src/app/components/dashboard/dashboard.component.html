@@ -4,19 +4,39 @@
     <div class="navbar-left">
       <span class="navbar-title">SpotScout</span>
     </div>
+    <!-- Search Location (Center Aligned) -->
+    <div class="search-container">
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search location"
+          (input)="onSearchInput($event)"
+          #searchInput
+        />
+        <ul class="suggestions" *ngIf="suggestions.length">
+          <li
+            *ngFor="let suggestion of suggestions"
+            (click)="selectSuggestion(suggestion)"
+          >
+            <span class="icon">📍</span>
+            {{ suggestion.display_name }}
+          </li>
+        </ul>
+      </div>
+    </div>
     <div class="navbar-right">
       <button
         (click)="toggleSidebar()"
-        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+        class="text-white px-4 py-2 rounded-md"
       >
-        Select
+        <span class="material-symbols-outlined">add_location_alt</span>
       </button>
       <!-- Hamburger Menu Button -->
       <button (click)="toggleMenu()" class="hamburger-menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="38" height="38" viewBox="0 0 29 29" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
           <line x1="4" y1="6" x2="20" y2="6" />
-          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="12" x2="20" y2="12" />   
           <line x1="4" y1="18" x2="20" y2="18" />
         </svg>
       </button>
@@ -288,25 +308,6 @@
   </div>
 </div>
 
-<div class="search-container">
-  <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Search location"
-      (input)="onSearchInput($event)"
-      #searchInput
-    />
-    <ul class="suggestions" *ngIf="suggestions.length">
-      <li
-        *ngFor="let suggestion of suggestions"
-        (click)="selectSuggestion(suggestion)"
-      >
-        <span class="icon">📍</span>
-        {{ suggestion.display_name }}
-      </li>
-    </ul>
-  </div>
-</div>
 
 <div *ngIf="showHistoryModal" class="modal">
   <div class="modal-content">
