@@ -29,7 +29,6 @@ import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MatIconModule } from '@angular/material/icon';
 
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -126,10 +125,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
-  
-  
+  @ViewChild('functionDropdownContainer')
+  functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer')
+  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -615,37 +614,45 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     event.stopPropagation();
     this.dropdownOpen = !this.dropdownOpen;
   }
-  
+
   toggleAmenityDropdown(event: Event) {
     event.stopPropagation();
     this.dropdownAmenityOpen = !this.dropdownAmenityOpen;
   }
 
   selectFunction(selectedFunction: string, event: Event) {
-    event.stopPropagation();  // ป้องกันการกระจาย event ต่อไป
-    console.log("Function selected:", selectedFunction);
+    event.stopPropagation(); // ป้องกันการกระจาย event ต่อไป
+    console.log('Function selected:', selectedFunction);
     this.selectedFunction = selectedFunction;
     this.dropdownOpen = false;
-    console.log("Dropdown should be closed:", this.dropdownOpen);
-}
+    console.log('Dropdown should be closed:', this.dropdownOpen);
+  }
 
-selectAmenity(amenity: string, event: Event) {
-    event.stopPropagation();  // ป้องกันการกระจาย event ต่อไป
-    console.log("Amenity selected:", amenity);
+  selectAmenity(amenity: string, event: Event) {
+    event.stopPropagation(); // ป้องกันการกระจาย event ต่อไป
+    console.log('Amenity selected:', amenity);
     this.selectedAmenity = amenity;
     this.dropdownAmenityOpen = false;
-    console.log("Dropdown should be closed:", this.dropdownAmenityOpen);
-}
+    console.log('Dropdown should be closed:', this.dropdownAmenityOpen);
+  }
 
-@HostListener('document:click', ['$event'])
-onClickOutside(event: Event) {
-  if (!this.functionDropdownContainer.nativeElement.contains(event.target as Node)) {
-    this.dropdownOpen = false;
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (
+      !this.functionDropdownContainer.nativeElement.contains(
+        event.target as Node
+      )
+    ) {
+      this.dropdownOpen = false;
+    }
+    if (
+      !this.amenityDropdownContainer.nativeElement.contains(
+        event.target as Node
+      )
+    ) {
+      this.dropdownAmenityOpen = false;
+    }
   }
-  if (!this.amenityDropdownContainer.nativeElement.contains(event.target as Node)) {
-    this.dropdownAmenityOpen = false;
-  }
-}
 
   private outputExists(
     lat: number,
@@ -785,7 +792,7 @@ onClickOutside(event: Event) {
 
               polyline.on('pm:cut', (e: any) => {
                 e.layer.remove();
-                this.polylines = this.polylines.filter(p => p !== e.layer);
+                this.polylines = this.polylines.filter((p) => p !== e.layer);
                 this.redrawOutput(loadingOutput);
                 polyline.addTo(this.map);
               });
@@ -929,7 +936,10 @@ onClickOutside(event: Event) {
     }
     if (output.markers) {
       output.markers.forEach((marker: any, index: number) => {
-        marker.setLatLng([output.locations[index].lat, output.locations[index].lon]);
+        marker.setLatLng([
+          output.locations[index].lat,
+          output.locations[index].lon,
+        ]);
       });
     }
     if (output.redMarker) {
@@ -1173,8 +1183,9 @@ onClickOutside(event: Event) {
         }
       });
     });
-
     this.outputs = map.data.outputs;
+    let markerCreated = false; // Flag to track if redMarker is already created
+
     this.outputs.forEach((output: any) => {
       if (output.polyline) {
         import('leaflet').then((L) => {
@@ -1192,7 +1203,7 @@ onClickOutside(event: Event) {
 
           polyline.on('pm:cut', (e: any) => {
             e.layer.remove();
-            this.polylines = this.polylines.filter(p => p !== e.layer);
+            this.polylines = this.polylines.filter((p) => p !== e.layer);
             this.redrawOutput(output);
             polyline.addTo(this.map);
           });
@@ -1235,63 +1246,51 @@ onClickOutside(event: Event) {
           output.markers = markers;
         });
       }
-      if (output.startLat && output.startLon) {
-        import('leaflet').then((L) => {
-          const redMarker = L.marker([output.startLat, output.startLon], {
-            icon: this.redIcon,
-          }).addTo(this.map);
-          redMarker.isOutputLayer = true;
-          this.markers.push(redMarker);
-          output.redMarker = redMarker;
-          this.latInput.nativeElement.value = output.startLat;
-          this.lonInput.nativeElement.value = output.startLon;
 
-          redMarker.on('pm:dragend', () => {
-            this.redrawMarker();
-          });
-        });
-      } else {
+      // Handle redMarker: Move or create only one redMarker
+      if (!markerCreated) {
         import('leaflet').then((L) => {
-          const redMarker = L.marker([output.lat, output.lon], {
-            icon: this.redIcon,
-          }).addTo(this.map);
-          redMarker.isOutputLayer = true;
-          this.markers.push(redMarker);
-          output.redMarker = redMarker;
-          this.latInput.nativeElement.value = output.lat;
-          this.lonInput.nativeElement.value = output.lon;
+          const lat = output.startLat ?? output.lat;
+          const lon = output.startLon ?? output.lon;
 
-          redMarker.on('pm:dragend', () => {
-            this.redrawMarker();
-          });
+          if (lat !== undefined && lon !== undefined) {
+            const latLng: [number, number] = [lat, lon]; // Define as LatLngTuple
+
+            if (this.marker) {
+              this.marker.setLatLng(latLng); // Move existing marker
+            } else {
+              this.marker = L.marker(latLng, {
+                icon: this.redIcon,
+              }).addTo(this.map);
+              (this.marker as any).isOutputLayer = true;
+              this.markers.push(this.marker);
+            }
+
+            this.latInput.nativeElement.value = lat.toString();
+            this.lonInput.nativeElement.value = lon.toString();
+
+            this.marker.on('pm:dragend', () => {
+              this.redrawMarker();
+            });
+
+            markerCreated = true; // Mark that redMarker is created
+          } else {
+            console.error('Latitude or Longitude is undefined');
+          }
         });
       }
 
       if (output.type === 'predict') {
         import('leaflet').then((L) => {
           const popupContent = `<div class="predict-info-box">
-            <p>Predicted Amenity Category:</p>
-            <p>${output.predicted_amenity_category}</p>
-          </div>`;
-          if (output.redMarker) {
-            output.redMarker.bindPopup(output.popupContent, {
-              className: 'custom-popup',
-            });
-            if (output.visible) {
-              output.redMarker.openPopup();
-            }
-          } else {
-            const redMarker = L.marker([output.lat, output.lon], {
-              icon: this.redIcon,
-            })
-              .addTo(this.map)
-              .bindPopup(output.popupContent, { className: 'custom-popup' });
-            redMarker.isOutputLayer = true;
-            this.markers.push(redMarker);
-            output.redMarker = redMarker;
-            if (output.visible) {
-              redMarker.openPopup();
-            }
+                    <p>Predicted Amenity Category:</p>
+                    <p>${output.predicted_amenity_category}</p>
+                </div>`;
+          this.marker.bindPopup(output.popupContent, {
+            className: 'custom-popup',
+          });
+          if (output.visible) {
+            this.marker.openPopup();
           }
         });
       }
