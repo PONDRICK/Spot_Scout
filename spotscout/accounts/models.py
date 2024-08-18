@@ -67,6 +67,7 @@ class ActivityLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    ip_address = models.GenericIPAddressField(null=True, blank=True)  # เพิ่มฟิลด์นี้
+    
     def __str__(self):
-        return f"{self.user.email} - {self.action} - {self.timestamp}"
+        return f"{self.user.email} - {self.action} - {self.timestamp} - {self.ip_address}"

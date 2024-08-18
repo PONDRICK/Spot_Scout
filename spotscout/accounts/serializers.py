@@ -172,4 +172,4 @@ class ActivityLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActivityLog
-        fields = ['user_email', 'action', 'timestamp']
+        fields = ['user_email', 'action', 'timestamp', 'ip_address']  # เพิ่ม ip_address
