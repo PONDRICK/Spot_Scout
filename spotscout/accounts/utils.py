@@ -73,5 +73,5 @@ def send_normal_email(data):
     )
     email.send()
 
-def log_activity(user, action):
-    ActivityLog.objects.create(user=user, action=action)
+def log_activity(user, action, ip_address=None):
+    ActivityLog.objects.create(user=user, action=action, ip_address=ip_address)

@@ -188,8 +188,13 @@ class LoginUserView(GenericAPIView):
             raise AuthenticationFailed("This account has been banned.")
         user.is_online = True
         user.save()
-        log_activity(user, "logged_in")
+
+        # บันทึก IP Address
+        ip_address = request.META.get('REMOTE_ADDR')
+        log_activity(user, "logged_in", ip_address=ip_address)
+        
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 class TestAuthenticationView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
