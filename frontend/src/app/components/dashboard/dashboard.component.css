@@ -11,7 +11,8 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1100; /* Ensure the navbar is above the sidebar */
+  z-index: 1100;
+  height: 56px; /* กำหนดความสูงคงที่ */
 }
 
 .navbar-content {
@@ -19,6 +20,18 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  overflow: hidden; /* ป้องกันไม่ให้เนื้อหาขยายออกนอกขอบ */
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  overflow: hidden; /* ป้องกันไม่ให้เนื้อหาขยายออกนอกขอบ */
+}
+
+.navbar-right button,
+.navbar-right .material-symbols-outlined {
+  flex-shrink: 0; /* ป้องกันไม่ให้ปุ่มหรือไอคอนขยายหรือหดตัว */
 }
 
 .navbar-left {
@@ -31,10 +44,12 @@
   font-weight: bold;
 }
 
-.navbar-right {
-  display: flex;
-  align-items: center;
+.navbar-right .material-symbols-outlined {
+  font-size: 48px; /* ขนาดของไอคอน */
+  max-height: 48px; /* กำหนดขนาดสูงสุด */
+  max-width: 48px; /* กำหนดขนาดสูงสุด */
 }
+
 
 body,
 html {
@@ -303,6 +318,7 @@ button {
   background: white;
 }
 
+
 /* Search container styles */
 .search-container {
   position: absolute;
@@ -518,3 +534,12 @@ input[type="number"]::-webkit-inner-spin-button {
   color: #9ca3af; /* Placeholder color */
 }
 
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 40;
+  transform: scale(0.65); /* ปรับค่า scale ให้ขนาดเล็กลง */
+  display: inline-block; /* ให้ transform ทำงานบน inline element */
+}
