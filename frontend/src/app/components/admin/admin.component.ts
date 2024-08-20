@@ -1,4 +1,3 @@
-// admin.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -30,7 +29,6 @@ export class AdminComponent implements OnInit {
   filteredLogs: any[] = [];
   logSearchTerm: string = '';
 
-  private tokenCheckInterval: any;
   totalUsers: number = 0;
   totalRoles: number = 0;
   recentActivities: number = 0;
@@ -63,8 +61,6 @@ export class AdminComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.checkSession();
-    this.startTokenCheck();
     this.fetchUsers();
     this.fetchRoles();
     this.fetchConfig();
@@ -221,55 +217,7 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  private checkSession() {
-    const accessToken = this.cookieService.get('access_token');
-    const refreshToken = this.cookieService.get('refresh_token');
-    if (!accessToken && refreshToken) {
-      this.apiService.refreshToken().subscribe({
-        next: () => {},
-        error: () => {
-          this.router.navigate(['/login']);
-        },
-      });
-    } else if (!accessToken && !refreshToken) {
-      this.router.navigate(['/login']);
-    }
-  }
-
-  private startTokenCheck() {
-    this.tokenCheckInterval = setInterval(() => {
-      if (this.authService.isAccessTokenExpired()) {
-        this.apiService.refreshToken().subscribe({
-          next: () => {},
-          error: () => {
-            if (this.authService.isRefreshTokenExpired()) {
-              this.showSessionExpiredAlert();
-            }
-          },
-        });
-      } else if (this.authService.isRefreshTokenExpired()) {
-        this.showSessionExpiredAlert();
-      }
-    }, 5000);
-  }
-
-  private showSessionExpiredAlert() {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Session Expired',
-      text: 'Your session has expired. Please log in again.',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      this.authService.logout();
-      this.navigateAfterLogout();
-    });
-  }
-
   logout() {
-    if (this.tokenCheckInterval) {
-      clearInterval(this.tokenCheckInterval);
-    }
-
     const refreshToken = this.apiService.getCookie('refresh_token');
     if (refreshToken) {
       this.apiService.logoutUser(refreshToken).subscribe(

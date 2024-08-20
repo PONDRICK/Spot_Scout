@@ -73,5 +73,6 @@ def send_normal_email(data):
     )
     email.send()
 
-def log_activity(user, action, ip_address=None):
+def log_activity(user, action, request=None):
+    ip_address = request.META.get('REMOTE_ADDR') if request else None
     ActivityLog.objects.create(user=user, action=action, ip_address=ip_address)

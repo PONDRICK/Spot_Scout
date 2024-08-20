@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,6 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class LoginComponent implements OnInit {
   credentials = { email: '', password: '' };
-  errorMessage = '';
   debugMessage = '';
 
   constructor(
@@ -56,9 +56,18 @@ export class LoginComponent implements OnInit {
       },
       (error) => {
         console.error('Login failed', error);
-        this.errorMessage = 'Login failed. Email or password is invalid.';
+        this.showLoginError();
       }
     );
+  }
+
+  showLoginError() {
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: 'Email or password is invalid. Please try again.',
+      confirmButtonText: 'OK',
+    });
   }
 
   isLoggedIn(): boolean {

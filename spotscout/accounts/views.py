@@ -1,16 +1,20 @@
 import pytz
 from django.shortcuts import render
-from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView,DestroyAPIView
-from .serializers import UserRegisterSerializer,ActivityLogSerializer ,LoginSerializer, PasswordResetRequestSerializer, SetNewPasswordSerializer, LogoutUserSerializer,UserSerializer, RoleSerializer, PermissionSerializer
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, DestroyAPIView
+from .serializers import (
+    UserRegisterSerializer, ActivityLogSerializer, LoginSerializer, 
+    PasswordResetRequestSerializer, SetNewPasswordSerializer, 
+    LogoutUserSerializer, UserSerializer, RoleSerializer, PermissionSerializer
+)
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .utils import send_code_to_user,log_activity,generate_verification_token
+from .utils import send_code_to_user, log_activity, generate_verification_token
 from .models import OneTimePassword, User, ActivityLog
 from django.contrib.auth.models import Permission
 from rest_framework_simplejwt.tokens import RefreshToken, UntypedToken
 from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import smart_str , DjangoUnicodeDecodeError
+from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.http import HttpResponse
 from django.core.management import call_command
@@ -26,9 +30,6 @@ from spotscout import settings
 from rest_framework_simplejwt.settings import api_settings
 from jwt.exceptions import ExpiredSignatureError
 
-
-
-
 logger = logging.getLogger(__name__)
 
 # Create your views here.
@@ -39,7 +40,7 @@ class AdminUserListView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        log_activity(request.user, "viewed_users")
+        log_activity(request.user, "viewed_users", request)
         return response
 
 class AdminUserDetailView(RetrieveUpdateDestroyAPIView):
@@ -67,10 +68,11 @@ class AdminLogoutUserView(UpdateAPIView):
         try:
             refresh = RefreshToken.for_user(user)
             refresh.blacklist()
-            log_activity(self.request.user, f"logged_out_user {user.email}")
+            log_activity(self.request.user, f"logged_out_user {user.email}", request)
             return Response({"detail": "User logged out successfully"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class AdminSystemConfigView(UpdateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
@@ -78,17 +80,24 @@ class AdminSystemConfigView(UpdateAPIView):
         config_data = request.data.get("config")
         with open("system_config.json", "w") as config_file:
             json.dump(config_data, config_file)
+        log_activity(request.user, "updated_system_config", request)
         return Response({"detail": "System configuration updated successfully"}, status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
         with open("system_config.json", "r") as config_file:
             config_data = json.load(config_file)
+        log_activity(request.user, "viewed_system_config", request)
         return Response({"config": config_data}, status=status.HTTP_200_OK)
 
 class AdminActivityLogView(ListAPIView):
     queryset = ActivityLog.objects.all()
     serializer_class = ActivityLogSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        log_activity(request.user, "viewed_activity_logs", request)
+        return response
 
 class AdminUserDeleteView(DestroyAPIView):
     queryset = User.objects.all()
@@ -98,8 +107,7 @@ class AdminUserDeleteView(DestroyAPIView):
     def perform_destroy(self, instance):
         user_email = instance.email
         instance.delete()
-        # Log the activity
-        log_activity(self.request.user, f"deleted_user {user_email}")
+        log_activity(self.request.user, f"deleted_user {user_email}", self.request)
 
 class BanUserView(GenericAPIView):
     queryset = User.objects.all()
@@ -113,7 +121,7 @@ class BanUserView(GenericAPIView):
             user.is_banned = True
             user.is_online = False  # Force logout if currently logged in
             user.save()
-            log_activity(request.user, f"banned_user {user.email}")
+            log_activity(request.user, f"banned_user {user.email}", request)
             return Response({"message": "User has been banned successfully."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -129,10 +137,11 @@ class UnbanUserView(GenericAPIView):
             user = User.objects.get(id=user_id)
             user.is_banned = False
             user.save()
-            log_activity(request.user, f"unbanned_user {user.email}")
+            log_activity(request.user, f"unbanned_user {user.email}", request)
             return Response({"message": "User has been unbanned successfully."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
 class RegisterUserView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -142,7 +151,7 @@ class RegisterUserView(GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             otp_code, expiration_time, token = send_code_to_user(user.email)
-            log_activity(user, "registered")
+            log_activity(user, "registered", request)
             return Response({
                 'data': serializer.data,
                 'message': 'Thanks for signing up!',
@@ -165,7 +174,7 @@ class VerifyUserEmail(GenericAPIView):
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-                log_activity(user, "verified_email")
+                log_activity(user, "verified_email", request)
                 return Response({
                     'message': 'Account email verified successfully'
                 }, status=status.HTTP_200_OK)
@@ -190,8 +199,7 @@ class LoginUserView(GenericAPIView):
         user.save()
 
         # บันทึก IP Address
-        ip_address = request.META.get('REMOTE_ADDR')
-        log_activity(user, "logged_in", ip_address=ip_address)
+        log_activity(user, "logged_in", request)
         
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -199,11 +207,8 @@ class TestAuthenticationView(GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        data={
-            'msg' : 'its works'
-        }
-        return Response(data,status.HTTP_200_OK)
-    
+        log_activity(request.user, "tested_authentication", request)
+        return Response({'msg': 'its works'}, status.HTTP_200_OK)
 
 class PasswordResetRequestView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
@@ -213,21 +218,21 @@ class PasswordResetRequestView(GenericAPIView):
         if serializer.is_valid():
             serializer.save()
             user = User.objects.get(email=serializer.validated_data['email'])
-            log_activity(user, "requested_password_reset")
+            log_activity(user, "requested_password_reset", request)
             return Response({'message': 'A link has been sent to your email to reset your password'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
 class PasswordResetConfirm(GenericAPIView):
 
     def get(self, request, uidb64, token):
         try:
-            user_id=smart_str(urlsafe_base64_decode(uidb64))
-            user=User.objects.get(id=user_id)
+            user_id = smart_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=user_id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
                 return Response({'message':'token is invalid or has expired'}, status=status.HTTP_401_UNAUTHORIZED)
-            return Response({'success':True, 'message':'credentials is valid', 'uidb64':uidb64, 'token':token}, status=status.HTTP_200_OK)
+            log_activity(user, "confirmed_password_reset", request)
+            return Response({'success':True, 'message':'credentials are valid', 'uidb64':uidb64, 'token':token}, status=status.HTTP_200_OK)
 
         except DjangoUnicodeDecodeError as identifier:
             return Response({'message':'token is invalid or has expired'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -236,8 +241,9 @@ class SetNewPassword(GenericAPIView):
     serializer_class=SetNewPasswordSerializer
 
     def patch(self, request):
-        serializer=self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        log_activity(request.user, "set_new_password", request)
         return Response({'success':True, 'message':"password reset is successful"}, status=status.HTTP_200_OK)
     
 class LogoutUserView(GenericAPIView):
@@ -250,7 +256,7 @@ class LogoutUserView(GenericAPIView):
         serializer.save()
         request.user.is_online = False
         request.user.save()
-        log_activity(request.user, "logged_out")
+        log_activity(request.user, "logged_out", request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class ResendOTPView(APIView):
@@ -265,7 +271,7 @@ class ResendOTPView(APIView):
             OneTimePassword.objects.filter(user=user).delete()
             # Generate and send new OTP
             otp_code, expiration_time, new_token = send_code_to_user(user.email)
-            log_activity(user, "resent_otp")
+            log_activity(user, "resent_otp", request)
             return Response({
                 'message': 'OTP has been resent',
                 'expiration_time': expiration_time,
@@ -292,13 +298,14 @@ class GetOTPExpirationView(APIView):
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except KeyError:
             return Response({'message': 'Token has no expiration time'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class TokenRefreshView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             refresh_token = request.data.get('refresh')
             if refresh_token:
                 token = RefreshToken(refresh_token)
+                log_activity(request.user, "refreshed_token", request)
                 return Response({
                     'access': str(token.access_token)
                 })
