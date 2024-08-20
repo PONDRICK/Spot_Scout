@@ -118,7 +118,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private polylines: any[] = [];
   private circles: any[] = [];
   private markers: any[] = [];
-  private tokenCheckInterval: any;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
@@ -160,9 +159,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.checkSession();
-    this.startTokenCheck();
-
     this.filteredOptions = this.searchControl.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter(value))
@@ -532,61 +528,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private cleanup() {
-    if (this.tokenCheckInterval) {
-      clearInterval(this.tokenCheckInterval);
-    }
     this.cleanupMap();
-  }
-
-  private checkSession() {
-    const accessToken = this.cookieService.get('access_token');
-    const refreshToken = this.cookieService.get('refresh_token');
-    if (!accessToken && refreshToken) {
-      this.apiService.refreshToken().subscribe({
-        next: () => {},
-        error: () => {
-          this.router.navigate(['/login']);
-        },
-      });
-    } else if (!accessToken && !refreshToken) {
-      this.router.navigate(['/login']);
-    }
-  }
-
-  private startTokenCheck() {
-    this.tokenCheckInterval = setInterval(() => {
-      if (this.authService.isAccessTokenExpired()) {
-        this.apiService.refreshToken().subscribe({
-          next: () => {},
-          error: () => {
-            if (this.authService.isRefreshTokenExpired()) {
-              this.showSessionExpiredAlert();
-            }
-          },
-        });
-      } else if (this.authService.isRefreshTokenExpired()) {
-        this.showSessionExpiredAlert();
-      }
-    }, 300000);
-  }
-
-  private showSessionExpiredAlert() {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Session Expired',
-      text: 'Your session has expired. Please log in again.',
-      confirmButtonText: 'OK',
-    }).then(() => {
-      this.authService.logout();
-      this.navigateAfterLogout();
-    });
   }
 
   logout() {
     this.isMenuOpen = false;
-    if (this.tokenCheckInterval) {
-      clearInterval(this.tokenCheckInterval);
-    }
 
     const refreshToken = this.apiService.getCookie('refresh_token');
     if (refreshToken) {
