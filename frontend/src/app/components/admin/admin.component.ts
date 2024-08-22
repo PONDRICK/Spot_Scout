@@ -55,9 +55,6 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
-    private cookieService: CookieService,
-    private router: Router
   ) {}
 
   ngOnInit() {

@@ -13,8 +13,6 @@ import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
-import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -108,7 +106,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     'university',
     'village',
     'zoo',
-    'restroom',
   ];
 
   functions: string[] = ['nearest', 'count', 'population', 'predict'];
@@ -124,10 +121,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer')
-  functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer')
-  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -150,9 +145,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
     private router: Router,
-    private cookieService: CookieService,
     private http: HttpClient,
     private sharedService: SharedService,
     @Inject(PLATFORM_ID) private platformId: Object
