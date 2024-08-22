@@ -49,4 +49,27 @@ export class HistoryComponent implements OnInit {
       error: (error) => console.error('Error deleting map:', error),
     });
   }
+
+  logout() {
+    const refreshToken = this.apiService.getCookie('refresh_token');
+    if (refreshToken) {
+      this.apiService.logoutUser(refreshToken).subscribe(
+        (response) => {
+          console.log('Logout successful', response);
+          this.apiService.clearToken();
+          this.navigateAfterLogout();
+        },
+        (error) => {
+          console.error('Logout failed', error);
+          this.apiService.clearToken();
+          this.navigateAfterLogout();
+        }
+      );
+    }
+  }
+
+  private navigateAfterLogout() {
+    window.location.replace('/login');
+  }
+  
 }

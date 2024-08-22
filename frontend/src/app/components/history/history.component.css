@@ -58,3 +58,17 @@ h2 {
   background-color: #f44336;
   color: #ffffff;
 }
+
+.logout-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-logout {
+  background-color: #ff9800;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
