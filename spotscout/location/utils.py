@@ -3,7 +3,10 @@ import networkx as nx
 import requests
 import joblib
 import pandas as pd
-import numpy as np 
+import numpy as np
+import geopandas as gpd
+import os
+from shapely.geometry import Point 
 from geopy.distance import geodesic
 from .models import Location
 
@@ -239,3 +242,34 @@ def predict_amenity_category(user_location):
     top_ranked_prediction = ranked_predictions[0]  # Get the top-ranked prediction
 
     return ranked_predictions, top_ranked_prediction
+
+os.environ['SHAPE_RESTORE_SHX'] = 'YES'
+
+# Load the shapefiles
+subdistrict_shapefile_path = os.path.join(os.path.dirname(__file__), 'shapes', 'tha_admbnda_adm3_rtsd_20220121.shp')
+district_shapefile_path = os.path.join(os.path.dirname(__file__), 'shapes', 'tha_admbnda_adm2_rtsd_20220121.shp')
+
+gdf_subdistrict = gpd.read_file(subdistrict_shapefile_path)
+gdf_district = gpd.read_file(district_shapefile_path)
+
+# Function to find location based on latitude and longitude
+def find_location(lat, lon):
+    point = Point(lon, lat)  # Create a point from latitude and longitude
+    
+    # Find subdistrict that contains this point
+    subdistrict = gdf_subdistrict[gdf_subdistrict.contains(point)]
+    
+    # Find district that contains this point
+    district = gdf_district[gdf_district.contains(point)]
+    
+    if not subdistrict.empty and not district.empty:
+        return {
+            "subdistrict_en": subdistrict['ADM3_EN'].iloc[0],
+            "subdistrict_th": subdistrict['ADM3_TH'].iloc[0],
+            "district_en": district['ADM2_EN'].iloc[0],
+            "district_th": district['ADM2_TH'].iloc[0],
+            "province_en": district['ADM1_EN'].iloc[0],
+            "province_th": district['ADM1_TH'].iloc[0],
+        }
+    else:
+        return None
