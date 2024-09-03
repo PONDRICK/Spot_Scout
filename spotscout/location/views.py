@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserLocation
-from .utils import calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
+from .utils import find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
 from .models import Location
@@ -347,3 +347,25 @@ class PopulationView(APIView):
 
         population = get_population(lat, lon, distance)
         return Response({"population": population}, status=status.HTTP_200_OK)
+
+class LocationDetailView(APIView):
+    
+    def get(self, request):
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+
+        if not lat or not lon:
+            return Response({"error": "Missing latitude or longitude"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return Response({"error": "Invalid latitude or longitude format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        location_details = find_location(lat, lon)
+
+        if location_details:
+            return Response(location_details, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Location not found"}, status=status.HTTP_404_NOT_FOUND)
