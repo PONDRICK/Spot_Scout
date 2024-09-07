@@ -24,10 +24,10 @@ Spot Scout is a location analysis and prediction platform designed to help users
 ## Contributors
 
 - **[Pakin Suwannop]**   
-  [GitHub Profile](https://github.com/yourusername) 
+  [GitHub Profile](https://github.com/SpiritJom) 
 
 - **[Sorrawit Nuernuam]**    
-  [GitHub Profile](https://github.com/yourusername) 
+  [GitHub Profile](https://github.com/PONDRICK) 
 
 # 
 
