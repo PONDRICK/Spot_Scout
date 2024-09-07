@@ -23,20 +23,21 @@ Spot Scout is a location analysis and prediction platform designed to help users
 
 ## Contributors
 
-- **[Pakin Suwannop]** 
+- **[Pakin Suwannop]**   
   [GitHub Profile](https://github.com/yourusername) 
 
-- **[Sorrawit Nuernuam]**  
+- **[Sorrawit Nuernuam]**    
   [GitHub Profile](https://github.com/yourusername) 
 
 
+- **Map interface.**
 ![image](https://github.com/user-attachments/assets/ac837b50-e848-42b2-a5f8-fce435050450)
-Map interface.
 
+- **Using the predict function.**
 ![image](https://github.com/user-attachments/assets/77a3aec3-9759-4644-9964-82beb764f0d7)
-Using the predict function.
 
+- **Overview.**
 ![image](https://github.com/user-attachments/assets/90350cb2-b00f-47fc-8829-a4114603f75f)
-Overview.
+
 
 
