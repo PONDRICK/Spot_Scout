@@ -5,7 +5,7 @@ Spot Scout is a location analysis and prediction platform designed to help users
 
 ## Features
 
-- **Location Prediction**: Spot Scout leverages a trained machine learning model to predict what type of establishment (e.g., café, restaurant, store) is best suited for a specific location based on its latitude and longitude.
+- **Location Prediction**: Spot Scout leverages a trained machine learning model to predict what type of establishment (e.g., cafe, restaurant, store) is best suited for a specific location based on its latitude and longitude.
   
 - **Map Analysis**: Users can analyze maps with various tools and functions, including the ability to save and load maps for future reference or modification.
 
