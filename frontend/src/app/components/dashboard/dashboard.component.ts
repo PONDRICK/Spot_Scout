@@ -121,8 +121,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('functionDropdownContainer')
+  functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer')
+  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -208,6 +210,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.amenitySelect.nativeElement.selectedIndex = index;
       this.selectedAmenity = this.amenities[index];
     }
+  }
+
+  toggleLocationVisibility(place: any) {
+    place.locationsVisible = !place.locationsVisible;
+  }
+
+  getDisplayedLocations(place: any) {
+    return place.locationsVisible ? place.locations : [];
   }
 
   private async initOrReinitMap(): Promise<void> {

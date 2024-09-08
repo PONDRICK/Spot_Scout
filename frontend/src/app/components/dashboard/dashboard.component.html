@@ -25,18 +25,26 @@
       </div>
     </div>
     <div class="navbar-right">
-      <button
-        (click)="toggleSidebar()"
-        class="text-white px-4 py-2 rounded-md"
-      >
+      <button (click)="toggleSidebar()" class="text-white px-4 py-2 rounded-md">
         <span class="material-symbols-outlined">add_location_alt</span>
       </button>
       <!-- Hamburger Menu Button -->
       <button (click)="toggleMenu()" class="hamburger-menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" width="38" height="38" viewBox="0 0 29 29" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon icon-tabler icon-tabler-menu-2"
+          width="38"
+          height="38"
+          viewBox="0 0 29 29"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <line x1="4" y1="6" x2="20" y2="6" />
-          <line x1="4" y1="12" x2="20" y2="12" />   
+          <line x1="4" y1="12" x2="20" y2="12" />
           <line x1="4" y1="18" x2="20" y2="18" />
         </svg>
       </button>
@@ -86,20 +94,54 @@
     <input type="text" placeholder="Longitude" #lonInput class="latlon-input" />
     <div class="checkbox-container flex items-center space-x-2 mt-1">
       <label class="relative inline-flex items-center cursor-pointer">
-        <input class="sr-only peer" type="checkbox" [(ngModel)]="isMarkerLocked">
-        <div class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95">
-          <svg class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5" height="50" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100" width="50" x="0" xmlns="http://www.w3.org/2000/svg" y="0">
-            <path class="svg-fill-primary" d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"></path>
+        <input
+          class="sr-only peer"
+          type="checkbox"
+          [(ngModel)]="isMarkerLocked"
+        />
+        <div
+          class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95"
+        >
+          <svg
+            class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5"
+            height="50"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 100 100"
+            width="50"
+            x="0"
+            xmlns="http://www.w3.org/2000/svg"
+            y="0"
+          >
+            <path
+              class="svg-fill-primary"
+              d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"
+            ></path>
           </svg>
-          <svg class="group-hover:scale-75 duration-300 absolute top-0.5 left-0.5 stroke-gray-900 w-5 h-5" height="50" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100" width="50" x="0" xmlns="http://www.w3.org/2000/svg" y="0">
-            <path d="M30,46V38a20,20,0,0,1,40,0v8a8,8,0,0,1,8,8V74a8,8,0,0,1-8,8H30a8,8,0,0,1-8-8V54A8,8,0,0,1,30,46Zm32-8v8H38V38a12,12,0,0,1,24,0Z" fill-rule="evenodd"></path>
+          <svg
+            class="group-hover:scale-75 duration-300 absolute top-0.5 left-0.5 stroke-gray-900 w-5 h-5"
+            height="50"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 100 100"
+            width="50"
+            x="0"
+            xmlns="http://www.w3.org/2000/svg"
+            y="0"
+          >
+            <path
+              d="M30,46V38a20,20,0,0,1,40,0v8a8,8,0,0,1,8,8V74a8,8,0,0,1-8,8H30a8,8,0,0,1-8-8V54A8,8,0,0,1,30,46Zm32-8v8H38V38a12,12,0,0,1,24,0Z"
+              fill-rule="evenodd"
+            ></path>
           </svg>
         </div>
       </label>
       <label class="text-white">Lock Location</label>
     </div>
     <label for="function">Select Function:</label>
-    <div class="dropdown-container" #functionDropdownContainer (click)="toggleDropdown($event)">
+    <div
+      class="dropdown-container"
+      #functionDropdownContainer
+      (click)="toggleDropdown($event)"
+    >
       <div class="selected-option">{{ selectedFunction }}</div>
       <div class="dropdown-options" *ngIf="dropdownOpen">
         <div
@@ -115,7 +157,11 @@
     <!-- Conditionally display the amenity selection based on the selected function -->
     <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
       <label for="amenity">Select Amenity:</label>
-      <div class="dropdown-container" #amenityDropdownContainer (click)="toggleAmenityDropdown($event)">
+      <div
+        class="dropdown-container"
+        #amenityDropdownContainer
+        (click)="toggleAmenityDropdown($event)"
+      >
         <div class="selected-option">{{ selectedAmenity }}</div>
         <div class="dropdown-options" *ngIf="dropdownAmenityOpen">
           <div
@@ -130,7 +176,9 @@
     </div>
 
     <!-- Add distance input for Count and Population -->
-    <div *ngIf="selectedFunction === 'count' || selectedFunction === 'population'">
+    <div
+      *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
+    >
       <label for="distance">Distance:</label>
       <div class="input-container">
         <input
@@ -239,8 +287,14 @@
         <p>Distance: {{ place.distance }} meters</p>
         <p>Count: {{ place.count }}</p>
 
-        <ul>
-          <li *ngFor="let amenity of place.locations">
+        <!-- Button to toggle locations visibility -->
+        <button (click)="toggleLocationVisibility(place)">
+          {{ place.locationsVisible ? "Hide Locations" : "Show Locations" }}
+        </button>
+
+        <!-- Conditionally display the list of locations -->
+        <ul *ngIf="place.locationsVisible">
+          <li *ngFor="let amenity of getDisplayedLocations(place)">
             Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
           </li>
         </ul>
@@ -307,7 +361,6 @@
     </div>
   </div>
 </div>
-
 
 <div *ngIf="showHistoryModal" class="modal">
   <div class="modal-content">
