@@ -1,19 +1,26 @@
-<div class="modal-content">
-  <span class="close" (click)="navigateToDashboard()">&times;</span>
-  <h2>Saved Maps History</h2>
-  <ul class="map-list">
-    <li *ngFor="let map of savedMaps" class="map-item">
-      <div class="map-info">
-        <span>Map ID: {{ map.id }}</span>
-        <span>Map Name: {{ map.name }}</span>
+<div class="history-container">
+  <h2 class="title">History</h2>
+  <div class="map-grid">
+    <div *ngFor="let map of savedMaps" class="map-card">
+      <div class="map-header">
+        <span>{{ map.name }}</span>
+      </div>
+      <div class="map-details">
+        <div><strong>Created At:</strong> {{ formatDate(map.created_at) }}</div>
+        <div><strong>Updated At:</strong> {{ formatDate(map.updated_at) }}</div>
+        <div><strong>Coordinates:</strong></div>
+        <ul *ngIf="map.startLat && map.startLon">
+          <li>
+            Lat: {{ map.startLat }}, Lon: {{ map.startLon }}
+          </li>
+        </ul>
       </div>
       <div class="map-actions">
         <button (click)="loadMap(map)" class="btn-load">Load</button>
         <button (click)="deleteMap(map.id)" class="btn-delete">Delete</button>
       </div>
-    </li>
-  </ul>
-  <!-- Logout button -->
+    </div>
+  </div>
   <div class="logout-container">
     <button (click)="logout()" class="btn-logout">Logout</button>
   </div>
