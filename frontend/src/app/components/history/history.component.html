@@ -1,20 +1,80 @@
-<div class="modal-content">
-  <span class="close" (click)="navigateToDashboard()">&times;</span>
-  <h2>Saved Maps History</h2>
-  <ul class="map-list">
-    <li *ngFor="let map of savedMaps" class="map-item">
-      <div class="map-info">
-        <span>Map ID: {{ map.id }}</span>
-        <span>Map Name: {{ map.name }}</span>
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <!-- Make SpotScout clickable with a click event to navigate to dashboard -->
+      <span class="navbar-title" (click)="navigateToDashboard()">SpotScout</span>
+    </div>
+    
+    <!-- Search Filter -->
+    <div class="search-container">
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search maps"
+          (input)="onSearchInput($event)"
+          [(ngModel)]="searchText"
+        />
+      </div>
+    </div>
+    
+    <div class="navbar-right">
+      <!-- Hamburger Menu Button for logout -->
+      <button (click)="toggleMenu()" class="hamburger-menu">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon icon-tabler icon-tabler-menu-2"
+          width="38"
+          height="38"
+          viewBox="0 0 29 29"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isMenuOpen" class="dropdown-menu">
+        <ul>
+          <li (click)="logout()">
+            <mat-icon class="icon">logout</mat-icon>
+            Logout
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<!-- History Container -->
+<div class="history-container">
+  <div class="map-grid">
+    <div *ngFor="let map of filteredMaps" class="map-card">
+      <div class="map-header">
+        <span>{{ map.name }}</span>
+      </div>
+      <div class="map-details">
+        <div><strong>Created At:</strong> {{ formatDate(map.created_at) }}</div>
+        <div><strong>Updated At:</strong> {{ formatDate(map.updated_at) }}</div>
+        <div><strong>Coordinates:</strong></div>
+        <ul *ngIf="map.startLat && map.startLon">
+          <li>
+            Lat: {{ map.startLat }}, Lon: {{ map.startLon }}
+          </li>
+        </ul>
       </div>
       <div class="map-actions">
         <button (click)="loadMap(map)" class="btn-load">Load</button>
         <button (click)="deleteMap(map.id)" class="btn-delete">Delete</button>
       </div>
-    </li>
-  </ul>
-  <!-- Logout button -->
-  <div class="logout-container">
-    <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
   </div>
 </div>
