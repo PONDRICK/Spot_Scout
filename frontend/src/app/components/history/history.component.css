@@ -43,6 +43,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  color: black; /* เปลี่ยนสีข้อความใน input เป็นสีดำ */
+  background-color: white; /* เพิ่มพื้นหลังเป็นสีขาวเพื่อความชัดเจน */
 }
 
 .hamburger-menu {
