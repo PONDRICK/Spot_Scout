@@ -1,6 +1,91 @@
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 56px;
+  
+}
+
+
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer; 
+}
+
+.search-container {
+  margin: 0 auto;
+  width: 250px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.hamburger-menu {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background-color: #333;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  width: 150px;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-menu li {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: none; 
+  /* border-bottom: 1px solid #555; */
+}
+
+.dropdown-menu li:hover {
+  background-color: #444;
+}
+
+
 .history-container {
-  padding: 20px;
-  background-color: #f4f5f7;
+  padding: 80px 20px 20px 20px; 
+  background-color: #294886;
+  box-sizing: border-box; 
 }
 
 .title {
