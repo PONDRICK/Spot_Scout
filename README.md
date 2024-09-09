@@ -31,13 +31,13 @@ Spot Scout is a location analysis and prediction platform designed to help users
 
 # 
 
-## **Map interface.**  
+## **Map interface**  
 ![image](https://github.com/user-attachments/assets/ac837b50-e848-42b2-a5f8-fce435050450)
 
-## **Using the predict function.**  
+## **Using the predict function**  
 ![image](https://github.com/user-attachments/assets/77a3aec3-9759-4644-9964-82beb764f0d7)
 
-## **Overview.**  
+## **Overview**  
 ![image](https://github.com/user-attachments/assets/90350cb2-b00f-47fc-8829-a4114603f75f)
 
 
