@@ -197,3 +197,12 @@ class UserLocation(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.lat}, {self.lon}"
+    
+class BusinessOwnerCount(models.Model):
+    subdistrict = models.CharField(max_length=255)
+    district = models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    count = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.subdistrict}, {self.district}, {self.province}: {self.count}"
