@@ -8,7 +8,8 @@ import geopandas as gpd
 import os
 from shapely.geometry import Point 
 from geopy.distance import geodesic
-from .models import Location
+from .models import Location, BusinessOwnerCount
+import csv
 
 def calculate_nearest_place(latitude, longitude, amenity):
     node_coords = (latitude, longitude)
@@ -273,3 +274,4 @@ def find_location(lat, lon):
         }
     else:
         return None
+    

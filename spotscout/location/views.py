@@ -6,7 +6,7 @@ from .models import UserLocation
 from .utils import find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
-from .models import Location
+from .models import Location, BusinessOwnerCount
 
 
 class AddUserLocationView(APIView):
@@ -366,6 +366,19 @@ class LocationDetailView(APIView):
         location_details = find_location(lat, lon)
 
         if location_details:
+            subdistrict = location_details.get("subdistrict_th")
+            district = location_details.get("district_th")
+            
+            # ค้นหาจำนวนผู้ประกอบการในตำบลและอำเภอนั้น
+            business_count = BusinessOwnerCount.objects.filter(
+                subdistrict=subdistrict,
+                district=district
+            ).first()
+            
+            business_count_data = business_count.count if business_count else 0
+            
+            location_details["business_count"] = business_count_data
+
             return Response(location_details, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Location not found"}, status=status.HTTP_404_NOT_FOUND)
