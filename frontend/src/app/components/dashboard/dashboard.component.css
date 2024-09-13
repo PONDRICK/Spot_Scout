@@ -222,7 +222,8 @@ button {
 .nearest-place-info,
 .amenities-count-info,
 .population-info,
-.predict-info {
+.predict-info,
+.economy-info {
   position: relative;
   padding: 16px;
   margin-bottom: 10px;
@@ -240,7 +241,8 @@ button {
 .nearest-place-info h3,
 .amenities-count-info h3,
 .population-info h3,
-.predict-info h3 {
+.predict-info h3,
+.economy-info h3 {
   margin-bottom: 10px;
   color: #ffffff; /* White text color */
 }
@@ -249,7 +251,8 @@ button {
 .amenities-count-info p,
 .amenities-count-info ul li,
 .population-info p,
-.predict-info p {
+.predict-info p,
+.economy-info p {
   margin-bottom: 5px;
   color: #cccccc; /* Light grey text color */
 }
