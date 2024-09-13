@@ -217,4 +217,12 @@ export class ApiService {
       headers: headers,
     });
   }
+
+  getEconomyDetails(lat: number, lon: number): Observable<any> {
+    return this.http.get(
+      `${this.locationBaseUrl}location-details/?lat=${lat}&lon=${lon}`
+    );
+  }
+  
+  
 }

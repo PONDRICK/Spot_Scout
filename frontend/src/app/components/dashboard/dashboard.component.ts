@@ -108,7 +108,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     'zoo',
   ];
 
-  functions: string[] = ['nearest', 'count', 'population', 'predict'];
+  functions: string[] = ['nearest', 'count', 'population', 'predict', 'economy'];
 
   private map: any;
   private marker: any;
@@ -592,21 +592,25 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (
-      !this.functionDropdownContainer.nativeElement.contains(
-        event.target as Node
-      )
-    ) {
-      this.dropdownOpen = false;
-    }
-    if (
-      !this.amenityDropdownContainer.nativeElement.contains(
-        event.target as Node
-      )
-    ) {
-      this.dropdownAmenityOpen = false;
-    }
+  // Check if functionDropdownContainer exists and contains the event target
+  if (
+    this.functionDropdownContainer &&
+    this.functionDropdownContainer.nativeElement &&
+    !this.functionDropdownContainer.nativeElement.contains(event.target as Node)
+  ) {
+    this.dropdownOpen = false;
   }
+
+  // Check if amenityDropdownContainer exists and contains the event target
+  if (
+    this.amenityDropdownContainer &&
+    this.amenityDropdownContainer.nativeElement &&
+    !this.amenityDropdownContainer.nativeElement.contains(event.target as Node)
+  ) {
+    this.dropdownAmenityOpen = false;
+  }
+}
+
 
   private outputExists(
     lat: number,
@@ -871,6 +875,30 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           });
         },
         error: (error) => console.error('Error predicting model:', error),
+      });
+    }else if (this.selectedFunction === 'economy') {
+      this.apiService.getEconomyDetails(lat, lon).subscribe({
+        next: (response) => {
+          console.log('Economy data received:', response);
+          if (this.isOutputRemoved(loadingOutput)) return;
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            subdistrict: response.subdistrict_th || 'ไม่ทราบ', // ใช้ "ไม่ทราบ" หากไม่พบข้อมูล
+            district: response.district_th || 'ไม่ทราบ', // ใช้ "ไม่ทราบ" หากไม่พบข้อมูล
+            business_count: response.business_count !== undefined ? response.business_count : -1, // ใช้ -1 หากไม่พบข้อมูล business_count
+          });
+        },
+        error: (error) => {
+          console.error('Error fetching economy details:', error);
+          if (error.status === 404) {
+            loadingOutput.loading = false;
+            Object.assign(loadingOutput, {
+              subdistrict: 'ไม่ทราบ',  // ถ้าเกิด 404 ให้แสดงว่า "ไม่ทราบ"
+              district: 'ไม่ทราบ',    // ถ้าเกิด 404 ให้แสดงว่า "ไม่ทราบ"
+              business_count: 0,      // ถ้าเกิด 404 ให้แสดงว่า -1
+            });
+          }
+        },
       });
     }
   }
