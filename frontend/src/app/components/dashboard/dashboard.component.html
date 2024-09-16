@@ -329,10 +329,7 @@
       </div>
 
       <!-- Added Economy Section -->
-      <div
-        *ngIf="!place.loading && place.type === 'economy'"
-        class="economy-info"
-      >
+      <div *ngIf="!place.loading && place.type === 'economy'" class="economy-info">
         <button (click)="removeOutput(place)" class="delete-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -356,6 +353,8 @@
         <p>Subdistrict: {{ place.subdistrict }}</p>
         <p>District: {{ place.district }}</p>
         <p>Business Count: {{ place.business_count }}</p>
+        <p>Closed Business Count: {{ place.closed_business_count }}</p>
+        <p>Average Income: {{ place.average_income | number: '1.0-2' }} THB</p>
       </div>
 
       <div
