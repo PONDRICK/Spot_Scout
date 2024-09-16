@@ -6,7 +6,7 @@ from .models import UserLocation
 from .utils import find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
-from .models import Location, BusinessOwnerCount
+from .models import Location, BusinessOwnerCount, AverageIncome, ClosedBusinessCount
 
 
 class AddUserLocationView(APIView):
@@ -349,7 +349,6 @@ class PopulationView(APIView):
         return Response({"population": population}, status=status.HTTP_200_OK)
 
 class LocationDetailView(APIView):
-    
     def get(self, request):
         lat = request.GET.get('lat')
         lon = request.GET.get('lon')
@@ -368,16 +367,30 @@ class LocationDetailView(APIView):
         if location_details:
             subdistrict = location_details.get("subdistrict_th")
             district = location_details.get("district_th")
-            
-            # ค้นหาจำนวนผู้ประกอบการในตำบลและอำเภอนั้น
+            province = location_details.get("province_th")  # Get province in Thai
+
+            # Fetch the business owner count
             business_count = BusinessOwnerCount.objects.filter(
                 subdistrict=subdistrict,
                 district=district
             ).first()
-            
             business_count_data = business_count.count if business_count else 0
-            
             location_details["business_count"] = business_count_data
+
+            # Fetch the average income for the province
+            average_income = AverageIncome.objects.filter(
+                province=province
+            ).first()
+            average_income_value = average_income.value if average_income else None
+            location_details["average_income"] = average_income_value
+
+            # Fetch the closed businesses count
+            closed_business = ClosedBusinessCount.objects.filter(
+                subdistrict=subdistrict,
+                district=district
+            ).first()
+            closed_business_count = closed_business.count if closed_business else 0
+            location_details["closed_business_count"] = closed_business_count
 
             return Response(location_details, status=status.HTTP_200_OK)
         else:

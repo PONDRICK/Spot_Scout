@@ -206,3 +206,19 @@ class BusinessOwnerCount(models.Model):
 
     def __str__(self):
         return f"{self.subdistrict}, {self.district}, {self.province}: {self.count}"
+
+class AverageIncome(models.Model):
+    province = models.CharField(max_length=255)
+    value = models.FloatField()
+
+    def __str__(self):
+        return f"{self.province}: {self.value}"
+
+class ClosedBusinessCount(models.Model):
+    subdistrict = models.CharField(max_length=255)
+    district = models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    count = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.subdistrict}, {self.district}, {self.province}: {self.count}"
