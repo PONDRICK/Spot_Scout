@@ -883,9 +883,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           if (this.isOutputRemoved(loadingOutput)) return;
           loadingOutput.loading = false;
           Object.assign(loadingOutput, {
-            subdistrict: response.subdistrict_th || 'ไม่ทราบ', // ใช้ "ไม่ทราบ" หากไม่พบข้อมูล
-            district: response.district_th || 'ไม่ทราบ', // ใช้ "ไม่ทราบ" หากไม่พบข้อมูล
-            business_count: response.business_count !== undefined ? response.business_count : -1, // ใช้ -1 หากไม่พบข้อมูล business_count
+            subdistrict: response.subdistrict_th || 'ไม่ทราบ',
+            district: response.district_th || 'ไม่ทราบ',
+            business_count: response.business_count !== undefined ? response.business_count : -1,
+            average_income: response.average_income !== undefined ? response.average_income : 'ไม่ทราบ',
+            closed_business_count: response.closed_business_count !== undefined ? response.closed_business_count : 0,
           });
         },
         error: (error) => {
@@ -893,9 +895,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           if (error.status === 404) {
             loadingOutput.loading = false;
             Object.assign(loadingOutput, {
-              subdistrict: 'ไม่ทราบ',  // ถ้าเกิด 404 ให้แสดงว่า "ไม่ทราบ"
-              district: 'ไม่ทราบ',    // ถ้าเกิด 404 ให้แสดงว่า "ไม่ทราบ"
-              business_count: 0,      // ถ้าเกิด 404 ให้แสดงว่า -1
+              subdistrict: 'ไม่ทราบ',
+              district: 'ไม่ทราบ',
+              business_count: 0,
+              average_income: 'ไม่ทราบ',
+              closed_business_count: 0,
             });
           }
         },
