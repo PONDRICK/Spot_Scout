@@ -1,0 +1,157 @@
+<!-- admin.component.html -->
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <span class="navbar-title">Admin Panel</span>
+    </div>
+    <div class="navbar-right">
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="admin-content">
+  <div class="admin-section">
+    <h2>Users</h2>
+    <input
+      [(ngModel)]="userSearchTerm"
+      (input)="searchUsers()"
+      placeholder="Search Users"
+    />
+    <button (click)="fetchUsers()" class="btn-refresh">Refresh Users</button>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Is Verified</th>
+          <th>Is Online</th>
+          <th>Is Banned</th>
+          <th>Date Joined</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>{{ user.email }}</td>
+          <td>{{ user.first_name }}</td>
+          <td>{{ user.last_name }}</td>
+          <td>{{ user.is_verified }}</td>
+          <td>{{ user.is_online }}</td>
+          <td>{{ user.is_banned }}</td>
+          <td>{{ user.date_joined | date : "short" }}</td>
+          <td>{{ user.last_login | date : "short" }}</td>
+          <td>
+            <button (click)="deleteUser(user.id)" class="btn-delete">
+              Delete
+            </button>
+            <button
+              (click)="banUser(user.id)"
+              [disabled]="user.is_banned"
+              class="btn-ban"
+            >
+              Ban
+            </button>
+            <button
+              (click)="unbanUser(user.id)"
+              [disabled]="!user.is_banned"
+              class="btn-unban"
+            >
+              Unban
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-section">
+    <h2>Roles</h2>
+    <button (click)="fetchRoles()" class="btn-refresh">Refresh Roles</button>
+    <ul>
+      <li *ngFor="let role of roles">
+        {{ role.name }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="admin-section">
+    <h2>System Configuration</h2>
+    <button (click)="fetchConfig()" class="btn-refresh">Refresh Config</button>
+    <pre>{{ systemConfig | json }}</pre>
+    <button (click)="updateConfig()" class="btn-update">Update Config</button>
+  </div>
+
+  <div class="admin-section">
+    <h2>Activity Logs</h2>
+    <input
+      [(ngModel)]="logSearchTerm"
+      (input)="searchLogs()"
+      placeholder="Search Logs"
+    />
+    <button (click)="fetchLogs()" class="btn-refresh">Refresh Logs</button>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User Email</th>
+            <th>Action</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of filteredLogs">
+            <td>{{ log.timestamp }}</td>
+            <td>{{ log.user_email }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.ip_address }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <p>{{ totalUsers }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Roles</h3>
+        <p>{{ totalRoles }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Recent Activities</h3>
+        <p>{{ recentActivities }}</p>
+      </div>
+    </div>
+    <div class="charts">
+      <canvas
+        baseChart
+        [data]="usersChartData"
+        [options]="chartOptions"
+        chartType="bar"
+      >
+      </canvas>
+      <canvas
+        baseChart
+        [data]="rolesChartData"
+        [options]="chartOptions"
+        chartType="line"
+      >
+      </canvas>
+      <canvas
+        baseChart
+        [data]="activitiesChartData"
+        [options]="chartOptions"
+        chartType="doughnut"
+      >
+      </canvas>
+    </div>
+  </div>
+</div>

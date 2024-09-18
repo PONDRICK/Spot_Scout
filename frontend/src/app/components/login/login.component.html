@@ -1,0 +1,104 @@
+<div class="login-background">
+  <!-- Waves Container -->
+  <div>
+    <svg
+      class="waves"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 24 150 28"
+      preserveAspectRatio="none"
+      shape-rendering="auto"
+    >
+      <defs>
+        <path
+          id="gentle-wave"
+          d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+        />
+      </defs>
+      <g class="parallax">
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="0"
+          fill="rgba(255,255,255,0.7)"
+        />
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="3"
+          fill="rgba(255,255,255,0.5)"
+        />
+        <use
+          xlink:href="#gentle-wave"
+          x="48"
+          y="5"
+          fill="rgba(255,255,255,0.3)"
+        />
+        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
+      </g>
+    </svg>
+  </div>
+  
+  <!-- Login Form Container -->
+  <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-6xl mx-auto p-10 main-container">
+    <div class="w-1/2 pr-10">
+      <div class="flex flex-col items-center">
+        <h3 class="text-3xl font-bold mb-6 text-white">Sign In</h3>
+        <p class="mb-4 text-gray-300">Please Enter your Account details</p>
+      </div>
+      <form (ngSubmit)="login()" class="space-y-4">
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-300 text-left label-padding">Email</label>
+          <input
+            [(ngModel)]="credentials.email"
+            name="email"
+            type="email"
+            class="mt-1 p-2 border rounded-md w-full"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-gray-300 text-left label-padding">Password</label>
+          <input
+            [(ngModel)]="credentials.password"
+            name="password"
+            type="password"
+            class="mt-1 p-2 border rounded-md w-full"
+            required
+          />
+        </div>
+        <div class="flex justify-between items-center">
+          <a routerLink="/reset-password" class="text-blue-500">Forgot Password?</a>
+        </div>
+        <div class="flex justify-center mt-4 space-x-10">
+          <button
+            type="button"
+            routerLink="/register"
+            class="bg-green-500 text-white px-4 py-2 rounded-md"
+          >
+            Sign Up
+          </button>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Sign In
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="w-1/2 pl-10 text-white flex flex-col items-center">
+      <div style="display: flex; justify-content: center;">
+        <img src="assets/spotscout_logo.png" alt="Spot Scout Logo" style="width: 200px; height: auto;" />
+      </div>
+      <h5 class="text-2xl font-bold mb-4 spotscout-title">SpotScout</h5>
+      <div class="text-container">
+        <p>
+          Search and find your dream location
+          is now easier than ever. Just analyze
+          your favorite location.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

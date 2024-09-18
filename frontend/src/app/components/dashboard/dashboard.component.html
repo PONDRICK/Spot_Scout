@@ -1,0 +1,404 @@
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <span class="navbar-title">SpotScout</span>
+    </div>
+    <!-- Search Location (Center Aligned) -->
+    <div class="search-container">
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search location"
+          (input)="onSearchInput($event)"
+          #searchInput
+        />
+        <ul class="suggestions" *ngIf="suggestions.length">
+          <li
+            *ngFor="let suggestion of suggestions"
+            (click)="selectSuggestion(suggestion)"
+          >
+            <span class="icon">📍</span>
+            {{ suggestion.display_name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <button (click)="toggleSidebar()" class="text-white px-4 py-2 rounded-md">
+        <span class="material-symbols-outlined">add_location_alt</span>
+      </button>
+      <!-- Hamburger Menu Button -->
+      <button (click)="toggleMenu()" class="hamburger-menu">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon icon-tabler icon-tabler-menu-2"
+          width="38"
+          height="38"
+          viewBox="0 0 29 29"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isMenuOpen" class="dropdown-menu">
+        <ul>
+          <li (click)="saveMap()">
+            <mat-icon class="icon">save_alt</mat-icon>
+            Save
+          </li>
+          <li (click)="viewHistory()">
+            <mat-icon class="icon">history</mat-icon>
+            History
+          </li>
+          <li (click)="logout()">
+            <mat-icon class="icon">logout</mat-icon>
+            Logout
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="map"></div>
+
+<div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
+  <div class="sidebar-content">
+    <button (click)="toggleSidebar()" class="close-button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+    <input type="text" placeholder="Latitude" #latInput class="latlon-input" />
+    <input type="text" placeholder="Longitude" #lonInput class="latlon-input" />
+    <div class="checkbox-container flex items-center space-x-2 mt-1">
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input
+          class="sr-only peer"
+          type="checkbox"
+          [(ngModel)]="isMarkerLocked"
+        />
+        <div
+          class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95"
+        >
+          <svg
+            class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5"
+            height="50"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 100 100"
+            width="50"
+            x="0"
+            xmlns="http://www.w3.org/2000/svg"
+            y="0"
+          >
+            <path
+              class="svg-fill-primary"
+              d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"
+            ></path>
+          </svg>
+          <svg
+            class="group-hover:scale-75 duration-300 absolute top-0.5 left-0.5 stroke-gray-900 w-5 h-5"
+            height="50"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 100 100"
+            width="50"
+            x="0"
+            xmlns="http://www.w3.org/2000/svg"
+            y="0"
+          >
+            <path
+              d="M30,46V38a20,20,0,0,1,40,0v8a8,8,0,0,1,8,8V74a8,8,0,0,1-8,8H30a8,8,0,0,1-8-8V54A8,8,0,0,1,30,46Zm32-8v8H38V38a12,12,0,0,1,24,0Z"
+              fill-rule="evenodd"
+            ></path>
+          </svg>
+        </div>
+      </label>
+      <label class="text-white">Lock Location</label>
+    </div>
+    <label for="function">Select Function:</label>
+    <div
+      class="dropdown-container"
+      #functionDropdownContainer
+      (click)="toggleDropdown($event)"
+    >
+      <div class="selected-option">{{ selectedFunction }}</div>
+      <div class="dropdown-options" *ngIf="dropdownOpen">
+        <div
+          *ngFor="let function of functions"
+          class="dropdown-option"
+          (click)="selectFunction(function, $event)"
+        >
+          {{ function }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Conditionally display the amenity selection based on the selected function -->
+    <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
+      <label for="amenity">Select Amenity:</label>
+      <div
+        class="dropdown-container"
+        #amenityDropdownContainer
+        (click)="toggleAmenityDropdown($event)"
+      >
+        <div class="selected-option">{{ selectedAmenity }}</div>
+        <div class="dropdown-options" *ngIf="dropdownAmenityOpen">
+          <div
+            *ngFor="let amenity of amenities"
+            class="dropdown-option"
+            (click)="selectAmenity(amenity, $event)"
+          >
+            {{ amenity }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add distance input for Count and Population -->
+    <div
+      *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
+    >
+      <label for="distance">Distance:</label>
+      <div class="input-container">
+        <input
+          type="number"
+          id="distance"
+          [(ngModel)]="distance"
+          min="100"
+          step="100"
+          (change)="validateDistance()"
+          class="distance-input"
+        />
+      </div>
+    </div>
+
+    <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
+
+    <!-- Output Information -->
+    <div *ngFor="let place of outputs" class="output-info">
+      <div *ngIf="place.loading" class="loading-indicator">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <div class="rounded-md p-4 max-w-sm w-full mx-auto">
+          <div class="animate-pulse flex space-x-4">
+            <div class="flex-1 space-y-6 py-1">
+              <div class="h-2 bg-slate-700 rounded"></div>
+              <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="h-2 bg-slate-700 rounded col-span-2"></div>
+                  <div class="h-2 bg-slate-700 rounded col-span-1"></div>
+                </div>
+                <div class="h-2 bg-slate-700 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="!place.loading && place.type === 'nearest'"
+        class="nearest-place-info"
+      >
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <button (click)="toggleVisibility(place)" class="toggle-button">
+          {{ place.visible ? "Hide" : "Show" }}
+        </button>
+        <p>Nearest: {{ place.amenity }}</p>
+        <p>Distance: {{ place.distance }} meters</p>
+        <p>Province: {{ place.province }}</p>
+        <p>Lat: {{ place.lat }}</p>
+        <p>Lon: {{ place.lon }}</p>
+      </div>
+
+      <div
+        *ngIf="!place.loading && place.type === 'count'"
+        class="amenities-count-info"
+      >
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <button (click)="toggleVisibility(place)" class="toggle-button">
+          {{ place.visible ? "Hide" : "Show" }}
+        </button>
+        <p>Amenity: {{ place.amenity }}</p>
+        <p>Distance: {{ place.distance }} meters</p>
+        <p>Count: {{ place.count }}</p>
+
+        <!-- Button to toggle locations visibility -->
+        <button (click)="toggleLocationVisibility(place)">
+          {{ place.locationsVisible ? "Hide Locations" : "Show Locations" }}
+        </button>
+
+        <!-- Conditionally display the list of locations -->
+        <ul *ngIf="place.locationsVisible">
+          <li *ngFor="let amenity of getDisplayedLocations(place)">
+            Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
+          </li>
+        </ul>
+      </div>
+
+      <div
+        *ngIf="!place.loading && place.type === 'population'"
+        class="population-info"
+      >
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <button (click)="toggleVisibility(place)" class="toggle-button">
+          {{ place.visible ? "Hide" : "Show" }}
+        </button>
+        <p>Population:</p>
+        <p>Distance: {{ place.distance }} meters</p>
+        <p>Population: {{ place.population }}</p>
+      </div>
+
+      <!-- Added Economy Section -->
+      <div *ngIf="!place.loading && place.type === 'economy'" class="economy-info">
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <button (click)="toggleVisibility(place)" class="toggle-button">
+          {{ place.visible ? "Hide" : "Show" }}
+        </button>
+        <p>Economy Information:</p>
+        <p>Subdistrict: {{ place.subdistrict }}</p>
+        <p>District: {{ place.district }}</p>
+        <p>Business Count: {{ place.business_count }}</p>
+        <p>Closed Business Count: {{ place.closed_business_count }}</p>
+        <p>Average Income: {{ place.average_income | number: '1.0-2' }} THB</p>
+      </div>
+
+      <div
+        *ngIf="!place.loading && place.type === 'predict'"
+        class="predict-info"
+      >
+        <button (click)="removeOutput(place)" class="delete-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <button (click)="toggleVisibility(place)" class="toggle-button">
+          {{ place.visible ? "Hide" : "Show" }}
+        </button>
+        <p>Prediction Results:</p>
+        <p>Most Suitable Amenity</p>
+        <p *ngFor="let pred of place.top_predictions">
+          {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
+        </p>
+        <p>other : {{ place.remaining_score.toFixed(2) }}%</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showHistoryModal" class="modal">
+  <div class="modal-content">
+    <span class="close" (click)="closeHistoryModal()">&times;</span>
+    <h2>Saved Maps History</h2>
+    <ul>
+      <li *ngFor="let map of savedMaps" (click)="loadMap(map)">
+        Map ID: {{ map.id }}, Map Name: {{ map.name }}
+      </li>
+    </ul>
+  </div>
+</div>

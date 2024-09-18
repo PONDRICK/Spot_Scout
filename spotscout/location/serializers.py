@@ -1,0 +1,53 @@
+from rest_framework import serializers
+from .models import UserLocation
+
+class UserLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLocation
+        fields = [
+            'id', 'user', 'lat', 'lon', 'province', 'ISO3166_2',
+            'distance_nearest_bank', 'count_bank_within_500m',
+            'distance_nearest_fuel', 'count_fuel_within_500m',
+            'distance_nearest_office', 'count_office_within_500m',
+            'distance_nearest_police', 'count_police_within_500m',
+            'distance_nearest_townhall', 'count_townhall_within_500m',
+            'distance_nearest_bus_station', 'count_bus_station_within_500m',
+            'distance_nearest_bus_stop', 'count_bus_stop_within_500m',
+            'distance_nearest_convenience', 'count_convenience_within_500m',
+            'distance_nearest_mall', 'count_mall_within_500m',
+            'distance_nearest_supermarket', 'count_supermarket_within_500m',
+            'distance_nearest_books', 'count_books_within_500m',
+            'distance_nearest_coffee', 'count_coffee_within_500m',
+            'distance_nearest_department_store', 'count_department_store_within_500m',
+            'distance_nearest_clothes', 'count_clothes_within_500m',
+            'distance_nearest_bakery', 'count_bakery_within_500m',
+            'distance_nearest_cafe', 'count_cafe_within_500m',
+            'count_viewpoint_within_500m', 'count_attraction_within_500m',
+            'count_camp_site_within_500m', 'count_guest_house_within_500m',
+            'count_information_within_500m', 'count_museum_within_500m',
+            'count_zoo_within_500m', 'count_picnic_site_within_500m',
+            'count_hotel_within_500m', 'count_motel_within_500m',
+            'count_chalet_within_500m', 'count_artwork_within_500m',
+            'count_wilderness_hut_within_500m', 'count_waterfall_within_500m',
+            'distance_nearest_restaurant', 'count_restaurant_within_500m',
+            'distance_nearest_fast_food', 'count_fast_food_within_500m',
+            'distance_nearest_village', 'count_village_within_500m',
+            'distance_nearest_hospital', 'count_hospital_within_500m',
+            'distance_nearest_pharmacy', 'count_pharmacy_within_500m',
+            'distance_nearest_clinic', 'count_clinic_within_500m',
+            'distance_nearest_hotel', 'count_apartment_within_500m',
+            'distance_nearest_apartment', 'count_atm_within_500m',
+            'distance_nearest_atm', 'count_traffic_signals_within_500m',
+            'distance_nearest_traffic_signals', 'count_station_within_500m',
+            'distance_nearest_station', 'count_school_within_500m',
+            'distance_nearest_school', 'count_motorway_junction_within_500m',
+            'distance_nearest_motorway_junction', 'count_crossing_within_500m',
+            'distance_nearest_crossing', 'distance_nearest_viewpoint',
+            'distance_nearest_attraction', 'distance_nearest_camp_site',
+            'distance_nearest_guest_house', 'distance_nearest_information',
+            'distance_nearest_museum', 'distance_nearest_zoo',
+            'distance_nearest_picnic_site', 'distance_nearest_motel',
+            'distance_nearest_chalet', 'distance_nearest_artwork',
+            'distance_nearest_wilderness_hut', 'distance_nearest_waterfall',
+            'population', 'predicted_amenity_category'  # Include the prediction field
+        ]

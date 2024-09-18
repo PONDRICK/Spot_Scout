@@ -1,0 +1,143 @@
+@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch&family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+/* Apply the font to the whole website */
+body,
+html {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.login-background {
+  position: relative;
+  text-align: center;
+  background: linear-gradient(
+    60deg,
+    rgba(84, 58, 183, 1) 0%,
+    rgba(0, 172, 193, 1) 100%
+  );
+  color: black;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.waves {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 15vh;
+  margin-bottom: -7px; /* Fix for safari gap */
+  min-height: 100px;
+  max-height: 150px;
+}
+
+.parallax > use {
+  animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+.parallax > use:nth-child(1) {
+  animation-delay: -2s;
+  animation-duration: 7s;
+}
+.parallax > use:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 10s;
+}
+.parallax > use:nth-child(3) {
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+.parallax > use:nth-child(4) {
+  animation-delay: -5s;
+  animation-duration: 20s;
+}
+
+@keyframes move-forever {
+  0% {
+    transform: translate3d(-90px, 0, 0);
+  }
+  100% {
+    transform: translate3d(85px, 0, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .waves {
+    height: 40px;
+    min-height: 40px;
+  }
+  .content {
+    height: 30vh;
+  }
+  h1 {
+    font-size: 24px;
+  }
+}
+
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for Leaflet Geoman toolbar */
+.leaflet-bar.leaflet-control {
+  background-color: #fff; /* Set a background color */
+  border-radius: 4px; /* Add rounded corners */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Add a shadow */
+  overflow: hidden; /* Ensure the toolbar doesn't overflow */
+}
+
+.leaflet-bar a {
+  display: flex; /* Use flexbox for better alignment */
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  width: 34px; /* Set a fixed width */
+  height: 34px; /* Set a fixed height */
+  margin: 0; /* Remove margin between buttons */
+  border-radius: 0; /* Remove rounded corners on individual buttons */
+  background-color: #f9f9f9; /* Set a background color */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Add transition for hover effects */
+  border: none; /* Remove border */
+}
+
+.leaflet-bar a:hover {
+  background-color: #007bff; /* Change background on hover */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); /* Add a shadow on hover */
+  color: #fff; /* Change text color on hover */
+}
+
+.leaflet-bar a:active {
+  background-color: #0056b3; /* Change background on active */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Add a shadow on active */
+}
+
+.leaflet-bar a img {
+  width: 20px; /* Ensure the icons fit well */
+  height: 20px;
+}
+
+/* Specific styles for Geoman buttons if needed */
+.leaflet-geoman-button {
+  width: 34px;
+  height: 34px;
+  line-height: 34px; /* Ensure text is centered */
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
