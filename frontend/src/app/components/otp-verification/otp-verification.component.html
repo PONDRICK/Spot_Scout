@@ -44,7 +44,7 @@
 
   <div class="flex items-center justify-center w-full h-full main-container">
     <div class="otp-container bg-black bg-opacity-50 rounded-lg shadow-md p-10">
-      <h2 class="text-2xl font-bold mb-4 text-white">Please enter the One-Time Password to verify your account</h2>
+      <h6 class="text-2xl font-bold mb-4 text-white">Please enter the One-Time Password to verify your account</h6>
       <p class="mb-6 text-gray-300" *ngIf="email">A One-Time Password has been sent to {{ email }}</p>
       <p class="mb-6 text-gray-300" *ngIf="!email">A One-Time Password has been sent</p>
       <form (ngSubmit)="verifyOTP()" class="space-y-4">
@@ -118,9 +118,19 @@
         </div>
         <button type="submit" class="validate-button bg-red-500 text-white px-4 py-2 rounded-md w-full">Validate</button>
       </form>
-      <button (click)="resendOTP()" class="resend-button bg-gray-500 text-white px-4 py-2 rounded-md w-full mt-4">Resend One-Time Password</button>
+      <button
+  (click)="resendOTP()"
+  [disabled]="resendCooldown > 0"
+  class="resend-button bg-gray-500 text-white px-4 py-2 rounded-md w-full mt-4 mb-4"
+>
+  Resend One-Time Password
+</button>
+
+<p *ngIf="resendCooldown > 0" class="text-gray-300 mt-4">
+  You can resend a new OTP in: {{resendCooldown}} seconds
+</p>
+      <!-- <p *ngIf="successMessage" class="success-message text-green-500 mt-4">{{ successMessage }}</p>  -->
       <p *ngIf="errorMessage" class="error-message text-red-500 mt-4">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="success-message text-green-500 mt-4">{{ successMessage }}</p>
       <p *ngIf="timeLeft > 0" class="countdown-timer text-gray-300 mt-4">OTP will expire in: {{ formatTimeLeft() }}</p>
     </div>
   </div>

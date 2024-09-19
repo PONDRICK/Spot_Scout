@@ -31,7 +31,22 @@ def send_code_to_user(email):
     Subject = "One time passcode for Email verification"
     user = User.objects.get(email=email)
     current_site = "Spotscout.com"
-    token, expiration_time, otp_code = generate_verification_token(user)
+    otp_code = generateOtp()
+    expiration_time = timezone.now() + timedelta(minutes=3)
+    
+    # Get or create the OTP record
+    otp_record, created = OneTimePassword.objects.get_or_create(user=user)
+    otp_record.code = otp_code
+    otp_record.expires_at = expiration_time
+    otp_record.last_resent_at = timezone.now()
+    otp_record.save()
+    
+    token = jwt.encode({
+        'user_id': user.id,
+        'email': user.email,
+        'exp': expiration_time.timestamp()
+    }, settings.SECRET_KEY, algorithm='HS256')
+    
     verification_link = f"http://localhost:4200/verify-otp/{token}/"
 
     email_body = format_html(
@@ -59,10 +74,10 @@ def send_code_to_user(email):
     from_email = settings.DEFAULT_FROM_EMAIL
     
     d_email = EmailMessage(subject=Subject, body=email_body, from_email=from_email, to=[email])
-    d_email.content_subtype = "html"  # Main content is now text/html
+    d_email.content_subtype = "html"
     d_email.send(fail_silently=True)
-
-    return otp_code, expiration_time, token # Return the OTP code and expiration time
+    
+    return otp_code, expiration_time, token
 
 def send_normal_email(data):
     email = EmailMessage(

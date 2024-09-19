@@ -29,6 +29,8 @@ from django.utils import timezone
 from spotscout import settings
 from rest_framework_simplejwt.settings import api_settings
 from jwt.exceptions import ExpiredSignatureError
+from datetime import timedelta
+
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +158,7 @@ class RegisterUserView(GenericAPIView):
                 'data': serializer.data,
                 'message': 'Thanks for signing up!',
                 'expiration_time': expiration_time,
-                'token': token  # Include the token in the response
+                'token': token
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -166,25 +168,38 @@ class VerifyUserEmail(GenericAPIView):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
             user = User.objects.get(id=payload['user_id'], email=payload['email'])
-            user_code_obj = OneTimePassword.objects.get(user=user, code=otpcode)
-
-            if user_code_obj.expires_at < timezone.now():
+            otp_record = OneTimePassword.objects.get(user=user)
+    
+            if otp_record.code != otpcode:
+                return Response({'message': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
+    
+            if otp_record.expires_at < timezone.now():
                 return Response({'message': 'OTP has expired'}, status=status.HTTP_400_BAD_REQUEST)
-
+    
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
+                otp_record.delete()  # Remove OTP record after successful verification
                 log_activity(user, "verified_email", request)
                 return Response({
                     'message': 'Account email verified successfully'
                 }, status=status.HTTP_200_OK)
-
+    
             return Response({
-                'message': 'Code is invalid, user already verified'
-            }, status=status.HTTP_204_NO_CONTENT)
-
-        except (jwt.ExpiredSignatureError, jwt.DecodeError, User.DoesNotExist, OneTimePassword.DoesNotExist):
-            return Response({'message': 'Invalid token or OTP'}, status=status.HTTP_400_BAD_REQUEST)        
+                'message': 'User already verified'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+        except jwt.ExpiredSignatureError:
+            return Response({'message': 'Token has expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.InvalidTokenError:
+            return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'message': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'OTP record not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"An error occurred: {str(e)}")
+            return Response({'message': 'An error occurred during verification'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
 
 class LoginUserView(GenericAPIView):
     serializer_class = LoginSerializer
@@ -267,8 +282,22 @@ class ResendOTPView(APIView):
             decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
             user_id = decoded_token['user_id']
             user = User.objects.get(id=user_id)
-            # Delete old OTP
-            OneTimePassword.objects.filter(user=user).delete()
+            otp_record = OneTimePassword.objects.get(user=user)
+    
+            # Check cooldown (30 seconds)
+            cooldown_period = timedelta(seconds=30)
+            now = timezone.now()
+            if otp_record.last_resent_at and now - otp_record.last_resent_at < cooldown_period:
+                time_left = (cooldown_period - (now - otp_record.last_resent_at)).seconds
+                return Response({
+                    'message': 'Please wait before requesting another OTP.',
+                    'time_left': time_left
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    
+            # Update last_resent_at
+            otp_record.last_resent_at = now
+            otp_record.save()
+    
             # Generate and send new OTP
             otp_code, expiration_time, new_token = send_code_to_user(user.email)
             log_activity(user, "resent_otp", request)
@@ -281,9 +310,12 @@ class ResendOTPView(APIView):
             return Response({'message': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'message': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'OTP record not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(f"An error occurred: {str(e)}")
             return Response({'message': 'An error occurred while resending OTP'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         
 class GetOTPExpirationView(APIView):
     def post(self, request):
