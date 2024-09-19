@@ -23,6 +23,8 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   timeLeft: number = 0;
   timerSubscription: Subscription | null = null;
   token: string = '';
+  resendCooldown: number = 0;
+  resendTimerSubscription: Subscription | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -52,6 +54,24 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.clearCountdown();
+    this.clearResendCooldown();
+  }
+
+  startResendCooldown() {
+    this.clearResendCooldown();
+    this.resendTimerSubscription = interval(1000).subscribe(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        this.clearResendCooldown();
+      }
+    });
+  }
+  
+  clearResendCooldown() {
+    if (this.resendTimerSubscription) {
+      this.resendTimerSubscription.unsubscribe();
+      this.resendTimerSubscription = null;
+    }
   }
 
   startCountdown() {
@@ -105,15 +125,33 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
   }
 
   resendOTP() {
+    if (this.resendCooldown > 0) {
+      this.errorMessage = `Please wait before resending OTP.`;
+      return;
+    }
+  
     this.apiService.resendOTP({ token: this.token }).subscribe(
       (response) => {
         console.log('OTP resent successfully', response);
         this.successMessage = 'OTP has been resent. Please check your email.';
         this.errorMessage = ''; // Clear error message when OTP is resent
+  
+        // Handle expiration time
         if (response.expiration_time) {
           this.expirationTime = new Date(response.expiration_time);
           this.startCountdown();
         }
+  
+        // Handle cooldown time
+        if (response.time_left) {
+          this.resendCooldown = response.time_left;
+          this.startResendCooldown();
+        } else {
+          // If no cooldown time is provided, default to 30 seconds
+          this.resendCooldown = 30;
+          this.startResendCooldown();
+        }
+  
         // Update the token if it's included in the response
         if (response.token) {
           this.token = response.token;
@@ -124,7 +162,13 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
       },
       (error) => {
         console.error('Resend OTP failed', error);
-        this.errorMessage = 'Resend OTP failed. Please try again.';
+        if (error.status === 429 && error.error.time_left) {
+          this.resendCooldown = error.error.time_left;
+          this.startResendCooldown();
+          this.errorMessage = `Please wait before resending OTP.`;
+        } else {
+          this.errorMessage = 'Resend OTP failed. Please try again.';
+        }
       }
     );
   }

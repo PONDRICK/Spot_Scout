@@ -50,11 +50,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 class OneTimePassword(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=6, unique=True)
-    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=3))
+    expires_at = models.DateTimeField()
+    last_resent_at = models.DateTimeField(null=True, blank=True)  # New field
 
     def save(self, *args, **kwargs):
         if not self.expires_at:
-            self.expires_at = timezone.now() + timedelta(minutes=3)  # OTP expires in 10 minutes
+            self.expires_at = timezone.now() + timedelta(minutes=3)
         super().save(*args, **kwargs)
 
     def __str__(self):
