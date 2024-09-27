@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserLocation
-from .utils import calculate_distance_category,find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
+from .utils import calculate_count_category,calculate_distance_category,find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
 from .models import Location, BusinessOwnerCount, AverageIncome, ClosedBusinessCount
@@ -419,3 +419,29 @@ class CalculateDistanceCategoryView(APIView):
             return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({"distance": nearest_distance, "category": category}, status=status.HTTP_200_OK)
+
+class CalculateCountCategoryView(APIView):
+    def get(self, request):
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+        category = request.GET.get('category')
+        radius = request.GET.get('radius')
+
+        # Check if all parameters are provided
+        if not lat or not lon or not category or not radius:
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            lat = float(lat)
+            lon = float(lon)
+            radius = float(radius)
+        except ValueError:
+            return Response({"error": "Invalid latitude, longitude, or radius format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Call the calculate_count_category function
+        count = calculate_count_category(lat, lon, category, radius)
+        
+        if count is None:
+            return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"count": count, "category": category, "radius": radius}, status=status.HTTP_200_OK)    

@@ -299,3 +299,36 @@ def calculate_distance_category(lat, lon, category):
     nearest_distance = dist[0][1] if dist[0][0] == 0 else dist[0][0]
 
     return nearest_distance * 111319.9 
+
+def calculate_count_category(lat, lon, category, radius):
+    # Query data from LocationCategory model for the specific category
+    locations = LocationCategory.objects.filter(category=category).values('lat', 'lon')
+    df = pd.DataFrame(locations)
+
+    if df.empty:
+        return None  # Return None if no locations are found for the category
+
+    # Get the coordinates for the specific category
+    category_coords = df[['lat', 'lon']].values
+
+    # Build the KDTree for the category coordinates
+    tree = KDTree(category_coords)
+
+    # Convert radius from meters to degrees
+    radius_in_degrees = radius / 111319.9
+
+    # Define the point (lat, lon) to query around
+    point = [[lat, lon]]
+
+    # Query the tree to find neighbors within the radius
+    indices = tree.query_radius(point, r=radius_in_degrees)
+
+    # Filter out the input point itself from the result
+    count = 0
+    for index in indices[0]:
+        neighbor_lat = category_coords[index][0]
+        neighbor_lon = category_coords[index][1]
+        if not (abs(neighbor_lat - lat) < 1e-6 and abs(neighbor_lon - lon) < 1e-6):
+            count += 1
+
+    return count
