@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserLocation
-from .utils import find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
+from .utils import calculate_distance_category,find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
 from .models import Location, BusinessOwnerCount, AverageIncome, ClosedBusinessCount
@@ -395,3 +395,27 @@ class LocationDetailView(APIView):
             return Response(location_details, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Location not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+class CalculateDistanceCategoryView(APIView):
+    def get(self, request):
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+        category = request.GET.get('category')
+
+        # Check if lat, lon, and category are provided
+        if not lat or not lon or not category:
+            return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return Response({"error": "Invalid latitude or longitude format"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Call the calculate_distance_category function with correct parameters
+        nearest_distance = calculate_distance_category(lat, lon, category)
+        
+        if nearest_distance is None:
+            return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"distance": nearest_distance, "category": category}, status=status.HTTP_200_OK)

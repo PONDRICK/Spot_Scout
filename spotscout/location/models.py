@@ -222,3 +222,13 @@ class ClosedBusinessCount(models.Model):
 
     def __str__(self):
         return f"{self.subdistrict}, {self.district}, {self.province}: {self.count}"
+
+class LocationCategory(models.Model):
+    id = models.BigAutoField(primary_key=True)  # Primary key for the table
+    name = models.CharField(max_length=255)  # Name of the location
+    lat = models.FloatField()  # Latitude
+    lon = models.FloatField()  # Longitude
+    category = models.CharField(max_length=255)  # Category (such as Food, Service, etc.)
+
+    def __str__(self):
+        return self.name    
