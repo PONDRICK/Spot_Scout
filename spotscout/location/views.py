@@ -445,3 +445,24 @@ class CalculateCountCategoryView(APIView):
             return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({"count": count, "category": category, "radius": radius}, status=status.HTTP_200_OK)    
+    
+class LocationLookupView(APIView):
+    def get(self, request):
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+
+        if not lat or not lon:
+            return Response({"error": "Missing latitude or longitude"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return Response({"error": "Invalid latitude or longitude format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        location_details = find_location(lat, lon)
+
+        if location_details:
+            return Response(location_details, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Location not found"}, status=status.HTTP_404_NOT_FOUND)
