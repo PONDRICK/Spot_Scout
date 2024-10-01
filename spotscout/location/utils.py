@@ -8,7 +8,7 @@ import geopandas as gpd
 import os
 from shapely.geometry import Point 
 from geopy.distance import geodesic
-from .models import Location, BusinessOwnerCount, LocationCategory
+from .models import Location, BusinessOwnerCount
 from sklearn.neighbors import KDTree
 import csv
 
@@ -278,57 +278,50 @@ def find_location(lat, lon):
     
     
 def calculate_distance_category(lat, lon, category):
-    # Query data from LocationCategory model for the specific category
-    locations = LocationCategory.objects.filter(category=category).values('lat', 'lon')
+    # Query data from Location model for the specific category
+    locations = Location.objects.filter(category=category).values('lat', 'lon')
     df = pd.DataFrame(locations)
 
     if df.empty:
         return None  # Return None if no locations are found for the category
 
     # Get the coordinates for the specific category
-    category_coords = df[['lat', 'lon']].values
-    
+    category_coords = df[['lat', 'lon']].values.astype(float)
+
     # Build the KDTree for the category coordinates
     tree = KDTree(category_coords)
 
-    # Find the nearest two distances to the given lat/lon point
-    point = [[lat, lon]]
-    dist, ind = tree.query(point, k=2)  # k=2 to skip the point itself
+    # Find the nearest distance to the given lat/lon point
+    point = [[float(lat), float(lon)]]
+    dist, ind = tree.query(point, k=1)
 
-    # If the closest point is the same as the input point, skip it
-    nearest_distance = dist[0][1] if dist[0][0] == 0 else dist[0][0]
+    nearest_distance = dist[0][0] * 111319.9  # Convert degrees to meters
 
-    return nearest_distance * 111319.9 
+    return nearest_distance
 
 def calculate_count_category(lat, lon, category, radius):
-    # Query data from LocationCategory model for the specific category
-    locations = LocationCategory.objects.filter(category=category).values('lat', 'lon')
+    # Query data from Location model for the specific category
+    locations = Location.objects.filter(category=category).values('lat', 'lon')
     df = pd.DataFrame(locations)
 
     if df.empty:
         return None  # Return None if no locations are found for the category
 
     # Get the coordinates for the specific category
-    category_coords = df[['lat', 'lon']].values
+    category_coords = df[['lat', 'lon']].values.astype(float)
 
     # Build the KDTree for the category coordinates
     tree = KDTree(category_coords)
 
     # Convert radius from meters to degrees
-    radius_in_degrees = radius / 111319.9
+    radius_in_degrees = float(radius) / 111319.9
 
     # Define the point (lat, lon) to query around
-    point = [[lat, lon]]
+    point = [[float(lat), float(lon)]]
 
     # Query the tree to find neighbors within the radius
     indices = tree.query_radius(point, r=radius_in_degrees)
 
-    # Filter out the input point itself from the result
-    count = 0
-    for index in indices[0]:
-        neighbor_lat = category_coords[index][0]
-        neighbor_lon = category_coords[index][1]
-        if not (abs(neighbor_lat - lat) < 1e-6 and abs(neighbor_lon - lon) < 1e-6):
-            count += 1
-
+    # Subtract 1 if the point itself is in the dataset
+    count = len(indices[0])
     return count
