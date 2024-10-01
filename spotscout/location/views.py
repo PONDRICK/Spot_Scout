@@ -405,20 +405,21 @@ class CalculateDistanceCategoryView(APIView):
         # Check if lat, lon, and category are provided
         if not lat or not lon or not category:
             return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             lat = float(lat)
             lon = float(lon)
         except ValueError:
             return Response({"error": "Invalid latitude or longitude format"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Call the calculate_distance_category function with correct parameters
         nearest_distance = calculate_distance_category(lat, lon, category)
-        
+
         if nearest_distance is None:
             return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({"distance": nearest_distance, "category": category}, status=status.HTTP_200_OK)
+
 
 class CalculateCountCategoryView(APIView):
     def get(self, request):
@@ -430,7 +431,7 @@ class CalculateCountCategoryView(APIView):
         # Check if all parameters are provided
         if not lat or not lon or not category or not radius:
             return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             lat = float(lat)
             lon = float(lon)
@@ -440,11 +441,12 @@ class CalculateCountCategoryView(APIView):
 
         # Call the calculate_count_category function
         count = calculate_count_category(lat, lon, category, radius)
-        
+
         if count is None:
             return Response({"message": f"No locations found for category: {category}"}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({"count": count, "category": category, "radius": radius}, status=status.HTTP_200_OK)    
+        return Response({"count": count, "category": category, "radius": radius}, status=status.HTTP_200_OK)
+
     
 class LocationLookupView(APIView):
     def get(self, request):
