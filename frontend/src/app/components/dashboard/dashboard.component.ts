@@ -112,21 +112,22 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   functions: string[] = ['nearest', 'count', 'population', 'predict', 'economy'];
 
+  private L: any;
   private map: any;
   private marker: any;
   private polylines: any[] = [];
   private circles: any[] = [];
   private markers: any[] = [];
+  private markerColors = ['green', 'orange', 'yellow', 'black', 'violet', 'gold'];
+  private countFunctionUsage = 0;
   private navigationSubscription: Subscription | undefined;
   suggestions: any[] = [];
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer')
-  functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer')
-  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -229,9 +230,9 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private async loadLeaflet(): Promise<void> {
-    const L = await import('leaflet');
+    this.L = await import('leaflet');
     await import('@geoman-io/leaflet-geoman-free');
-    this.initMap(L);
+    this.initMap(this.L);
   }
 
   private initMap(L: any): void {
@@ -668,28 +669,29 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   confirmSelection() {
+    if (!this.L) {
+      console.error('Leaflet is not loaded yet.');
+      return;
+    }
+  
     this.validateDistance();
-
+  
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
-
+  
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
-      import('leaflet').then((L) => {
-        this.marker = L.marker([lat, lon], { icon: this.redIcon }).addTo(
-          this.map
-        );
-        (this.marker as any).isOutputLayer = true;
-
-        this.marker.on('pm:dragend', () => {
-          this.redrawMarker();
-        });
+      this.marker = this.L.marker([lat, lon], { icon: this.redIcon }).addTo(this.map);
+      (this.marker as any).isOutputLayer = true;
+  
+      this.marker.on('pm:dragend', () => {
+        this.redrawMarker();
       });
     }
-
+  
     this.map.setView([lat, lon], this.map.getZoom());
-
+  
     if (
       this.outputExists(
         lat,
@@ -704,7 +706,22 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
-
+  
+    // Determine the color for this usage
+    const colorIndex = this.countFunctionUsage % this.markerColors.length;
+    const currentColor = this.markerColors[colorIndex];
+    this.countFunctionUsage++;
+  
+    // Create the icon
+    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${currentColor}.png`;
+    const markerIcon = this.L.icon({
+      iconUrl: iconUrl,
+      iconSize: [16, 28],
+      iconAnchor: [8, 28],
+      popupAnchor: [1, -34],
+      shadowSize: [28, 28],
+    });
+  
     const loadingOutput = {
       type: this.selectedFunction,
       loading: true,
@@ -715,6 +732,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       distance: this.distance,
       startLat: lat,
       startLon: lon,
+      color: currentColor, // Store the color
     };
     this.outputs.unshift(loadingOutput);
 
@@ -776,14 +794,16 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               }).addTo(this.map);
               (circle as any).isOutputLayer = true;
               this.circles.push(circle);
+  
               const markers = response.locations.map((location: any) => {
                 const marker = L.marker([location.lat, location.lon], {
-                  icon: this.greenIcon,
+                  icon: markerIcon, // Use the dynamically created icon
                 }).addTo(this.map);
                 (marker as any).isOutputLayer = true;
                 this.markers.push(marker);
                 return marker;
               });
+  
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
                 count: response.count,
@@ -791,12 +811,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 locations: response.locations,
                 circle: circle,
                 markers: markers,
+                color: currentColor, // Store the color
               });
-
+  
               circle.on('pm:dragend', () => {
                 this.redrawOutput(loadingOutput);
               });
-
+  
               markers.forEach((marker: any) => {
                 marker.on('pm:dragend', () => {
                   this.redrawOutput(loadingOutput);
@@ -971,6 +992,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const index = this.outputs.indexOf(output);
     if (index > -1) {
       this.outputs.splice(index, 1);
+
+      if (output.type === 'count') {
+        this.countFunctionUsage--;
+      }
 
       if (output.polyline) {
         output.polyline.remove();
@@ -1322,18 +1347,27 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         });
       }
       if (output.markers) {
+        const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${output.color}.png`;
+        const markerIcon = this.L.icon({
+          iconUrl: iconUrl,
+          iconSize: [16, 28],
+          iconAnchor: [8, 28],
+          popupAnchor: [1, -34],
+          shadowSize: [28, 28],
+        });
+      
         output.markers = output.markers.map((markerData: any) => {
           return import('leaflet').then((L) => {
             const marker = L.marker([markerData.lat, markerData.lon], {
-              icon: this.greenIcon,
+              icon: markerIcon, // Use the stored color
             }).addTo(this.map);
             marker.isOutputLayer = true;
             this.markers.push(marker);
-
+      
             marker.on('pm:dragend', () => {
               this.redrawOutput(output);
             });
-
+      
             return marker;
           });
         });
