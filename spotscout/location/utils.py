@@ -291,11 +291,18 @@ def calculate_distance_category(lat, lon, category):
     # Build the KDTree for the category coordinates
     tree = KDTree(category_coords)
 
-    # Find the nearest distance to the given lat/lon point
+    # Find the nearest two distances to the given lat/lon point
     point = [[float(lat), float(lon)]]
-    dist, ind = tree.query(point, k=1)
+    dist, ind = tree.query(point, k=2)
 
-    nearest_distance = dist[0][0] * 111319.9  # Convert degrees to meters
+    # Check if the closest point is the same as the input point
+    closest_point = category_coords[ind[0][0]]
+    if closest_point[0] == float(lat) and closest_point[1] == float(lon):
+        # If the nearest point is itself, return the second nearest point
+        nearest_distance = dist[0][1] * 111319.9  # Convert degrees to meters
+    else:
+        # Otherwise, return the nearest point
+        nearest_distance = dist[0][0] * 111319.9  # Convert degrees to meters
 
     return nearest_distance
 
