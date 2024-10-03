@@ -1,3 +1,5 @@
 
 spotscout/location/spot_scout_model/random_forest_model.pkl
 spotscout/.env
+spotscout/location/spot_scout_model/trained_model_100_v.2.pkl
+spotscout/location/spot_scout_model/label_encoder_100_v.2.pkl
