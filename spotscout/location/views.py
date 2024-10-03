@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserLocation
-from .utils import calculate_count_category,calculate_distance_category,find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
+from .utils import calculate_count_category, calculate_count_category_1000m, calculate_count_category_500m,calculate_distance_category, calculate_nearest_category,find_location ,calculate_nearest_place, count_amenities_within_500m, get_province_and_iso, get_population, predict_amenity_category
 from rest_framework.permissions import IsAuthenticated
 from geopy.distance import geodesic
 from .models import Location, BusinessOwnerCount, AverageIncome, ClosedBusinessCount
@@ -18,139 +18,39 @@ class AddUserLocationView(APIView):
         lon = request.data.get('lon')
         province, ISO3166_2 = get_province_and_iso(lat, lon)
 
-        # Calculate distances and counts
+        # Calculate distances and counts for new categories
+        categories = [
+            'Food', 'Drink_and_Bar', 'Education', 'Health', 'Residential', 
+            'Service', 'Hotel', 'Convenience', 'Buying_Place', 'Other'
+        ]
+        distances = {}
+        counts_500m = {}
+        counts_1000m = {}
+
+        for category in categories:
+            distances[category] = calculate_nearest_category(lat, lon, category)
+            counts_500m[category] = calculate_count_category_500m(lat, lon, category)
+            counts_1000m[category] = calculate_count_category_1000m(lat, lon, category)
+
+        # Calculate distances for specific amenities
         distance_nearest_bank, _ = calculate_nearest_place(lat, lon, 'bank')
-        count_bank_within_500m = count_amenities_within_500m(lat, lon, 'bank')
-
         distance_nearest_fuel, _ = calculate_nearest_place(lat, lon, 'fuel')
-        count_fuel_within_500m = count_amenities_within_500m(lat, lon, 'fuel')
-
-        distance_nearest_office, _ = calculate_nearest_place(lat, lon, 'office')
-        count_office_within_500m = count_amenities_within_500m(lat, lon, 'office')
-
         distance_nearest_police, _ = calculate_nearest_place(lat, lon, 'police')
-        count_police_within_500m = count_amenities_within_500m(lat, lon, 'police')
-
-        distance_nearest_townhall, _ = calculate_nearest_place(lat, lon, 'townhall')
-        count_townhall_within_500m = count_amenities_within_500m(lat, lon, 'townhall')
-
-        distance_nearest_bus_station, _ = calculate_nearest_place(lat, lon, 'bus_station')
-        count_bus_station_within_500m = count_amenities_within_500m(lat, lon, 'bus_station')
-
         distance_nearest_bus_stop, _ = calculate_nearest_place(lat, lon, 'bus_stop')
-        count_bus_stop_within_500m = count_amenities_within_500m(lat, lon, 'bus_stop')
-
-        distance_nearest_convenience, _ = calculate_nearest_place(lat, lon, 'convenience')
-        count_convenience_within_500m = count_amenities_within_500m(lat, lon, 'convenience')
-
-        distance_nearest_mall, _ = calculate_nearest_place(lat, lon, 'mall')
-        count_mall_within_500m = count_amenities_within_500m(lat, lon, 'mall')
-
-        distance_nearest_supermarket, _ = calculate_nearest_place(lat, lon, 'supermarket')
-        count_supermarket_within_500m = count_amenities_within_500m(lat, lon, 'supermarket')
-
-        distance_nearest_books, _ = calculate_nearest_place(lat, lon, 'books')
-        count_books_within_500m = count_amenities_within_500m(lat, lon, 'books')
-
-        distance_nearest_coffee, _ = calculate_nearest_place(lat, lon, 'coffee')
-        count_coffee_within_500m = count_amenities_within_500m(lat, lon, 'coffee')
-
-        distance_nearest_department_store, _ = calculate_nearest_place(lat, lon, 'department_store')
-        count_department_store_within_500m = count_amenities_within_500m(lat, lon, 'department_store')
-
-        distance_nearest_clothes, _ = calculate_nearest_place(lat, lon, 'clothes')
-        count_clothes_within_500m = count_amenities_within_500m(lat, lon, 'clothes')
-
-        distance_nearest_bakery, _ = calculate_nearest_place(lat, lon, 'bakery')
-        count_bakery_within_500m = count_amenities_within_500m(lat, lon, 'bakery')
-
-        distance_nearest_cafe, _ = calculate_nearest_place(lat, lon, 'cafe')
-        count_cafe_within_500m = count_amenities_within_500m(lat, lon, 'cafe')
-
-        # Calculate additional distances and counts
-        distance_nearest_restaurant, _ = calculate_nearest_place(lat, lon, 'restaurant')
-        count_restaurant_within_500m = count_amenities_within_500m(lat, lon, 'restaurant')
-
-        distance_nearest_fast_food, _ = calculate_nearest_place(lat, lon, 'fast_food')
-        count_fast_food_within_500m = count_amenities_within_500m(lat, lon, 'fast_food')
-
-        distance_nearest_village, _ = calculate_nearest_place(lat, lon, 'village')
-        count_village_within_500m = count_amenities_within_500m(lat, lon, 'village')
-
         distance_nearest_hospital, _ = calculate_nearest_place(lat, lon, 'hospital')
-        count_hospital_within_500m = count_amenities_within_500m(lat, lon, 'hospital')
-
-        distance_nearest_pharmacy, _ = calculate_nearest_place(lat, lon, 'pharmacy')
-        count_pharmacy_within_500m = count_amenities_within_500m(lat, lon, 'pharmacy')
-
-        distance_nearest_clinic, _ = calculate_nearest_place(lat, lon, 'clinic')
-        count_clinic_within_500m = count_amenities_within_500m(lat, lon, 'clinic')
-
-        distance_nearest_hotel, _ = calculate_nearest_place(lat, lon, 'hotel')
-        count_hotel_within_500m = count_amenities_within_500m(lat, lon, 'hotel')
-
-        distance_nearest_apartment, _ = calculate_nearest_place(lat, lon, 'apartment')
-        count_apartment_within_500m = count_amenities_within_500m(lat, lon, 'apartment')
-
         distance_nearest_atm, _ = calculate_nearest_place(lat, lon, 'atm')
-        count_atm_within_500m = count_amenities_within_500m(lat, lon, 'atm')
-
-        distance_nearest_traffic_signals, _ = calculate_nearest_place(lat, lon, 'traffic_signals')
-        count_traffic_signals_within_500m = count_amenities_within_500m(lat, lon, 'traffic_signals')
-
         distance_nearest_station, _ = calculate_nearest_place(lat, lon, 'station')
-        count_station_within_500m = count_amenities_within_500m(lat, lon, 'station')
+        
+        population = get_population(lat, lon, 500)  # Population within 500 meters
 
-        distance_nearest_school, _ = calculate_nearest_place(lat, lon, 'school')
-        count_school_within_500m = count_amenities_within_500m(lat, lon, 'school')
-
-        distance_nearest_motorway_junction, _ = calculate_nearest_place(lat, lon, 'motorway_junction')
-        count_motorway_junction_within_500m = count_amenities_within_500m(lat, lon, 'motorway_junction')
-
-        distance_nearest_crossing, _ = calculate_nearest_place(lat, lon, 'crossing')
-        count_crossing_within_500m = count_amenities_within_500m(lat, lon, 'crossing')
-
-        distance_nearest_viewpoint, _ = calculate_nearest_place(lat, lon, 'viewpoint')
-        count_viewpoint_within_500m = count_amenities_within_500m(lat, lon, 'viewpoint')
-
-        distance_nearest_attraction, _ = calculate_nearest_place(lat, lon, 'attraction')
-        count_attraction_within_500m = count_amenities_within_500m(lat, lon, 'attraction')
-
-        distance_nearest_camp_site, _ = calculate_nearest_place(lat, lon, 'camp_site')
-        count_camp_site_within_500m = count_amenities_within_500m(lat, lon, 'camp_site')
-
-        distance_nearest_guest_house, _ = calculate_nearest_place(lat, lon, 'guest_house')
-        count_guest_house_within_500m = count_amenities_within_500m(lat, lon, 'guest_house')
-
-        distance_nearest_information, _ = calculate_nearest_place(lat, lon, 'information')
-        count_information_within_500m = count_amenities_within_500m(lat, lon, 'information')
-
-        distance_nearest_museum, _ = calculate_nearest_place(lat, lon, 'museum')
-        count_museum_within_500m = count_amenities_within_500m(lat, lon, 'museum')
-
-        distance_nearest_zoo, _ = calculate_nearest_place(lat, lon, 'zoo')
-        count_zoo_within_500m = count_amenities_within_500m(lat, lon, 'zoo')
-
-        distance_nearest_picnic_site, _ = calculate_nearest_place(lat, lon, 'picnic_site')
-        count_picnic_site_within_500m = count_amenities_within_500m(lat, lon, 'picnic_site')
-
-        distance_nearest_motel, _ = calculate_nearest_place(lat, lon, 'motel')
-        count_motel_within_500m = count_amenities_within_500m(lat, lon, 'motel')
-
-        distance_nearest_chalet, _ = calculate_nearest_place(lat, lon, 'chalet')
-        count_chalet_within_500m = count_amenities_within_500m(lat, lon, 'chalet')
-
-        distance_nearest_artwork, _ = calculate_nearest_place(lat, lon, 'artwork')
-        count_artwork_within_500m = count_amenities_within_500m(lat, lon, 'artwork')
-
-        distance_nearest_wilderness_hut, _ = calculate_nearest_place(lat, lon, 'wilderness_hut')
-        count_wilderness_hut_within_500m = count_amenities_within_500m(lat, lon, 'wilderness_hut')
-
-        distance_nearest_waterfall, _ = calculate_nearest_place(lat, lon, 'waterfall')
-        count_waterfall_within_500m = count_amenities_within_500m(lat, lon, 'waterfall')
-
-        population = get_population(lat, lon, 500)  # Calculate population within 500 meters
-
+        location_details = find_location(lat, lon)
+        if location_details:
+            district_th = location_details.get('district_th')
+            subdistrict_th = location_details.get('subdistrict_th')
+        else:
+            district_th = None
+            subdistrict_th = None
+        # Create the user location object with all required fields
         user_location = UserLocation.objects.create(
             user=user,
             lat=lat,
@@ -158,92 +58,48 @@ class AddUserLocationView(APIView):
             province=province,
             ISO3166_2=ISO3166_2,
             distance_nearest_bank=distance_nearest_bank,
-            count_bank_within_500m=count_bank_within_500m,
             distance_nearest_fuel=distance_nearest_fuel,
-            count_fuel_within_500m=count_fuel_within_500m,
-            distance_nearest_office=distance_nearest_office,
-            count_office_within_500m=count_office_within_500m,
             distance_nearest_police=distance_nearest_police,
-            count_police_within_500m=count_police_within_500m,
-            distance_nearest_townhall=distance_nearest_townhall,
-            count_townhall_within_500m=count_townhall_within_500m,
-            distance_nearest_bus_station=distance_nearest_bus_station,
-            count_bus_station_within_500m=count_bus_station_within_500m,
             distance_nearest_bus_stop=distance_nearest_bus_stop,
-            count_bus_stop_within_500m=count_bus_stop_within_500m,
-            distance_nearest_convenience=distance_nearest_convenience,
-            count_convenience_within_500m=count_convenience_within_500m,
-            distance_nearest_mall=distance_nearest_mall,
-            count_mall_within_500m=count_mall_within_500m,
-            distance_nearest_supermarket=distance_nearest_supermarket,
-            count_supermarket_within_500m=count_supermarket_within_500m,
-            distance_nearest_books=distance_nearest_books,
-            count_books_within_500m=count_books_within_500m,
-            distance_nearest_coffee=distance_nearest_coffee,
-            count_coffee_within_500m=count_coffee_within_500m,
-            distance_nearest_department_store=distance_nearest_department_store,
-            count_department_store_within_500m=count_department_store_within_500m,
-            distance_nearest_clothes=distance_nearest_clothes,
-            count_clothes_within_500m=count_clothes_within_500m,
-            distance_nearest_bakery=distance_nearest_bakery,
-            count_bakery_within_500m=count_bakery_within_500m,
-            distance_nearest_cafe=distance_nearest_cafe,
-            count_cafe_within_500m=count_cafe_within_500m,
-            distance_nearest_restaurant=distance_nearest_restaurant,
-            count_restaurant_within_500m=count_restaurant_within_500m,
-            distance_nearest_fast_food=distance_nearest_fast_food,
-            count_fast_food_within_500m=count_fast_food_within_500m,
-            distance_nearest_village=distance_nearest_village,
-            count_village_within_500m=count_village_within_500m,
             distance_nearest_hospital=distance_nearest_hospital,
-            count_hospital_within_500m=count_hospital_within_500m,
-            distance_nearest_pharmacy=distance_nearest_pharmacy,
-            count_pharmacy_within_500m=count_pharmacy_within_500m,
-            distance_nearest_clinic=distance_nearest_clinic,
-            count_clinic_within_500m=count_clinic_within_500m,
-            distance_nearest_hotel=distance_nearest_hotel,
-            count_hotel_within_500m=count_hotel_within_500m,
-            distance_nearest_apartment=distance_nearest_apartment,
-            count_apartment_within_500m=count_apartment_within_500m,
             distance_nearest_atm=distance_nearest_atm,
-            count_atm_within_500m=count_atm_within_500m,
-            distance_nearest_traffic_signals=distance_nearest_traffic_signals,
-            count_traffic_signals_within_500m=count_traffic_signals_within_500m,
             distance_nearest_station=distance_nearest_station,
-            count_station_within_500m=count_station_within_500m,
-            distance_nearest_school=distance_nearest_school,
-            count_school_within_500m=count_school_within_500m,
-            distance_nearest_motorway_junction=distance_nearest_motorway_junction,
-            count_motorway_junction_within_500m=count_motorway_junction_within_500m,
-            distance_nearest_crossing=distance_nearest_crossing,
-            count_crossing_within_500m=count_crossing_within_500m,
-            distance_nearest_viewpoint=distance_nearest_viewpoint,
-            count_viewpoint_within_500m=count_viewpoint_within_500m,
-            distance_nearest_attraction=distance_nearest_attraction,
-            count_attraction_within_500m=count_attraction_within_500m,
-            distance_nearest_camp_site=distance_nearest_camp_site,
-            count_camp_site_within_500m=count_camp_site_within_500m,
-            distance_nearest_guest_house=distance_nearest_guest_house,
-            count_guest_house_within_500m=count_guest_house_within_500m,
-            distance_nearest_information=distance_nearest_information,
-            count_information_within_500m=count_information_within_500m,
-            distance_nearest_museum=distance_nearest_museum,
-            count_museum_within_500m=count_museum_within_500m,
-            distance_nearest_zoo=distance_nearest_zoo,
-            count_zoo_within_500m=count_zoo_within_500m,
-            distance_nearest_picnic_site=distance_nearest_picnic_site,
-            count_picnic_site_within_500m=count_picnic_site_within_500m,
-            distance_nearest_motel=distance_nearest_motel,
-            count_motel_within_500m=count_motel_within_500m,
-            distance_nearest_chalet=distance_nearest_chalet,
-            count_chalet_within_500m=count_chalet_within_500m,
-            distance_nearest_artwork=distance_nearest_artwork,
-            count_artwork_within_500m=count_artwork_within_500m,
-            distance_nearest_wilderness_hut=distance_nearest_wilderness_hut,
-            count_wilderness_hut_within_500m=count_wilderness_hut_within_500m,
-            distance_nearest_waterfall=distance_nearest_waterfall,
-            count_waterfall_within_500m=count_waterfall_within_500m,
-            population=population
+            population=population,
+            # Category distances
+            distance_nearest_food=distances['Food'],
+            distance_nearest_drink_and_bar=distances['Drink_and_Bar'],
+            distance_nearest_education=distances['Education'],
+            distance_nearest_health=distances['Health'],
+            distance_nearest_residential=distances['Residential'],
+            distance_nearest_service=distances['Service'],
+            distance_nearest_hotel=distances['Hotel'],
+            distance_nearest_convenience=distances['Convenience'],
+            distance_nearest_buying_place=distances['Buying_Place'],
+            distance_nearest_other=distances['Other'],
+            # Category counts for 500m
+            count_500m_food=counts_500m['Food'],
+            count_500m_drink_and_bar=counts_500m['Drink_and_Bar'],
+            count_500m_education=counts_500m['Education'],
+            count_500m_health=counts_500m['Health'],
+            count_500m_residential=counts_500m['Residential'],
+            count_500m_service=counts_500m['Service'],
+            count_500m_hotel=counts_500m['Hotel'],
+            count_500m_convenience=counts_500m['Convenience'],
+            count_500m_buying_place=counts_500m['Buying_Place'],
+            count_500m_other=counts_500m['Other'],
+            # Category counts for 1000m
+            count_1000m_food=counts_1000m['Food'],
+            count_1000m_drink_and_bar=counts_1000m['Drink_and_Bar'],
+            count_1000m_education=counts_1000m['Education'],
+            count_1000m_health=counts_1000m['Health'],
+            count_1000m_residential=counts_1000m['Residential'],
+            count_1000m_service=counts_1000m['Service'],
+            count_1000m_hotel=counts_1000m['Hotel'],
+            count_1000m_convenience=counts_1000m['Convenience'],
+            count_1000m_buying_place=counts_1000m['Buying_Place'],
+            count_1000m_other=counts_1000m['Other'],
+            District_TH=district_th,
+            Subdistrict_TH=subdistrict_th
         )
 
         # Predict the amenity category using the trained model
