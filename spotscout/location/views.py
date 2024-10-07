@@ -98,8 +98,8 @@ class AddUserLocationView(APIView):
             count_1000m_convenience=counts_1000m['Convenience'],
             count_1000m_buying_place=counts_1000m['Buying_Place'],
             count_1000m_other=counts_1000m['Other'],
-            District_TH=district_th,
-            Subdistrict_TH=subdistrict_th
+            district_th=district_th,
+            subdistrict_th=subdistrict_th
         )
 
         # Predict the amenity category using the trained model
