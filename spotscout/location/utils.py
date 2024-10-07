@@ -122,50 +122,51 @@ feature_order = [
 def predict_amenity_category(user_location):
     # Prepare the test data in the correct structure
     test_data = {
-    'lat': [user_location.lat],
-    'lon': [user_location.lon],
-    'province': [user_location.province],
-    'distance_nearest_bank': [user_location.distance_nearest_bank],
-    'distance_nearest_fuel': [user_location.distance_nearest_fuel],
-    'distance_nearest_police': [user_location.distance_nearest_police],
-    'distance_nearest_bus_stop': [user_location.distance_nearest_bus_stop],
-    'distance_nearest_hospital': [user_location.distance_nearest_hospital],
-    'distance_nearest_atm': [user_location.distance_nearest_atm],
-    'distance_nearest_station': [user_location.distance_nearest_station],
-    'population': [user_location.population],
-    'distance_nearest_category: Food': [user_location.distance_nearest_food],
-    'distance_nearest_category: Drink_and_Bar': [user_location.distance_nearest_drink_and_bar],
-    'distance_nearest_category: Education': [user_location.distance_nearest_education],
-    'distance_nearest_category: Health': [user_location.distance_nearest_health],
-    'distance_nearest_category: Residential': [user_location.distance_nearest_residential],
-    'distance_nearest_category: Service': [user_location.distance_nearest_service],
-    'distance_nearest_category: Hotel': [user_location.distance_nearest_hotel],
-    'distance_nearest_category: Convenience': [user_location.distance_nearest_convenience],
-    'distance_nearest_category: Buying_Place': [user_location.distance_nearest_buying_place],
-    'distance_nearest_category: Other': [user_location.distance_nearest_other],
-    'count_500m_Food': [user_location.count_500m_food],
-    'count_1000m_Food': [user_location.count_1000m_food],
-    'count_500m_Drink_and_Bar': [user_location.count_500m_drink_and_bar],
-    'count_1000m_Drink_and_Bar': [user_location.count_1000m_drink_and_bar],
-    'count_500m_Education': [user_location.count_500m_education],
-    'count_1000m_Education': [user_location.count_1000m_education],
-    'count_500m_Health': [user_location.count_500m_health],
-    'count_1000m_Health': [user_location.count_1000m_health],
-    'count_500m_Residential': [user_location.count_500m_residential],
-    'count_1000m_Residential': [user_location.count_1000m_residential],
-    'count_500m_Service': [user_location.count_500m_service],
-    'count_1000m_Service': [user_location.count_1000m_service],
-    'count_500m_Hotel': [user_location.count_500m_hotel],
-    'count_1000m_Hotel': [user_location.count_1000m_hotel],
-    'count_500m_Convenience': [user_location.count_500m_convenience],
-    'count_1000m_Convenience': [user_location.count_1000m_convenience],
-    'count_500m_Buying_Place': [user_location.count_500m_buying_place],
-    'count_1000m_Buying_Place': [user_location.count_1000m_buying_place],
-    'count_500m_Other': [user_location.count_500m_other],
-    'count_1000m_Other': [user_location.count_1000m_other],
-    'District_TH': [user_location.district_th],
-    'Subdistrict_TH': [user_location.subdistrict_th]
-}
+        'lat': [user_location.lat],
+        'lon': [user_location.lon],
+        'province': [user_location.province],
+        'distance_nearest_bank': [user_location.distance_nearest_bank],
+        'distance_nearest_fuel': [user_location.distance_nearest_fuel],
+        'distance_nearest_police': [user_location.distance_nearest_police],
+        'distance_nearest_bus_stop': [user_location.distance_nearest_bus_stop],
+        'distance_nearest_hospital': [user_location.distance_nearest_hospital],
+        'distance_nearest_atm': [user_location.distance_nearest_atm],
+        'distance_nearest_station': [user_location.distance_nearest_station],
+        'population': [user_location.population],
+        'distance_nearest_category: Food': [user_location.distance_nearest_food],
+        'distance_nearest_category: Drink_and_Bar': [user_location.distance_nearest_drink_and_bar],
+        'distance_nearest_category: Education': [user_location.distance_nearest_education],
+        'distance_nearest_category: Health': [user_location.distance_nearest_health],
+        'distance_nearest_category: Residential': [user_location.distance_nearest_residential],
+        'distance_nearest_category: Service': [user_location.distance_nearest_service],
+        'distance_nearest_category: Hotel': [user_location.distance_nearest_hotel],
+        'distance_nearest_category: Convenience': [user_location.distance_nearest_convenience],
+        'distance_nearest_category: Buying_Place': [user_location.distance_nearest_buying_place],
+        'distance_nearest_category: Other': [user_location.distance_nearest_other],
+        'count_500m_Food': [user_location.count_500m_food],
+        'count_1000m_Food': [user_location.count_1000m_food],
+        'count_500m_Drink_and_Bar': [user_location.count_500m_drink_and_bar],
+        'count_1000m_Drink_and_Bar': [user_location.count_1000m_drink_and_bar],
+        'count_500m_Education': [user_location.count_500m_education],
+        'count_1000m_Education': [user_location.count_1000m_education],
+        'count_500m_Health': [user_location.count_500m_health],
+        'count_1000m_Health': [user_location.count_1000m_health],
+        'count_500m_Residential': [user_location.count_500m_residential],
+        'count_1000m_Residential': [user_location.count_1000m_residential],
+        'count_500m_Service': [user_location.count_500m_service],
+        'count_1000m_Service': [user_location.count_1000m_service],
+        'count_500m_Hotel': [user_location.count_500m_hotel],
+        'count_1000m_Hotel': [user_location.count_1000m_hotel],
+        'count_500m_Convenience': [user_location.count_500m_convenience],
+        'count_1000m_Convenience': [user_location.count_1000m_convenience],
+        'count_500m_Buying_Place': [user_location.count_500m_buying_place],
+        'count_1000m_Buying_Place': [user_location.count_1000m_buying_place],
+        'count_500m_Other': [user_location.count_500m_other],
+        'count_1000m_Other': [user_location.count_1000m_other],
+        'District_TH': [user_location.district_th],
+        'Subdistrict_TH': [user_location.subdistrict_th]
+    }
+    
     # Handle any missing features by assigning default values
     missing_features = list(set(feature_order) - set(test_data.keys()))
     for feature in missing_features:
@@ -177,12 +178,13 @@ def predict_amenity_category(user_location):
     # Create DataFrame for model prediction
     test_df = pd.DataFrame(test_data)
 
-    # Ensure the 'province' column has all possible labels before transforming
-    all_possible_labels = np.append(label_encoder.classes_, user_location.province)
+    # Ensure the 'province', 'District_TH', and 'Subdistrict_TH' columns have all possible labels before transforming
+    all_possible_labels = np.append(label_encoder.classes_, [user_location.province, user_location.district_th, user_location.subdistrict_th])
     label_encoder.classes_ = np.unique(all_possible_labels)
 
-    # Encode the 'province' using the label encoder
-    test_df['province'] = label_encoder.transform(test_df['province'])
+    # Encode the 'province', 'District_TH', and 'Subdistrict_TH' using the label encoder
+    for col in ['province', 'District_TH', 'Subdistrict_TH']:
+        test_df[col] = label_encoder.transform(test_df[col])
 
     # Replace infinite values with 0, as the model might not handle infinity properly
     test_df.replace([np.inf, -np.inf], 0, inplace=True)
@@ -205,6 +207,7 @@ def predict_amenity_category(user_location):
     top_ranked_prediction = ranked_predictions[0]
 
     return ranked_predictions, top_ranked_prediction
+
 
 os.environ['SHAPE_RESTORE_SHX'] = 'YES'
 
