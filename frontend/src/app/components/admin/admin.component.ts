@@ -164,7 +164,11 @@ export class AdminComponent implements OnInit {
             this.fetchUsers(); // Refresh the user list
           },
           (error) => {
-            Swal.fire('Error!', 'Failed to delete user.', 'error');
+            if (error.status === 403) {
+              Swal.fire('Error!', 'You cannot delete yourself.', 'error'); // แจ้งเตือนกรณีที่พยายามลบตัวเอง
+            } else {
+              Swal.fire('Error!', 'Failed to delete user.', 'error'); // แจ้งเตือนกรณีอื่น ๆ
+            }
           }
         );
       }

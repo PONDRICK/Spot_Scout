@@ -106,10 +106,17 @@ class AdminUserDeleteView(DestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
-    def perform_destroy(self, instance):
-        user_email = instance.email
-        instance.delete()
-        log_activity(self.request.user, f"deleted_user {user_email}", self.request)
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # ตรวจสอบว่าผู้ใช้ที่กำลังลบเป็นตัวเองหรือไม่
+        if request.user.id == instance.id:
+            return Response(
+                {"error": "You cannot delete yourself."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # ถ้าไม่ใช่ตัวเองก็สามารถลบได้ตามปกติ
+        return super().delete(request, *args, **kwargs)
 
 class BanUserView(GenericAPIView):
     queryset = User.objects.all()
@@ -120,6 +127,8 @@ class BanUserView(GenericAPIView):
         user_id = request.data.get("user_id")
         try:
             user = User.objects.get(id=user_id)
+            if request.user.id == user.id:
+                return Response({"error": "You cannot ban yourself."}, status=status.HTTP_403_FORBIDDEN)
             user.is_banned = True
             user.is_online = False  # Force logout if currently logged in
             user.save()
