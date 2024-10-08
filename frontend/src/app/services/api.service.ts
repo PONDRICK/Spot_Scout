@@ -223,6 +223,23 @@ export class ApiService {
       `${this.locationBaseUrl}location-details/?lat=${lat}&lon=${lon}`
     );
   }
+
+  // Sends OTP to the current admin's email
+sendOtp(): Observable<any> {
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+  });
+  return this.http.post(`${this.baseUrl}send-otp/`, {}, { headers: headers });
+}
+
+// Verifies the OTP entered by the admin
+verifyOtp(otpData: any): Observable<any> {
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${this.cookieService.get('access_token')}`,
+    'Content-Type': 'application/json',
+  });
+  return this.http.post(`${this.baseUrl}verify-otp/`, otpData, { headers: headers });
+}
   
   
 }

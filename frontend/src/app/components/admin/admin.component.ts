@@ -148,55 +148,82 @@ export class AdminComponent implements OnInit {
     );
   }
 
-  deleteUser(userId: number) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will not be able to recover this user!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.apiService.deleteUser(userId).subscribe(
-          () => {
-            Swal.fire('Deleted!', 'The user has been deleted.', 'success');
-            this.fetchUsers(); // Refresh the user list
-          },
-          (error) => {
-            if (error.status === 403) {
-              Swal.fire('Error!', 'You cannot delete yourself.', 'error'); // แจ้งเตือนกรณีที่พยายามลบตัวเอง
-            } else {
-              Swal.fire('Error!', 'Failed to delete user.', 'error'); // แจ้งเตือนกรณีอื่น ๆ
-            }
-          }
-        );
-      }
-    });
-  }
-
   banUser(userId: number) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will ban this user!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, ban it!',
-      cancelButtonText: 'No, keep it',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.apiService.banUser(userId).subscribe(
-          () => {
-            Swal.fire('Banned!', 'The user has been banned.', 'success');
-            this.fetchUsers(); // Refresh the user list
-          },
-          (error) => {
-            Swal.fire('Error!', 'Failed to ban user.', 'error');
-          }
-        );
-      }
-    });
-  }
+  // First, trigger sending OTP to verify identity before banning
+  this.apiService.sendOtp().subscribe(
+    (response) => {
+      Swal.fire({
+        title: 'Enter OTP',
+        input: 'text',
+        inputPlaceholder: 'Enter OTP sent to your email',
+        showCancelButton: true,
+        confirmButtonText: 'Verify OTP',
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          this.verifyOtp(result.value, () => {
+            // If OTP is verified, proceed with banning the user
+            this.apiService.banUser(userId).subscribe(
+              () => {
+                Swal.fire('Banned!', 'The user has been banned.', 'success');
+                this.fetchUsers(); // Refresh the user list
+              },
+              (error) => {
+                Swal.fire('Error!', 'Failed to ban user.', 'error');
+              }
+            );
+          });
+        }
+      });
+    },
+    (error) => {
+      Swal.fire('Error!', 'Failed to send OTP.', 'error');
+    }
+  );
+}
+
+deleteUser(userId: number) {
+  // Trigger OTP verification for deleting a user
+  this.apiService.sendOtp().subscribe(
+    (response) => {
+      Swal.fire({
+        title: 'Enter OTP',
+        input: 'text',
+        inputPlaceholder: 'Enter OTP sent to your email',
+        showCancelButton: true,
+        confirmButtonText: 'Verify OTP',
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          this.verifyOtp(result.value, () => {
+            // If OTP is verified, proceed with deleting the user
+            this.apiService.deleteUser(userId).subscribe(
+              () => {
+                Swal.fire('Deleted!', 'The user has been deleted.', 'success');
+                this.fetchUsers(); // Refresh the user list
+              },
+              (error) => {
+                Swal.fire('Error!', 'Failed to delete user.', 'error');
+              }
+            );
+          });
+        }
+      });
+    },
+    (error) => {
+      Swal.fire('Error!', 'Failed to send OTP.', 'error');
+    }
+  );
+}
+
+verifyOtp(otp: string, callback: Function) {
+  this.apiService.verifyOtp({ otp }).subscribe(
+    (response) => {
+      callback(); // Proceed with action after OTP is verified
+    },
+    (error) => {
+      Swal.fire('Invalid OTP', 'The OTP you entered is invalid', 'error');
+    }
+  );
+}
 
   unbanUser(userId: number) {
     Swal.fire({

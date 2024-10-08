@@ -32,9 +32,9 @@ from jwt.exceptions import ExpiredSignatureError
 from datetime import timedelta
 
 
+
 logger = logging.getLogger(__name__)
 
-# Create your views here.
 class AdminUserListView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -152,6 +152,56 @@ class UnbanUserView(GenericAPIView):
             return Response({"message": "User has been unbanned successfully."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+class SendOTPView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        user = request.user
+        try:
+            # Get the OTP record for the user
+            otp_record, created = OneTimePassword.objects.get_or_create(user=user)
+            now = timezone.now()
+            cooldown_period = timedelta(minutes=1)  # Set cooldown to 1 minute
+            
+            # Check if the cooldown period has passed
+            if otp_record.last_resent_at and now - otp_record.last_resent_at < cooldown_period:
+                time_left = (cooldown_period - (now - otp_record.last_resent_at)).seconds
+                return Response({
+                    'message': f'Please wait {time_left} seconds before requesting another OTP.'
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+            # Update the last_resent_at and send the OTP
+            otp_code, expiration_time, token = send_code_to_user(user.email, context="ban_delete")
+            otp_record.last_resent_at = now
+            otp_record.code = otp_code  # Optionally update the OTP code here if you're generating a new one
+            otp_record.save()
+
+            return Response({
+                'message': 'OTP sent to email',
+                'otp_expiration_time': expiration_time,
+                'token': token
+            }, status=200)
+        
+        except Exception as e:
+            logger.error(f"An error occurred: {str(e)}")
+            return Response({'message': 'Failed to send OTP'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class VerifyOTPView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        otp_code = request.data.get('otp')
+        user = request.user
+
+        try:
+            otp_record = OneTimePassword.objects.get(user=user)
+            if otp_record.code == otp_code and otp_record.expires_at > timezone.now():
+                otp_record.delete()  # Remove OTP record after successful verification
+                return Response({'message': 'OTP verified'}, status=200)
+            return Response({'message': 'Invalid or expired OTP'}, status=400)
+        except OneTimePassword.DoesNotExist:
+            return Response({'message': 'OTP not found'}, status=404)
 
 class RegisterUserView(GenericAPIView):
     serializer_class = UserRegisterSerializer
@@ -161,7 +211,7 @@ class RegisterUserView(GenericAPIView):
         serializer = self.serializer_class(data=user_data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            otp_code, expiration_time, token = send_code_to_user(user.email)
+            otp_code, expiration_time, token = send_code_to_user(user.email, context="registration")
             log_activity(user, "registered", request)
             return Response({
                 'data': serializer.data,
@@ -308,7 +358,7 @@ class ResendOTPView(APIView):
             otp_record.save()
     
             # Generate and send new OTP
-            otp_code, expiration_time, new_token = send_code_to_user(user.email)
+            otp_code, expiration_time, new_token = send_code_to_user(user.email, context="registration")
             log_activity(user, "resent_otp", request)
             return Response({
                 'message': 'OTP has been resent',
