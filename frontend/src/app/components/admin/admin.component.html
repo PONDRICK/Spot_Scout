@@ -1,14 +1,48 @@
 <!-- admin.component.html -->
+<!-- Navbar -->
 <nav class="navbar">
   <div class="navbar-content">
     <div class="navbar-left">
-      <span class="navbar-title">Admin Panel</span>
+      <!-- Make SpotScout clickable with a click event to navigate to dashboard -->
+      <span class="navbar-title" (click)="navigateToDashboard()">SpotScout</span>
     </div>
+    
+    
     <div class="navbar-right">
-      <button (click)="logout()" class="btn-logout">Logout</button>
+      <!-- Hamburger Menu Button for logout -->
+      <button (click)="toggleMenu()" class="hamburger-menu">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="icon icon-tabler icon-tabler-menu-2"
+          width="38"
+          height="38"
+          viewBox="0 0 29 29"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isMenuOpen" class="dropdown-menu">
+        <ul>
+          <li (click)="logout()">
+            <mat-icon class="icon">logout</mat-icon>
+            Logout
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </nav>
+
 
 <div class="admin-content">
   <div class="admin-section">

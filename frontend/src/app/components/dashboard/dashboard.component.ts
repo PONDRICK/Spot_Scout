@@ -827,18 +827,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           },
           error: (error) => console.error('Error counting amenities:', error),
         });
-    } else if (this.selectedFunction === 'population') {
-      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
-        next: (response) => {
-          if (this.isOutputRemoved(loadingOutput)) return;
-          loadingOutput.loading = false;
-          Object.assign(loadingOutput, {
-            population: response.population,
-            distance: this.distance,
-          });
-        },
-        error: (error) => console.error('Error fetching population:', error),
-      });
     } else if (this.selectedFunction === 'predict') {
       this.apiService.predictModel(lat, lon).subscribe({
         next: (response) => {
@@ -849,48 +837,33 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               response.ranked_predictions &&
               response.ranked_predictions.length > 0
             ) {
-              const top3Predictions: Array<{
+              const rankedPredictions: Array<{
                 category: string;
                 score: number;
-              }> = response.ranked_predictions.slice(0, 3);
-              const remainingScore =
-                response.ranked_predictions
-                  .slice(3)
-                  .reduce(
-                    (acc: number, curr: { score: number }) => acc + curr.score,
-                    0
-                  ) * 100;
-
-              console.log('Top 3 Predictions:', top3Predictions);
-
-              const predictionHtml = top3Predictions
-                .map((pred: { category: string; score: number }) => {
-                  const category = pred.category ? pred.category : 'Unknown';
-                  const score = pred.score
-                    ? (pred.score * 100).toFixed(2)
-                    : '0.00';
-                  return `<p>${category} : ${score}%</p>`;
-                })
-                .join('');
-
+              }> = response.ranked_predictions;
+    
+              // สำหรับการแสดงใน popup (แสดงเพียงอันดับ 1 เท่านั้น)
+              const topPrediction = rankedPredictions[0];
               const popupContent = `
-                            <div class="predict-info-box">
-                                <p>Predicted Amenity Category:</p>
-                                <p>${top3Predictions[0].category}</p>
-                            </div>`;
-
+                <div class="predict-info-box">
+                    <p>Predicted Amenity Category:</p>
+                    <p>${topPrediction.category} : ${(topPrediction.score * 100).toFixed(2)}%</p>
+                </div>`;
+    
+              // แสดง popup เฉพาะอันดับ 1
               if (this.marker) {
                 this.marker
                   .bindPopup(popupContent, { className: 'custom-popup' })
                   .openPopup();
               }
+    
+              // สำหรับการแสดงใน sidebar (แสดงผลการทำนายทั้งหมด)
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
-                predicted_amenity_category: top3Predictions[0].category,
-                top_predictions: top3Predictions,
-                remaining_score: remainingScore,
+                predicted_amenity_category: topPrediction.category, // อันดับ 1
+                ranked_predictions: rankedPredictions, // อันดับทั้งหมด
                 marker: this.marker,
-                popupContent: popupContent,
+                popupContent: popupContent, // สำหรับ popup
               });
             } else {
               console.error('Invalid response format:', response);
@@ -899,6 +872,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         },
         error: (error) => console.error('Error predicting model:', error),
       });
+  
     }else if (this.selectedFunction === 'economy') {
       this.apiService.getEconomyDetails(lat, lon).subscribe({
         next: (response) => {

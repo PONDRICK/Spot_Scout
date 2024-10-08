@@ -5,7 +5,7 @@ from .views import (
     PasswordResetConfirm, PasswordResetRequestView, SetNewPassword, LogoutUserView, ResendOTPView,
     AdminUserListView, AdminUserDetailView, AdminRoleListView, AdminRoleDetailView,
     AdminLogoutUserView, AdminSystemConfigView, AdminActivityLogView, AdminUserDeleteView,
-    BanUserView,UnbanUserView
+    BanUserView,UnbanUserView,SendOTPView,VerifyOTPView
 )
 
 urlpatterns = [
@@ -31,4 +31,6 @@ urlpatterns = [
     path('ban-user/', BanUserView.as_view(), name='ban-user'),
     path('unban-user/', UnbanUserView.as_view(), name='unban-user'),
     path('get-otp-expiration/', GetOTPExpirationView.as_view(), name='get-otp-expiration'),
+    path('send-otp/', SendOTPView.as_view(), name='send-otp'),
+    path('verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
 ]

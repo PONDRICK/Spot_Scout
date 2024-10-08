@@ -128,7 +128,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    
+    'DEFAULT_THROTTLE_RATES': {
+        'otp': '3/min',  # Allow only 3 OTP requests per minute per user
+    }
     
 }
 

@@ -329,7 +329,10 @@
       </div>
 
       <!-- Added Economy Section -->
-      <div *ngIf="!place.loading && place.type === 'economy'" class="economy-info">
+      <div
+        *ngIf="!place.loading && place.type === 'economy'"
+        class="economy-info"
+      >
         <button (click)="removeOutput(place)" class="delete-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -354,7 +357,7 @@
         <p>District: {{ place.district }}</p>
         <p>Business Count: {{ place.business_count }}</p>
         <p>Closed Business Count: {{ place.closed_business_count }}</p>
-        <p>Average Income: {{ place.average_income | number: '1.0-2' }} THB</p>
+        <p>Average Income: {{ place.average_income | number : "1.0-2" }} THB</p>
       </div>
 
       <div
@@ -382,10 +385,9 @@
         </button>
         <p>Prediction Results:</p>
         <p>Most Suitable Amenity</p>
-        <p *ngFor="let pred of place.top_predictions">
+        <p *ngFor="let pred of place.ranked_predictions">
           {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
         </p>
-        <p>other : {{ place.remaining_score.toFixed(2) }}%</p>
       </div>
     </div>
   </div>
