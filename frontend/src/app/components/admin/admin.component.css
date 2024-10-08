@@ -7,33 +7,89 @@ body {
   padding: 0;
 }
 
+.hamburger-menu {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  align-items: center;
   background-color: #333;
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 56px;
+  
+}
+
+
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .navbar-title {
-  font-size: 1.5rem;
+  font-size: 20px;
   font-weight: bold;
+  color: white;
+  cursor: pointer; 
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background-color: #333;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  width: 150px;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-menu li {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: none; 
+  /* border-bottom: 1px solid #555; */
+}
+
+.dropdown-menu li:hover {
+  background-color: #444;
+}
+
+.logout-container {
+  margin-top: 30px;
+  text-align: center;
 }
 
 .btn-logout {
-  background-color: #dc3545;
-  color: white;
-  padding: 0.5rem 1rem;
+  background-color: #ff9800;
+  color: #ffffff;
+  padding: 10px 20px;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-.btn-logout:hover {
-  background-color: #c82333;
-}
 
 .btn-refresh,
 .btn-delete,
@@ -95,6 +151,7 @@ body {
 
 .admin-content {
   padding: 2rem;
+  margin-top: 3rem;
 }
 
 .admin-section {

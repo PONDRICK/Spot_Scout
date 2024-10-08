@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { CookieService } from 'ngx-cookie-service';
 import Swal from 'sweetalert2';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, BaseChartDirective],
+  imports: [CommonModule, HttpClientModule, FormsModule, BaseChartDirective,MatIconModule],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css'],
 })
@@ -21,6 +21,8 @@ export class AdminComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   userSearchTerm: string = '';
+  isMenuOpen: boolean = false;
+
 
   roles: any[] = [];
 
@@ -55,6 +57,7 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -234,5 +237,14 @@ export class AdminComponent implements OnInit {
 
   private navigateAfterLogout() {
     window.location.replace('/login');
+  }
+
+  navigateToDashboard() {
+    this.router.navigate(['/dashboard']); // Programmatically navigate to the dashboard
+  }
+
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 }
