@@ -25,6 +25,7 @@ export class RegisterComponent {
   };
   acceptedPolicy = false;
   showPrivacyPolicy = false;
+  showTerms = false;
   errorMessage = '';
 
   constructor(private apiService: ApiService, private router: Router) {}
@@ -95,5 +96,14 @@ export class RegisterComponent {
 
   closePrivacyPolicy() {
     this.showPrivacyPolicy = false;
+  }
+
+  openTerms(event: Event) {
+    event.preventDefault();
+    this.showTerms = true;
+  }
+
+  closeTerms() {
+    this.showTerms = false;
   }
 }
