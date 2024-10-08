@@ -1,49 +1,66 @@
 .login-background {
-    position: relative;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #282c34;
-  }
-  
-  .waves {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 150px;
-  }
-  
-  form {
-    display: grid;
-    gap: 1rem;
-  }
-  
-  input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-    font-size: 1rem;
-  }
-  
-  button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #282c34;
+}
 
-  .width-9-10 {
-    width: 90%; /* ตั้งค่าความกว้างเป็น 80% */
-  }
-  
-  .form-container {
-    margin-top: -2rem; /* ขยับฟอร์มขึ้นด้านบน */
-    margin-bottom: 3rem; /* เพิ่มระยะห่างจากคลื่น */
-  }
-  
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.width-9-10 {
+  width: 90%;
+}
+
+.form-container {
+  margin-top: -1rem; /* ลดระยะห่างจากด้านบน */
+  margin-bottom: 1.5rem; /* ลดระยะห่างจากคลื่น */
+}
+
+.privacy-policy-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0; /* Remove padding */
+  line-height: 0; /* Set line height to reduce space */
+}
+
+.privacy-policy-container input {
+  margin: 0; /* Ensure no margin around the checkbox */
+}
+
+.privacy-policy-container label {
+  margin: 0; /* Ensure no margin around the label */
+}
+
+input[name="password2"] {
+  margin-bottom: -0.5rem; /* Reduce margin-bottom for Confirm Password */
+}
+
+button[type="submit"] {
+  margin-top: -0.5rem; /* Reduce margin-top for Sign Up button */
+}

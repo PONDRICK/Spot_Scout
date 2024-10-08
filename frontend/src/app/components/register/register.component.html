@@ -1,5 +1,6 @@
 <div class="login-background">
   <!-- Waves Container -->
+  <!-- Waves Container -->
   <div>
     <svg
       class="waves"
@@ -40,7 +41,7 @@
   </div>
 
   <div class="flex items-center justify-center w-full h-full form-container">
-    <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-lg p-10">
+    <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-lg p-8">
       <div class="w-full">
         <div class="flex flex-col items-center">
           <h3 class="text-2xl font-bold mb-10 text-white">Sign Up</h3>
@@ -90,16 +91,64 @@
               required
             />
           </div>
+
+          <div class="privacy-policy-container">
+            <input
+              type="checkbox"
+              id="privacyPolicy"
+              [(ngModel)]="acceptedPolicy"
+              name="privacyPolicy"
+              class="h-4 w-4"
+              required
+            />
+            <label for="privacyPolicy" class="text-gray-300">
+              I accept the Terms and 
+              <a
+                href="#"
+                (click)="openPrivacyPolicy($event)"
+                class="text-blue-500 hover:underline"
+              >Privacy Policy</a>
+            </label>
+          </div>
+
           <div class="flex justify-center mt-6">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">
+            <button
+              type="submit"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+              [disabled]="!acceptedPolicy"
+            >
               Sign Up
             </button>
           </div>
         </form>
         <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
         <p class="mt-4 text-gray-300 text-center">
-          Already have an account? <a routerLink="/login" class="text-blue-500">Login here</a>
+          Already have an account?
+          <a routerLink="/login" class="text-blue-500">Login here</a>
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div
+    class="modal-container"
+    *ngIf="showPrivacyPolicy"
+    style="display: flex; align-items: center; justify-content: center; height: 100vh; position: fixed; top: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;"
+  >
+    <div class="modal-content" style="margin: 0 auto; max-width: 500px; padding: 0.5rem; background-color: #fff; border-radius: 0.5rem; text-align: center;">
+      <h3 class="text-2xl font-bold mb-4">Privacy Policy</h3>
+      <p class="text-gray-700 mb-6">
+        This is where the privacy policy content will go. You can modify this
+        section later with the actual content.
+      </p>
+      <div class="flex justify-end">
+        <button
+          class="bg-blue-500 text-white px-4 py-2 rounded-md"
+          (click)="closePrivacyPolicy()"
+        >
+          Close
+        </button>
       </div>
     </div>
   </div>
