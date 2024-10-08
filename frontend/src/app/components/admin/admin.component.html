@@ -101,22 +101,7 @@
     </table>
   </div>
 
-  <div class="admin-section">
-    <h2>Roles</h2>
-    <button (click)="fetchRoles()" class="btn-refresh">Refresh Roles</button>
-    <ul>
-      <li *ngFor="let role of roles">
-        {{ role.name }}
-      </li>
-    </ul>
-  </div>
-
-  <div class="admin-section">
-    <h2>System Configuration</h2>
-    <button (click)="fetchConfig()" class="btn-refresh">Refresh Config</button>
-    <pre>{{ systemConfig | json }}</pre>
-    <button (click)="updateConfig()" class="btn-update">Update Config</button>
-  </div>
+  
 
   <div class="admin-section">
     <h2>Activity Logs</h2>

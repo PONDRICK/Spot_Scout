@@ -1,4 +1,3 @@
-// register.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -6,7 +5,6 @@ import { NgModel, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterLink, RouterOutlet } from '@angular/router';
-
 
 import Swal from 'sweetalert2';
 
@@ -25,6 +23,9 @@ export class RegisterComponent {
     password: '',
     password2: '',
   };
+  acceptedPolicy = false;
+  showPrivacyPolicy = false;
+  showTerms = false;
   errorMessage = '';
 
   constructor(private apiService: ApiService, private router: Router) {}
@@ -69,7 +70,6 @@ export class RegisterComponent {
           text: 'An OTP has been sent to your email address.',
         }).then(() => {
           this.router.navigate(['/verify-otp', response.token], {
-            // Pass the token
             state: {
               email: this.user.email,
               expirationTime: response.expiration_time,
@@ -87,5 +87,23 @@ export class RegisterComponent {
         }
       }
     );
+  }
+
+  openPrivacyPolicy(event: Event) {
+    event.preventDefault(); // Prevent default link behavior
+    this.showPrivacyPolicy = true;
+  }
+
+  closePrivacyPolicy() {
+    this.showPrivacyPolicy = false;
+  }
+
+  openTerms(event: Event) {
+    event.preventDefault();
+    this.showTerms = true;
+  }
+
+  closeTerms() {
+    this.showTerms = false;
   }
 }

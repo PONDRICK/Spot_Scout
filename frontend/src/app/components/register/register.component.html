@@ -40,7 +40,7 @@
   </div>
 
   <div class="flex items-center justify-center w-full h-full form-container">
-    <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-lg p-10">
+    <div class="flex bg-black bg-opacity-50 rounded-lg shadow-md w-full max-w-lg p-8">
       <div class="w-full">
         <div class="flex flex-col items-center">
           <h3 class="text-2xl font-bold mb-10 text-white">Sign Up</h3>
@@ -90,17 +90,131 @@
               required
             />
           </div>
+
+          <div class="privacy-policy-container">
+            <input
+              type="checkbox"
+              id="privacyPolicy"
+              [(ngModel)]="acceptedPolicy"
+              name="privacyPolicy"
+              class="h-4 w-4"
+              required
+            />
+            <label for="privacyPolicy" class="text-gray-300">
+              I accept the 
+              <a href="#" (click)="openTerms($event)" class="text-blue-500 hover:underline">Terms of Service</a> and 
+              <a href="#" (click)="openPrivacyPolicy($event)" class="text-blue-500 hover:underline">Privacy Policy</a>.
+            </label>
+          </div>
+
           <div class="flex justify-center mt-6">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4">
+            <button
+              type="submit"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+              [disabled]="!acceptedPolicy"
+            >
               Sign Up
             </button>
           </div>
         </form>
         <p *ngIf="errorMessage" class="text-red-500 mt-4">{{ errorMessage }}</p>
         <p class="mt-4 text-gray-300 text-center">
-          Already have an account? <a routerLink="/login" class="text-blue-500">Login here</a>
+          Already have an account?
+          <a routerLink="/login" class="text-blue-500">Login here</a>
         </p>
       </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div
+  class="modal-container"
+  *ngIf="showPrivacyPolicy"
+>
+  <div class="modal-content">
+    <h3>Privacy Policy</h3>
+    <p>
+      We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+    </p>
+    <p>
+      1. <strong>Collection of Information</strong><br>
+      Upon registration, we collect your email address, first name, and last name. This information is utilized solely for account management and service provision purposes. We ensure that your data is protected and kept confidential.
+    </p>
+    <p>
+      2. <strong>Use of Cookies</strong><br>
+      Our website uses cookies to enhance your browsing experience by maintaining session integrity. These cookies allow you to remain logged into your account for up to seven (7) days without the need for repeated authentication. No third-party tracking technologies are employed, ensuring your browsing activity remains private.
+    </p>
+    <p>
+      3. <strong>Log Files and Security Monitoring</strong><br>
+      To maintain the security and integrity of our platform, we log certain activities, including IP addresses and timestamps, to detect unusual patterns or unauthorized access attempts. These log files are retained for a period of one (1) year, after which they are securely deleted. In cases of investigation or legal requests, logs may be retained until such matters are fully resolved.
+    </p>
+    <p>
+      4. <strong>Data Sharing and Third Parties</strong><br>
+      We do not share, sell, or distribute your personal information to any third parties for marketing or other purposes, unless legally required to do so.
+    </p>
+    <p>
+      5. <strong>Data Retention and Destruction</strong><br>
+      Your personal data is stored securely on our systems for the duration of your account’s activity. Should you choose to delete your account or after prolonged inactivity, your information will be securely removed from our records.
+    </p>
+    <p>
+      6. <strong>Your Rights</strong><br>
+      You have the right to access, amend, or delete the personal data we hold about you. Should you have any concerns regarding the handling of your data, please contact us directly.
+    </p>
+    <div class="flex justify-end">
+      <button (click)="closePrivacyPolicy()">Close</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Terms of Service Modal -->
+  <div
+  class="modal-container"
+  *ngIf="showTerms"
+>
+  <div class="modal-content">
+    <h3 class="text-2xl font-bold mb-4">Terms of Service</h3>
+    <p class="text-gray-700 mb-6" style="text-align: left;">
+      By accessing and using our website, you agree to be bound by the following Terms of Service. Please review these terms carefully before proceeding:
+    </p>
+
+    <p>
+      1. <strong>Provision of Services</strong><br>
+      Our website offers location analysis and business recommendations based on geospatial data. These recommendations are provided strictly for informational purposes and should not be construed as definitive guidance or a guarantee of success. Users are advised to conduct their own due diligence before acting on any recommendations.
+    </p>
+
+    <p>
+      2. <strong>Disclaimer of Liability</strong><br>
+      The decisions you make based on the information provided through our service are made at your own risk. We disclaim all liability for any loss, damages, or negative consequences that may result from actions taken in reliance on the data, insights, or recommendations provided by our platform.
+    </p>
+
+    <p>   
+      3. <strong>Economic Data and Information Sources</strong><br>
+      The economic information displayed on this website, including the number of registered businesses, the number of businesses that have ceased operations, and the average household monthly income, is derived from official governmental entities in Thailand. Specifically:
+      <body style="margin-left: 20px;">
+        <li>The data concerning VAT-registered businesses is obtained from the Revenue Department of Thailand .</li>
+        <li>The data pertaining to businesses that have ceased operations is sourced from the Department of Business Development .</li>
+        <li>Data on the average monthly household income is provided by the National Statistical Office of Thailand.</li>
+      </body>
+      We strive to ensure the accuracy and timeliness of this information; however, we cannot guarantee its completeness or accuracy. This data is made available for informational purposes only, and users should conduct independent verification prior to making any business or financial decisions.
+    </p>
+
+    <p>
+      4. <strong>User Responsibility</strong><br>
+      You agree to provide accurate, current, and complete information when registering for an account. While the use of real names is not mandated, any falsification of personal details may result in suspension or termination of your account.
+    </p>
+
+    <p>
+      5. <strong>Account Suspension and Termination</strong><br>
+      We reserve the right to monitor user activity and, at our sole discretion, suspend or terminate accounts found to be engaging in fraudulent, abusive, or inappropriate conduct. This includes, but is not limited to, the submission of false information, violation of applicable laws, or any activity that disrupts or harms the service or other users.
+    </p>
+
+    <p>
+      6. <strong>Acceptance of Terms</strong><br>
+      By continuing to use our website and services, you acknowledge that you have read, understood, and agree to comply with these Terms of Service. Failure to adhere to these terms may result in suspension or permanent account termination.
+    </p>
+
+    <div class="flex justify-end">
+      <button class="bg-blue-500 text-white px-4 py-2 rounded-md" (click)="closeTerms()">Close</button>
     </div>
   </div>
 </div>
