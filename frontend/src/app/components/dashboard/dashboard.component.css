@@ -594,3 +594,28 @@ input[type="number"]::-webkit-inner-spin-button {
   line-height: 1.6;
   color: #555; /* Softer text color for professionalism */
 }
+
+
+.tutorial-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it overlays everything */
+  cursor: pointer;
+}
+
+.tutorial-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Keep aspect ratio */
+}
+
+.hidden {
+  display: none !important;
+}

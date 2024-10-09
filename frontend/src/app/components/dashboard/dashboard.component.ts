@@ -123,6 +123,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private navigationSubscription: Subscription | undefined;
   showTerms = false;
   showPrivacyPolicy = false;
+  tutorialImages: string[] = [
+    'assets/Tutorial1.png',
+    'assets/Tutorial2.png',
+    'assets/Tutorial3.png'
+  ];
+  currentTutorialIndex: number = 0;
+  showTutorial: boolean = false;
   suggestions: any[] = [];
 
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
@@ -1436,6 +1443,25 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   closePrivacyPolicy() {
     this.showPrivacyPolicy = false;
+  }
+
+  openTutorial(): void {
+    this.currentTutorialIndex = 0;
+    this.showTutorial = true;
+  }
+
+  // Method to cycle to the next tutorial image or close after the last image
+  nextTutorial(): void {
+    if (this.currentTutorialIndex < this.tutorialImages.length - 1) {
+      this.currentTutorialIndex++;
+    } else {
+      this.closeTutorial(); // Close when the last image is reached
+    }
+  }
+
+  // Method to close the tutorial
+  closeTutorial(): void {
+    this.showTutorial = false;
   }
 
 

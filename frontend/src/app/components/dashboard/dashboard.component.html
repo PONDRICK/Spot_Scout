@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar">
+<nav class="navbar" [ngClass]="{ 'hidden': showTutorial }">
   <div class="navbar-content">
     <div class="navbar-left">
       <span class="navbar-title">SpotScout</span>
@@ -67,6 +67,10 @@
           <li (click)="openPrivacyPolicy()">
             <mat-icon class="icon">privacy_tip</mat-icon>
             Privacy Policy
+          </li>
+          <li (click)="openTutorial()">
+            <mat-icon class="icon">help</mat-icon>
+            Help
           </li>
           <li (click)="logout()">
             <mat-icon class="icon">logout</mat-icon>
@@ -508,3 +512,7 @@
   </div>
 </div>
 
+<!-- Tutorial Modal -->
+<div class="tutorial-modal" *ngIf="showTutorial" (click)="nextTutorial()">
+  <img [src]="tutorialImages[currentTutorialIndex]" class="tutorial-image" alt="Tutorial Image" />
+</div>
