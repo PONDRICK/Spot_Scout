@@ -20,6 +20,8 @@ export class HistoryComponent implements OnInit {
   filteredMaps: any[] = [];
   searchText: string = '';
   isMenuOpen: boolean = false;
+  showTerms = false;
+  showPrivacyPolicy = false;
 
   constructor(
     private apiService: ApiService,
@@ -105,4 +107,23 @@ export class HistoryComponent implements OnInit {
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }
+
+  openTerms() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showTerms = true;
+  }
+
+  openPrivacyPolicy() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showPrivacyPolicy = true;
+  }
+
+  closeTerms() {
+    this.showTerms = false;
+  }
+
+  closePrivacyPolicy() {
+    this.showPrivacyPolicy = false;
+  }
+
 }

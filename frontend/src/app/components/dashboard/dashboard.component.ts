@@ -121,7 +121,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private markerColors = ['green', 'orange', 'yellow', 'black', 'violet', 'gold'];
   private countFunctionUsage = 0;
   private navigationSubscription: Subscription | undefined;
+  showTerms = false;
+  showPrivacyPolicy = false;
   suggestions: any[] = [];
+
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -1416,4 +1419,24 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.closeHistoryModal();
     }
   }
+
+  openTerms() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showTerms = true;
+  }
+
+  openPrivacyPolicy() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showPrivacyPolicy = true;
+  }
+
+  closeTerms() {
+    this.showTerms = false;
+  }
+
+  closePrivacyPolicy() {
+    this.showPrivacyPolicy = false;
+  }
+
+
 }

@@ -403,7 +403,7 @@ button {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   padding: 10px;
-  width: 200px; /* Adjust this value to control the width */
+  width: 210px; /* Adjust this value to control the width */
 }
 
 .dropdown-menu ul {
@@ -552,4 +552,45 @@ input[type="number"]::-webkit-inner-spin-button {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 40;
   transform: scale(0.65); /* ปรับค่า scale ให้ขนาดเล็กลง */
   display: inline-block; /* ให้ transform ทำงานบน inline element */
+}
+
+
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Darker backdrop for professionalism */
+  z-index: 9999;
+}
+
+.modal-content {
+  max-height: 80vh; /* Limit modal height */
+  width: 90%;
+  max-width: 600px; /* Fixed width for desktop, adaptive for mobile */
+  padding: 1.5rem;
+  background-color: #f9f9f9; /* Lighter background for formality */
+  border-radius: 10px;
+  overflow-y: auto; /* Enable scrolling for long content */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Professional font */
+  text-align: left; /* Align text for readability */
+}
+
+.modal-content h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333; /* Darker heading */
+  text-align: center; /* Center align the modal heading */
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555; /* Softer text color for professionalism */
 }
