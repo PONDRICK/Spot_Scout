@@ -188,6 +188,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.initOrReinitMap();
       }
     });
+
+    //If first time login
+    const isFirstLogin = localStorage.getItem('isFirstLogin');
+    if (!isFirstLogin) {
+      this.openTutorial();
+      localStorage.setItem('isFirstLogin', 'true'); 
+    }
   }
 
   ngOnDestroy() {
