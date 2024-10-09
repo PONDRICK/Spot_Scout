@@ -121,7 +121,20 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private markerColors = ['green', 'orange', 'yellow', 'black', 'violet', 'gold'];
   private countFunctionUsage = 0;
   private navigationSubscription: Subscription | undefined;
+  showTerms = false;
+  showPrivacyPolicy = false;
+  tutorialImages: string[] = [
+    'assets/Tutorial1.jpg',
+    'assets/Tutorial2.jpg',
+    'assets/Tutorial3.jpg',
+    'assets/Tutorial4.jpg',
+    'assets/Tutorial5.jpg',
+    'assets/Tutorial6.jpg',
+  ];
+  currentTutorialIndex: number = 0;
+  showTutorial: boolean = false;
   suggestions: any[] = [];
+
   @ViewChild('latInput') latInput!: ElementRef<HTMLInputElement>;
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -175,6 +188,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         this.initOrReinitMap();
       }
     });
+
+    //If first time login
+    const isFirstLogin = localStorage.getItem('isFirstLogin');
+    if (!isFirstLogin) {
+      this.openTutorial();
+      localStorage.setItem('isFirstLogin', 'true'); 
+    }
   }
 
   ngOnDestroy() {
@@ -1416,4 +1436,43 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       this.closeHistoryModal();
     }
   }
+
+  openTerms() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showTerms = true;
+  }
+
+  openPrivacyPolicy() {
+    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.showPrivacyPolicy = true;
+  }
+
+  closeTerms() {
+    this.showTerms = false;
+  }
+
+  closePrivacyPolicy() {
+    this.showPrivacyPolicy = false;
+  }
+
+  openTutorial(): void {
+    this.currentTutorialIndex = 0;
+    this.showTutorial = true;
+  }
+
+  // Method to cycle to the next tutorial image or close after the last image
+  nextTutorial(): void {
+    if (this.currentTutorialIndex < this.tutorialImages.length - 1) {
+      this.currentTutorialIndex++;
+    } else {
+      this.closeTutorial(); // Close when the last image is reached
+    }
+  }
+
+  // Method to close the tutorial
+  closeTutorial(): void {
+    this.showTutorial = false;
+  }
+
+
 }

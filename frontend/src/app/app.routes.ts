@@ -11,6 +11,8 @@ import { GuestGuard } from './guards/guest.guard';
 import { SuperUserGuard } from './guards/super-user.guard';
 import { AdminComponent } from './components/admin/admin.component';
 import { HistoryComponent } from './components/history/history.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+
 
 export const routes: Routes = [
   {
@@ -59,6 +61,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'login',
+    component: NotFoundComponent,
   },
+  
 ];
