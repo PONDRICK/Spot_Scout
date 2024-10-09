@@ -124,9 +124,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   showTerms = false;
   showPrivacyPolicy = false;
   tutorialImages: string[] = [
-    'assets/Tutorial1.png',
-    'assets/Tutorial2.png',
-    'assets/Tutorial3.png'
+    'assets/Tutorial1.jpg',
+    'assets/Tutorial2.jpg',
+    'assets/Tutorial3.jpg',
+    'assets/Tutorial4.jpg',
+    'assets/Tutorial5.jpg',
+    'assets/Tutorial6.jpg',
   ];
   currentTutorialIndex: number = 0;
   showTutorial: boolean = false;
