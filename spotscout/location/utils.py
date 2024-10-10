@@ -94,8 +94,8 @@ def get_population(lat, lon, distance):
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Set the correct paths for the model and label encoder
-model_path = os.path.join(current_directory, 'spot_scout_model', 'trained_model_100_v.2.pkl')
-encoder_path = os.path.join(current_directory, 'spot_scout_model', 'label_encoder_100_v.2.pkl')
+model_path = os.path.join(current_directory, 'spot_scout_model', 'model_80_v.2.pkl')
+encoder_path = os.path.join(current_directory, 'spot_scout_model', 'label_80_v.2.pkl')
 
 # Load the trained model and label encoder
 rf_classifier = joblib.load(model_path)
