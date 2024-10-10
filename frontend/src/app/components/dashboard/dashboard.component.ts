@@ -893,6 +893,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         error: (error) => console.error('Error predicting model:', error),
       });
   
+    }else if (this.selectedFunction === 'population') {
+      this.apiService.getPopulation(lat, lon, this.distance).subscribe({
+        next: (response) => {
+          if (this.isOutputRemoved(loadingOutput)) return;
+          loadingOutput.loading = false;
+          Object.assign(loadingOutput, {
+            population: response.population,
+            distance: this.distance,
+          });
+        },
+        error: (error) => console.error('Error fetching population:', error),
+      });
     }else if (this.selectedFunction === 'economy') {
       this.apiService.getEconomyDetails(lat, lon).subscribe({
         next: (response) => {
