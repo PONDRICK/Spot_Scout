@@ -64,7 +64,10 @@
 
 <!-- History Container -->
 <div class="history-container">
-  <div class="map-grid">
+  <div *ngIf="filteredMaps.length === 0" class="no-maps">
+    <p>No saved maps available</p>
+  </div>
+  <div *ngIf="filteredMaps.length > 0" class="map-grid">
     <div *ngFor="let map of filteredMaps" class="map-card">
       <div class="map-header">
         <span>{{ map.name }}</span>
