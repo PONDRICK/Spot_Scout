@@ -116,5 +116,7 @@ def send_normal_email(data):
     email.send()
 
 def log_activity(user, action, request=None):
+    if not user.is_authenticated:
+        return
     ip_address = request.META.get('REMOTE_ADDR') if request else None
     ActivityLog.objects.create(user=user, action=action, ip_address=ip_address)
