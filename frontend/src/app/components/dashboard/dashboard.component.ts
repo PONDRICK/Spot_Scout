@@ -26,6 +26,7 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MatIconModule } from '@angular/material/icon';
+import { AmenityNamePipe } from '../../pipes/amenity-name.pipe';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,6 +40,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatFormFieldModule,
     ReactiveFormsModule,
     MatIconModule,
+    AmenityNamePipe,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -150,13 +152,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
-  private greenIcon: any; // Add green icon
-  private blueIcon: any; // Add blue icon
+  private greenIcon: any; 
+  private blueIcon: any; 
   isMarkerLocked = false;
   isMenuOpen = false;
   saveIcon = SaveAltIcon;
   historyIcon = HistoryIcon;
   logoutIcon = LogoutIcon;
+  isHelpVisible = false;
 
   showHistoryModal = false;
   savedMaps: any[] = [];
@@ -1486,5 +1489,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.showTutorial = false;
   }
 
+  toggleHelp() {
+    this.isHelpVisible = !this.isHelpVisible;
+  }
 
 }
