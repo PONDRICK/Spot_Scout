@@ -619,3 +619,16 @@ input[type="number"]::-webkit-inner-spin-button {
 .hidden {
   display: none !important;
 }
+
+.mat-icon-help-function {
+  font-size: 16px;
+  vertical-align: middle; 
+  margin-left: -0.5rem;
+  margin-bottom: -1rem;
+}
+
+.help-content {
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+

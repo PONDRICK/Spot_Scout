@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar" [ngClass]="{ 'hidden': showTutorial }">
+<nav class="navbar" [ngClass]="{ hidden: showTutorial }">
   <div class="navbar-content">
     <div class="navbar-left">
       <span class="navbar-title">SpotScout</span>
@@ -82,8 +82,6 @@
   </div>
 </nav>
 
-
-
 <div id="map"></div>
 
 <div class="sidebar" [ngClass]="{ open: isSidebarOpen }">
@@ -104,306 +102,390 @@
         />
       </svg>
     </button>
-    <input type="text" placeholder="Latitude" #latInput class="latlon-input" />
-    <input type="text" placeholder="Longitude" #lonInput class="latlon-input" />
-    <div class="checkbox-container flex items-center space-x-2 mt-1">
-      <label class="relative inline-flex items-center cursor-pointer">
-        <input
-          class="sr-only peer"
-          type="checkbox"
-          [(ngModel)]="isMarkerLocked"
-        />
-        <div
-          class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95"
-        >
-          <svg
-            class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5"
-            height="50"
-            preserveAspectRatio="xMidYMid meet"
-            viewBox="0 0 100 100"
-            width="50"
-            x="0"
-            xmlns="http://www.w3.org/2000/svg"
-            y="0"
-          >
-            <path
-              class="svg-fill-primary"
-              d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"
-            ></path>
-          </svg>
-          <svg
-            class="group-hover:scale-75 duration-300 absolute top-0.5 left-0.5 stroke-gray-900 w-5 h-5"
-            height="50"
-            preserveAspectRatio="xMidYMid meet"
-            viewBox="0 0 100 100"
-            width="50"
-            x="0"
-            xmlns="http://www.w3.org/2000/svg"
-            y="0"
-          >
-            <path
-              d="M30,46V38a20,20,0,0,1,40,0v8a8,8,0,0,1,8,8V74a8,8,0,0,1-8,8H30a8,8,0,0,1-8-8V54A8,8,0,0,1,30,46Zm32-8v8H38V38a12,12,0,0,1,24,0Z"
-              fill-rule="evenodd"
-            ></path>
-          </svg>
-        </div>
-      </label>
-      <label class="text-white">Lock Location</label>
-    </div>
-    <label for="function">Select Function:</label>
-    <div
-      class="dropdown-container"
-      #functionDropdownContainer
-      (click)="toggleDropdown($event)"
-    >
-      <div class="selected-option">{{ selectedFunction }}</div>
-      <div class="dropdown-options" *ngIf="dropdownOpen">
-        <div
-          *ngFor="let function of functions"
-          class="dropdown-option"
-          (click)="selectFunction(function, $event)"
-        >
-          {{ function }}
-        </div>
-      </div>
+
+    <div *ngIf="isHelpVisible; else normalSidebarContent"class="help-content">
+      <button
+        (click)="toggleHelp()"
+        class="confirm-button"
+        style="margin-left: -0rem"
+      >
+        Back
+      </button>
+      <br>
+      <br>
+      <h4>Function Help</h4>
+      <p>
+        Nearest: Finds the nearest amenity from the selected coordinates. This
+        function calculates the shortest distance to a specific type of amenity
+        and shows its exact location.
+      </p>
+      <br>
+      <p>
+        Count: Counts the number of amenities within a specified distance. You
+        can select an amenity type and the function will return the total number
+        of those amenities in the defined radius.
+      </p>
+      <br>
+      <p>
+        Population: Displays the estimated population within the selected area.
+        This function calculates the population inside the radius defined around
+        the chosen location.
+      </p>
+      <br>
+      <p>
+        Predict: Predicts the most suitable type of amenity for the selected
+        area. Using a machine learning model, it analyzes the characteristics of
+        the location and recommends the best matching amenity type.
+      </p>
+      <br>
+      <p>
+        Economy: Provides economic data for the selected location, such as the
+        number of businesses, the number of closed businesses, and the average
+        household income in the area. Useful for understanding the economic
+        environment of a specific region.
+      </p>
     </div>
 
-    <!-- Conditionally display the amenity selection based on the selected function -->
-    <div *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'">
-      <label for="amenity">Select Amenity:</label>
+    <!-- เนื้อหาปกติของ sidebar -->
+    <ng-template #normalSidebarContent>
+      <input
+        type="text"
+        placeholder="Latitude"
+        #latInput
+        class="latlon-input"
+      />
+      <input
+        type="text"
+        placeholder="Longitude"
+        #lonInput
+        class="latlon-input"
+      />
+      <div class="checkbox-container flex items-center space-x-2 mt-1">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input
+            class="sr-only peer"
+            type="checkbox"
+            [(ngModel)]="isMarkerLocked"
+          />
+          <div
+            class="group peer ring-0 bg-gradient-to-r from-green-400 to-green-400 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-rose-500 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6 peer-hover:after:scale-95"
+          >
+            <svg
+              class="group-hover:scale-75 duration-300 absolute top-0.5 left-6 stroke-gray-900 w-5 h-5"
+              height="50"
+              preserveAspectRatio="xMidYMid meet"
+              viewBox="0 0 100 100"
+              width="50"
+              x="0"
+              xmlns="http://www.w3.org/2000/svg"
+              y="0"
+            >
+              <path
+                class="svg-fill-primary"
+                d="M50,18A19.9,19.9,0,0,0,30,38v8a8,8,0,0,0-8,8V74a8,8,0,0,0,8,8H70a8,8,0,0,0,8-8V54a8,8,0,0,0-8-8H38V38a12,12,0,0,1,23.6-3,4,4,0,1,0,7.8-2A20.1,20.1,0,0,0,50,18Z"
+              ></path>
+            </svg>
+            <svg
+              class="group-hover:scale-75 duration-300 absolute top-0.5 left-0.5 stroke-gray-900 w-5 h-5"
+              height="50"
+              preserveAspectRatio="xMidYMid meet"
+              viewBox="0 0 100 100"
+              width="50"
+              x="0"
+              xmlns="http://www.w3.org/2000/svg"
+              y="0"
+            >
+              <path
+                d="M30,46V38a20,20,0,0,1,40,0v8a8,8,0,0,1,8,8V74a8,8,0,0,1-8,8H30a8,8,0,0,1-8-8V54A8,8,0,0,1,30,46Zm32-8v8H38V38a12,12,0,0,1,24,0Z"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+        </label>
+        <label class="text-white">Lock Location</label>
+      </div>
+      <label
+        class="text-white"
+        for="function"
+        style="
+          margin-bottom: -0.25rem;
+          display: inline-flex;
+          align-items: center;
+        "
+      >
+        Select Function:
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="toggleHelp()"
+          aria-label="Help"
+          style="padding: 0"
+        >
+          <mat-icon class="mat-icon-help-function">help_outline</mat-icon>
+        </button>
+      </label>
       <div
         class="dropdown-container"
-        #amenityDropdownContainer
-        (click)="toggleAmenityDropdown($event)"
+        #functionDropdownContainer
+        (click)="toggleDropdown($event)"
       >
-        <div class="selected-option">{{ selectedAmenity }}</div>
-        <div class="dropdown-options" *ngIf="dropdownAmenityOpen">
+        <div class="selected-option">{{ selectedFunction | titlecase }}</div>
+        <div class="dropdown-options" *ngIf="dropdownOpen">
           <div
-            *ngFor="let amenity of amenities"
+            *ngFor="let function of functions"
             class="dropdown-option"
-            (click)="selectAmenity(amenity, $event)"
+            (click)="selectFunction(function, $event)"
           >
-            {{ amenity }}
+            {{ function | titlecase }}
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Add distance input for Count and Population -->
-    <div
-      *ngIf="selectedFunction === 'count' || selectedFunction === 'population'"
-    >
-      <label for="distance">Distance:</label>
-      <div class="input-container">
-        <input
-          type="number"
-          id="distance"
-          [(ngModel)]="distance"
-          min="100"
-          step="100"
-          (change)="validateDistance()"
-          class="distance-input"
-        />
-      </div>
-    </div>
-
-    <button (click)="confirmSelection()" class="confirm-button">Confirm</button>
-
-    <!-- Output Information -->
-    <div *ngFor="let place of outputs" class="output-info">
-      <div *ngIf="place.loading" class="loading-indicator">
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <div class="rounded-md p-4 max-w-sm w-full mx-auto">
-          <div class="animate-pulse flex space-x-4">
-            <div class="flex-1 space-y-6 py-1">
-              <div class="h-2 bg-slate-700 rounded"></div>
-              <div class="space-y-3">
-                <div class="grid grid-cols-3 gap-4">
-                  <div class="h-2 bg-slate-700 rounded col-span-2"></div>
-                  <div class="h-2 bg-slate-700 rounded col-span-1"></div>
-                </div>
-                <div class="h-2 bg-slate-700 rounded"></div>
-              </div>
+      <!-- Conditionally display the amenity selection based on the selected function -->
+      <div
+        *ngIf="selectedFunction === 'nearest' || selectedFunction === 'count'"
+      >
+        <label for="amenity">Select Amenity:</label>
+        <div
+          class="dropdown-container"
+          #amenityDropdownContainer
+          (click)="toggleAmenityDropdown($event)"
+        >
+          <div class="selected-option">{{ selectedAmenity | amenityName }}</div>
+          <div class="dropdown-options" *ngIf="dropdownAmenityOpen">
+            <div
+              *ngFor="let amenity of amenities"
+              class="dropdown-option"
+              (click)="selectAmenity(amenity, $event)"
+            >
+              {{ amenity | amenityName }}
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Add distance input for Count and Population -->
       <div
-        *ngIf="!place.loading && place.type === 'nearest'"
-        class="nearest-place-info"
+        *ngIf="
+          selectedFunction === 'count' || selectedFunction === 'population'
+        "
       >
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <p>Nearest: {{ place.amenity }}</p>
-        <p>Distance: {{ place.distance }} meters</p>
-        <p>Province: {{ place.province }}</p>
-        <p>Lat: {{ place.lat }}</p>
-        <p>Lon: {{ place.lon }}</p>
+        <label for="distance">Radius: (meters)</label>
+        <div class="input-container">
+          <input
+            type="number"
+            id="distance"
+            [(ngModel)]="distance"
+            min="100"
+            step="100"
+            (change)="validateDistance()"
+            class="distance-input"
+          />
+        </div>
       </div>
 
-      <div
-        *ngIf="!place.loading && place.type === 'count'"
-        class="amenities-count-info"
-      >
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <p>Amenity: {{ place.amenity }}</p>
-        <p>Distance: {{ place.distance }} meters</p>
-        <p>Count: {{ place.count }}</p>
+      <button (click)="confirmSelection()" class="confirm-button">
+        Confirm
+      </button>
 
-        <!-- Button to toggle locations visibility -->
-        <button (click)="toggleLocationVisibility(place)">
-          {{ place.locationsVisible ? "Hide Locations" : "Show Locations" }}
-        </button>
+      <!-- Output Information -->
+      <div *ngFor="let place of outputs" class="output-info">
+        <div *ngIf="place.loading" class="loading-indicator">
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <div class="rounded-md p-4 max-w-sm w-full mx-auto">
+            <div class="animate-pulse flex space-x-4">
+              <div class="flex-1 space-y-6 py-1">
+                <div class="h-2 bg-slate-700 rounded"></div>
+                <div class="space-y-3">
+                  <div class="grid grid-cols-3 gap-4">
+                    <div class="h-2 bg-slate-700 rounded col-span-2"></div>
+                    <div class="h-2 bg-slate-700 rounded col-span-1"></div>
+                  </div>
+                  <div class="h-2 bg-slate-700 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <!-- Conditionally display the list of locations -->
-        <ul *ngIf="place.locationsVisible">
-          <li *ngFor="let amenity of getDisplayedLocations(place)">
-            Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
-          </li>
-        </ul>
+        <div
+          *ngIf="!place.loading && place.type === 'nearest'"
+          class="nearest-place-info"
+        >
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <button (click)="toggleVisibility(place)" class="toggle-button">
+            {{ place.visible ? "Hide" : "Show" }}
+          </button>
+          <p>Nearest: {{ place.amenity }}</p>
+          <p>Distance: {{ place.distance }} meters</p>
+          <p>Province: {{ place.province }}</p>
+          <p>Lat: {{ place.lat }}</p>
+          <p>Lon: {{ place.lon }}</p>
+        </div>
+
+        <div
+          *ngIf="!place.loading && place.type === 'count'"
+          class="amenities-count-info"
+        >
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <button (click)="toggleVisibility(place)" class="toggle-button">
+            {{ place.visible ? "Hide" : "Show" }}
+          </button>
+          <p>Amenity: {{ place.amenity }}</p>
+          <p>Distance: {{ place.distance }} meters</p>
+          <p>Count: {{ place.count }}</p>
+
+          <!-- Button to toggle locations visibility -->
+          <button (click)="toggleLocationVisibility(place)">
+            {{ place.locationsVisible ? "Hide Locations" : "Show Locations" }}
+          </button>
+
+          <!-- Conditionally display the list of locations -->
+          <ul *ngIf="place.locationsVisible">
+            <li *ngFor="let amenity of getDisplayedLocations(place)">
+              Lat: {{ amenity.lat }}, Lon: {{ amenity.lon }}
+            </li>
+          </ul>
+        </div>
+
+        <div
+          *ngIf="!place.loading && place.type === 'population'"
+          class="population-info"
+        >
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <button (click)="toggleVisibility(place)" class="toggle-button">
+            {{ place.visible ? "Hide" : "Show" }}
+          </button>
+          <p>Population:</p>
+          <p>Distance: {{ place.distance }} meters</p>
+          <p>Population: {{ place.population }}</p>
+        </div>
+
+        <!-- Added Economy Section -->
+        <div
+          *ngIf="!place.loading && place.type === 'economy'"
+          class="economy-info"
+        >
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <button (click)="toggleVisibility(place)" class="toggle-button">
+            {{ place.visible ? "Hide" : "Show" }}
+          </button>
+          <p>Economy Information:</p>
+          <p>Subdistrict: {{ place.subdistrict }}</p>
+          <p>District: {{ place.district }}</p>
+          <p>Business Count: {{ place.business_count }}</p>
+          <p>Closed Business Count: {{ place.closed_business_count }}</p>
+          <p>
+            Average Income: {{ place.average_income | number : "1.0-2" }} THB
+          </p>
+        </div>
+
+        <div
+          *ngIf="!place.loading && place.type === 'predict'"
+          class="predict-info"
+        >
+          <button (click)="removeOutput(place)" class="delete-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <button (click)="toggleVisibility(place)" class="toggle-button">
+            {{ place.visible ? "Hide" : "Show" }}
+          </button>
+          <p>Prediction Results:</p>
+          <p>Most Suitable Amenity</p>
+          <p *ngFor="let pred of place.ranked_predictions">
+            {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
+          </p>
+        </div>
       </div>
-
-      <div
-        *ngIf="!place.loading && place.type === 'population'"
-        class="population-info"
-      >
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <p>Population:</p>
-        <p>Distance: {{ place.distance }} meters</p>
-        <p>Population: {{ place.population }}</p>
-      </div>
-
-      <!-- Added Economy Section -->
-      <div
-        *ngIf="!place.loading && place.type === 'economy'"
-        class="economy-info"
-      >
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <p>Economy Information:</p>
-        <p>Subdistrict: {{ place.subdistrict }}</p>
-        <p>District: {{ place.district }}</p>
-        <p>Business Count: {{ place.business_count }}</p>
-        <p>Closed Business Count: {{ place.closed_business_count }}</p>
-        <p>Average Income: {{ place.average_income | number : "1.0-2" }} THB</p>
-      </div>
-
-      <div
-        *ngIf="!place.loading && place.type === 'predict'"
-        class="predict-info"
-      >
-        <button (click)="removeOutput(place)" class="delete-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <button (click)="toggleVisibility(place)" class="toggle-button">
-          {{ place.visible ? "Hide" : "Show" }}
-        </button>
-        <p>Prediction Results:</p>
-        <p>Most Suitable Amenity</p>
-        <p *ngFor="let pred of place.ranked_predictions">
-          {{ pred.category }} : {{ (pred.score * 100).toFixed(2) }}%
-        </p>
-      </div>
-    </div>
+    </ng-template>
   </div>
 </div>
 
@@ -419,100 +501,164 @@
   </div>
 </div>
 
-  <!-- Privacy Policy Modal -->
-  <div
-  class="modal-container"
-  *ngIf="showPrivacyPolicy"
->
+<!-- Privacy Policy Modal -->
+<div class="modal-container" *ngIf="showPrivacyPolicy">
   <div class="modal-content">
     <h3>Privacy Policy</h3>
     <p>
-      We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+      We are committed to protecting your personal information and your right to
+      privacy. This Privacy Policy explains how we collect, use, disclose, and
+      safeguard your information when you visit our website.
     </p>
     <p>
-      1. <strong>Collection of Information</strong><br>
-      Upon registration, we collect your email address, first name, and last name. This information is utilized solely for account management and service provision purposes. We ensure that your data is protected and kept confidential.
+      1. <strong>Collection of Information</strong><br />
+      Upon registration, we collect your email address, first name, and last
+      name. This information is utilized solely for account management and
+      service provision purposes. We ensure that your data is protected and kept
+      confidential.
     </p>
     <p>
-      2. <strong>Use of Cookies</strong><br>
-      Our website uses cookies to enhance your browsing experience by maintaining session integrity. These cookies allow you to remain logged into your account for up to seven (7) days without the need for repeated authentication. No third-party tracking technologies are employed, ensuring your browsing activity remains private.
+      2. <strong>Use of Cookies</strong><br />
+      Our website uses cookies to enhance your browsing experience by
+      maintaining session integrity. These cookies allow you to remain logged
+      into your account for up to seven (7) days without the need for repeated
+      authentication. No third-party tracking technologies are employed,
+      ensuring your browsing activity remains private.
     </p>
     <p>
-      3. <strong>Log Files and Security Monitoring</strong><br>
-      To maintain the security and integrity of our platform, we log certain activities, including IP addresses and timestamps, to detect unusual patterns or unauthorized access attempts. These log files are retained for a period of one (1) year, after which they are securely deleted. In cases of investigation or legal requests, logs may be retained until such matters are fully resolved.
+      3. <strong>Log Files and Security Monitoring</strong><br />
+      To maintain the security and integrity of our platform, we log certain
+      activities, including IP addresses and timestamps, to detect unusual
+      patterns or unauthorized access attempts. These log files are retained for
+      a period of one (1) year, after which they are securely deleted. In cases
+      of investigation or legal requests, logs may be retained until such
+      matters are fully resolved.
     </p>
     <p>
-      4. <strong>Data Sharing and Third Parties</strong><br>
-      We do not share, sell, or distribute your personal information to any third parties for marketing or other purposes, unless legally required to do so.
+      4. <strong>Data Sharing and Third Parties</strong><br />
+      We do not share, sell, or distribute your personal information to any
+      third parties for marketing or other purposes, unless legally required to
+      do so.
     </p>
     <p>
-      5. <strong>Data Retention and Destruction</strong><br>
-      Your personal data is stored securely on our systems for the duration of your account’s activity. Should you choose to delete your account or after prolonged inactivity, your information will be securely removed from our records.
+      5. <strong>Data Retention and Destruction</strong><br />
+      Your personal data is stored securely on our systems for the duration of
+      your account’s activity. Should you choose to delete your account or after
+      prolonged inactivity, your information will be securely removed from our
+      records.
     </p>
     <p>
-      6. <strong>Your Rights</strong><br>
-      You have the right to access, amend, or delete the personal data we hold about you. Should you have any concerns regarding the handling of your data, please contact us directly.
+      6. <strong>Your Rights</strong><br />
+      You have the right to access, amend, or delete the personal data we hold
+      about you. Should you have any concerns regarding the handling of your
+      data, please contact us directly.
     </p>
     <div class="flex justify-end">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded-md" (click)="closePrivacyPolicy()">Close</button>
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+        (click)="closePrivacyPolicy()"
+      >
+        Close
+      </button>
     </div>
   </div>
 </div>
 
-  <!-- Terms of Service Modal -->
-  <div
-  class="modal-container"
-  *ngIf="showTerms"
->
+<!-- Terms of Service Modal -->
+<div class="modal-container" *ngIf="showTerms">
   <div class="modal-content">
     <h3 class="text-2xl font-bold mb-4">Terms of Service</h3>
-    <p class="text-gray-700 mb-6" style="text-align: left;">
-      By accessing and using our website, you agree to be bound by the following Terms of Service. Please review these terms carefully before proceeding:
+    <p class="text-gray-700 mb-6" style="text-align: left">
+      By accessing and using our website, you agree to be bound by the following
+      Terms of Service. Please review these terms carefully before proceeding:
     </p>
 
     <p>
-      1. <strong>Provision of Services</strong><br>
-      Our website offers location analysis and business recommendations based on geospatial data. These recommendations are provided strictly for informational purposes and should not be construed as definitive guidance or a guarantee of success. Users are advised to conduct their own due diligence before acting on any recommendations.
+      1. <strong>Provision of Services</strong><br />
+      Our website offers location analysis and business recommendations based on
+      geospatial data. These recommendations are provided strictly for
+      informational purposes and should not be construed as definitive guidance
+      or a guarantee of success. Users are advised to conduct their own due
+      diligence before acting on any recommendations.
     </p>
 
     <p>
-      2. <strong>Disclaimer of Liability</strong><br>
-      The decisions you make based on the information provided through our service are made at your own risk. We disclaim all liability for any loss, damages, or negative consequences that may result from actions taken in reliance on the data, insights, or recommendations provided by our platform.
+      2. <strong>Disclaimer of Liability</strong><br />
+      The decisions you make based on the information provided through our
+      service are made at your own risk. We disclaim all liability for any loss,
+      damages, or negative consequences that may result from actions taken in
+      reliance on the data, insights, or recommendations provided by our
+      platform.
     </p>
 
-    <p>   
-      3. <strong>Economic Data and Information Sources</strong><br>
-      The economic information displayed on this website, including the number of registered businesses, the number of businesses that have ceased operations, and the average household monthly income, is derived from official governmental entities in Thailand. Specifically:
-      <body style="margin-left: 20px;">
-        <li>The data concerning VAT-registered businesses is obtained from the Revenue Department of Thailand .</li>
-        <li>The data pertaining to businesses that have ceased operations is sourced from the Department of Business Development .</li>
-        <li>Data on the average monthly household income is provided by the National Statistical Office of Thailand.</li>
+    <p>
+      3. <strong>Economic Data and Information Sources</strong><br />
+      The economic information displayed on this website, including the number
+      of registered businesses, the number of businesses that have ceased
+      operations, and the average household monthly income, is derived from
+      official governmental entities in Thailand. Specifically:
+      <body style="margin-left: 20px">
+        <li>
+          The data concerning VAT-registered businesses is obtained from the
+          Revenue Department of Thailand .
+        </li>
+        <li>
+          The data pertaining to businesses that have ceased operations is
+          sourced from the Department of Business Development .
+        </li>
+        <li>
+          Data on the average monthly household income is provided by the
+          National Statistical Office of Thailand.
+        </li>
       </body>
-      We strive to ensure the accuracy and timeliness of this information; however, we cannot guarantee its completeness or accuracy. This data is made available for informational purposes only, and users should conduct independent verification prior to making any business or financial decisions.
+      We strive to ensure the accuracy and timeliness of this information;
+      however, we cannot guarantee its completeness or accuracy. This data is
+      made available for informational purposes only, and users should conduct
+      independent verification prior to making any business or financial
+      decisions.
     </p>
 
     <p>
-      4. <strong>User Responsibility</strong><br>
-      You agree to provide accurate, current, and complete information when registering for an account. While the use of real names is not mandated, any falsification of personal details may result in suspension or termination of your account.
+      4. <strong>User Responsibility</strong><br />
+      You agree to provide accurate, current, and complete information when
+      registering for an account. While the use of real names is not mandated,
+      any falsification of personal details may result in suspension or
+      termination of your account.
     </p>
 
     <p>
-      5. <strong>Account Suspension and Termination</strong><br>
-      We reserve the right to monitor user activity and, at our sole discretion, suspend or terminate accounts found to be engaging in fraudulent, abusive, or inappropriate conduct. This includes, but is not limited to, the submission of false information, violation of applicable laws, or any activity that disrupts or harms the service or other users.
+      5. <strong>Account Suspension and Termination</strong><br />
+      We reserve the right to monitor user activity and, at our sole discretion,
+      suspend or terminate accounts found to be engaging in fraudulent, abusive,
+      or inappropriate conduct. This includes, but is not limited to, the
+      submission of false information, violation of applicable laws, or any
+      activity that disrupts or harms the service or other users.
     </p>
 
     <p>
-      6. <strong>Acceptance of Terms</strong><br>
-      By continuing to use our website and services, you acknowledge that you have read, understood, and agree to comply with these Terms of Service. Failure to adhere to these terms may result in suspension or permanent account termination.
+      6. <strong>Acceptance of Terms</strong><br />
+      By continuing to use our website and services, you acknowledge that you
+      have read, understood, and agree to comply with these Terms of Service.
+      Failure to adhere to these terms may result in suspension or permanent
+      account termination.
     </p>
 
     <div class="flex justify-end">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded-md" (click)="closeTerms()">Close</button>
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+        (click)="closeTerms()"
+      >
+        Close
+      </button>
     </div>
   </div>
 </div>
 
 <!-- Tutorial Modal -->
 <div class="tutorial-modal" *ngIf="showTutorial" (click)="nextTutorial()">
-  <img [src]="tutorialImages[currentTutorialIndex]" class="tutorial-image" alt="Tutorial Image" />
+  <img
+    [src]="tutorialImages[currentTutorialIndex]"
+    class="tutorial-image"
+    alt="Tutorial Image"
+  />
 </div>
