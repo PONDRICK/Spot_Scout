@@ -112,7 +112,13 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     'zoo',
   ];
 
-  functions: string[] = ['nearest', 'count', 'population', 'predict', 'economy'];
+  functions: string[] = [
+    'nearest',
+    'count',
+    'population',
+    'predict',
+    'economy',
+  ];
 
   private L: any;
   private map: any;
@@ -120,7 +126,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   private polylines: any[] = [];
   private circles: any[] = [];
   private markers: any[] = [];
-  private markerColors = ['green', 'orange', 'yellow', 'black', 'violet', 'gold'];
+  private markerColors = [
+    'green',
+    'orange',
+    'yellow',
+    'black',
+    'violet',
+    'gold',
+  ];
   private countFunctionUsage = 0;
   private navigationSubscription: Subscription | undefined;
   showTerms = false;
@@ -141,8 +154,10 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('functionDropdownContainer')
+  functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer')
+  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -152,8 +167,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   outputs: any[] = [];
   distance = 1000; // Default distance
   private redIcon: any;
-  private greenIcon: any; 
-  private blueIcon: any; 
+  private greenIcon: any;
+  private blueIcon: any;
   isMarkerLocked = false;
   isMenuOpen = false;
   saveIcon = SaveAltIcon;
@@ -196,7 +211,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     const isFirstLogin = localStorage.getItem('isFirstLogin');
     if (!isFirstLogin) {
       this.openTutorial();
-      localStorage.setItem('isFirstLogin', 'true'); 
+      localStorage.setItem('isFirstLogin', 'true');
     }
   }
 
@@ -618,25 +633,28 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-  // Check if functionDropdownContainer exists and contains the event target
-  if (
-    this.functionDropdownContainer &&
-    this.functionDropdownContainer.nativeElement &&
-    !this.functionDropdownContainer.nativeElement.contains(event.target as Node)
-  ) {
-    this.dropdownOpen = false;
-  }
+    // Check if functionDropdownContainer exists and contains the event target
+    if (
+      this.functionDropdownContainer &&
+      this.functionDropdownContainer.nativeElement &&
+      !this.functionDropdownContainer.nativeElement.contains(
+        event.target as Node
+      )
+    ) {
+      this.dropdownOpen = false;
+    }
 
-  // Check if amenityDropdownContainer exists and contains the event target
-  if (
-    this.amenityDropdownContainer &&
-    this.amenityDropdownContainer.nativeElement &&
-    !this.amenityDropdownContainer.nativeElement.contains(event.target as Node)
-  ) {
-    this.dropdownAmenityOpen = false;
+    // Check if amenityDropdownContainer exists and contains the event target
+    if (
+      this.amenityDropdownContainer &&
+      this.amenityDropdownContainer.nativeElement &&
+      !this.amenityDropdownContainer.nativeElement.contains(
+        event.target as Node
+      )
+    ) {
+      this.dropdownAmenityOpen = false;
+    }
   }
-}
-
 
   private outputExists(
     lat: number,
@@ -668,6 +686,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           );
         case 'predict':
           return output.lat === lat && output.lon === lon;
+        case 'economy':
+          return output.lat === lat && output.lon === lon; // เพิ่มกรณี economy
         default:
           return false;
       }
@@ -696,25 +716,27 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       console.error('Leaflet is not loaded yet.');
       return;
     }
-  
+
     this.validateDistance();
-  
+
     const lat = parseFloat(this.latInput.nativeElement.value);
     const lon = parseFloat(this.lonInput.nativeElement.value);
-  
+
     if (this.marker) {
       this.marker.setLatLng([lat, lon]);
     } else {
-      this.marker = this.L.marker([lat, lon], { icon: this.redIcon }).addTo(this.map);
+      this.marker = this.L.marker([lat, lon], { icon: this.redIcon }).addTo(
+        this.map
+      );
       (this.marker as any).isOutputLayer = true;
-  
+
       this.marker.on('pm:dragend', () => {
         this.redrawMarker();
       });
     }
-  
+
     this.map.setView([lat, lon], this.map.getZoom());
-  
+
     if (
       this.outputExists(
         lat,
@@ -729,12 +751,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       );
       return;
     }
-  
+
     // Determine the color for this usage
     const colorIndex = this.countFunctionUsage % this.markerColors.length;
     const currentColor = this.markerColors[colorIndex];
     this.countFunctionUsage++;
-  
+
     // Create the icon
     const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${currentColor}.png`;
     const markerIcon = this.L.icon({
@@ -744,7 +766,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       popupAnchor: [1, -34],
       shadowSize: [28, 28],
     });
-  
+
     const loadingOutput = {
       type: this.selectedFunction,
       loading: true,
@@ -817,7 +839,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
               }).addTo(this.map);
               (circle as any).isOutputLayer = true;
               this.circles.push(circle);
-  
+
               const markers = response.locations.map((location: any) => {
                 const marker = L.marker([location.lat, location.lon], {
                   icon: markerIcon, // Use the dynamically created icon
@@ -826,7 +848,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.markers.push(marker);
                 return marker;
               });
-  
+
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
                 count: response.count,
@@ -836,11 +858,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 markers: markers,
                 color: currentColor, // Store the color
               });
-  
+
               circle.on('pm:dragend', () => {
                 this.redrawOutput(loadingOutput);
               });
-  
+
               markers.forEach((marker: any) => {
                 marker.on('pm:dragend', () => {
                   this.redrawOutput(loadingOutput);
@@ -864,22 +886,24 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                 category: string;
                 score: number;
               }> = response.ranked_predictions;
-    
+
               // สำหรับการแสดงใน popup (แสดงเพียงอันดับ 1 เท่านั้น)
               const topPrediction = rankedPredictions[0];
               const popupContent = `
                 <div class="predict-info-box">
                     <p>Predicted Amenity Category:</p>
-                    <p>${topPrediction.category} : ${(topPrediction.score * 100).toFixed(2)}%</p>
+                    <p>${topPrediction.category} : ${(
+                topPrediction.score * 100
+              ).toFixed(2)}%</p>
                 </div>`;
-    
+
               // แสดง popup เฉพาะอันดับ 1
               if (this.marker) {
                 this.marker
                   .bindPopup(popupContent, { className: 'custom-popup' })
                   .openPopup();
               }
-    
+
               // สำหรับการแสดงใน sidebar (แสดงผลการทำนายทั้งหมด)
               loadingOutput.loading = false;
               Object.assign(loadingOutput, {
@@ -895,8 +919,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         },
         error: (error) => console.error('Error predicting model:', error),
       });
-  
-    }else if (this.selectedFunction === 'population') {
+    } else if (this.selectedFunction === 'population') {
       this.apiService.getPopulation(lat, lon, this.distance).subscribe({
         next: (response) => {
           if (this.isOutputRemoved(loadingOutput)) return;
@@ -908,7 +931,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         },
         error: (error) => console.error('Error fetching population:', error),
       });
-    }else if (this.selectedFunction === 'economy') {
+    } else if (this.selectedFunction === 'economy') {
       this.apiService.getEconomyDetails(lat, lon).subscribe({
         next: (response) => {
           console.log('Economy data received:', response);
@@ -917,9 +940,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           Object.assign(loadingOutput, {
             subdistrict: response.subdistrict_th || 'ไม่ทราบ',
             district: response.district_th || 'ไม่ทราบ',
-            business_count: response.business_count !== undefined ? response.business_count : -1,
-            average_income: response.average_income !== undefined ? response.average_income : 'ไม่ทราบ',
-            closed_business_count: response.closed_business_count !== undefined ? response.closed_business_count : 0,
+            business_count:
+              response.business_count !== undefined
+                ? response.business_count
+                : -1,
+            average_income:
+              response.average_income !== undefined
+                ? response.average_income
+                : 'ไม่ทราบ',
+            closed_business_count:
+              response.closed_business_count !== undefined
+                ? response.closed_business_count
+                : 0,
           });
         },
         error: (error) => {
@@ -1086,7 +1118,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         drawnLayers.push(geoJson);
       }
     });
-  
+
     const combinedOutputs = [...this.outputs].map((output) => {
       const serializedOutput = { ...output };
       if (output.polyline) {
@@ -1110,12 +1142,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       delete serializedOutput.redMarker;
       return serializedOutput;
     });
-  
+
     const mapData = {
       drawnItems: drawnLayers,
       outputs: combinedOutputs,
     };
-  
+
     if (this.currentMapName) {
       Swal.fire({
         title: 'Save Map',
@@ -1127,12 +1159,14 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
         denyButtonText: 'Save New',
       }).then((result) => {
         if (result.isConfirmed) {
-          this.apiService.saveUserMap({ name: this.currentMapName, data: mapData }).subscribe({
-            next: (response) => {
-              console.log('Map saved successfully', response);
-            },
-            error: (error) => console.error('Error saving map:', error),
-          });
+          this.apiService
+            .saveUserMap({ name: this.currentMapName, data: mapData })
+            .subscribe({
+              next: (response) => {
+                console.log('Map saved successfully', response);
+              },
+              error: (error) => console.error('Error saving map:', error),
+            });
         } else if (result.isDenied) {
           Swal.fire({
             title: 'Enter a name for the map:',
@@ -1142,10 +1176,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           }).then((nameResult) => {
             if (nameResult.value) {
               const mapName = nameResult.value;
-  
+
               this.apiService.getUserMaps().subscribe({
                 next: (maps) => {
-                  const existingMap = maps.find((map: any) => map.name === mapName);
+                  const existingMap = maps.find(
+                    (map: any) => map.name === mapName
+                  );
                   if (existingMap) {
                     Swal.fire({
                       title: 'Map name already exists',
@@ -1156,23 +1192,29 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                       cancelButtonText: 'Cancel',
                     }).then((overwriteResult) => {
                       if (overwriteResult.isConfirmed) {
-                        this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
-                          next: (response) => {
-                            console.log('Map saved successfully', response);
-                            this.currentMapName = mapName;
-                          },
-                          error: (error) => console.error('Error saving map:', error),
-                        });
+                        this.apiService
+                          .saveUserMap({ name: mapName, data: mapData })
+                          .subscribe({
+                            next: (response) => {
+                              console.log('Map saved successfully', response);
+                              this.currentMapName = mapName;
+                            },
+                            error: (error) =>
+                              console.error('Error saving map:', error),
+                          });
                       }
                     });
                   } else {
-                    this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
-                      next: (response) => {
-                        console.log('Map saved successfully', response);
-                        this.currentMapName = mapName;
-                      },
-                      error: (error) => console.error('Error saving map:', error),
-                    });
+                    this.apiService
+                      .saveUserMap({ name: mapName, data: mapData })
+                      .subscribe({
+                        next: (response) => {
+                          console.log('Map saved successfully', response);
+                          this.currentMapName = mapName;
+                        },
+                        error: (error) =>
+                          console.error('Error saving map:', error),
+                      });
                   }
                 },
                 error: (error) => console.error('Error fetching maps:', error),
@@ -1190,7 +1232,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       }).then((nameResult) => {
         if (nameResult.value) {
           const mapName = nameResult.value;
-  
+
           this.apiService.getUserMaps().subscribe({
             next: (maps) => {
               const existingMap = maps.find((map: any) => map.name === mapName);
@@ -1204,23 +1246,28 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                   cancelButtonText: 'Cancel',
                 }).then((overwriteResult) => {
                   if (overwriteResult.isConfirmed) {
-                    this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
-                      next: (response) => {
-                        console.log('Map saved successfully', response);
-                        this.currentMapName = mapName;
-                      },
-                      error: (error) => console.error('Error saving map:', error),
-                    });
+                    this.apiService
+                      .saveUserMap({ name: mapName, data: mapData })
+                      .subscribe({
+                        next: (response) => {
+                          console.log('Map saved successfully', response);
+                          this.currentMapName = mapName;
+                        },
+                        error: (error) =>
+                          console.error('Error saving map:', error),
+                      });
                   }
                 });
               } else {
-                this.apiService.saveUserMap({ name: mapName, data: mapData }).subscribe({
-                  next: (response) => {
-                    console.log('Map saved successfully', response);
-                    this.currentMapName = mapName;
-                  },
-                  error: (error) => console.error('Error saving map:', error),
-                });
+                this.apiService
+                  .saveUserMap({ name: mapName, data: mapData })
+                  .subscribe({
+                    next: (response) => {
+                      console.log('Map saved successfully', response);
+                      this.currentMapName = mapName;
+                    },
+                    error: (error) => console.error('Error saving map:', error),
+                  });
               }
             },
             error: (error) => console.error('Error fetching maps:', error),
@@ -1229,8 +1276,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
       });
     }
   }
-  
-  
 
   loadMap(map: any) {
     console.log('Loading map data:', map);
@@ -1364,7 +1409,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           popupAnchor: [1, -34],
           shadowSize: [28, 28],
         });
-      
+
         output.markers = output.markers.map((markerData: any) => {
           return import('leaflet').then((L) => {
             const marker = L.marker([markerData.lat, markerData.lon], {
@@ -1372,11 +1417,11 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
             }).addTo(this.map);
             marker.isOutputLayer = true;
             this.markers.push(marker);
-      
+
             marker.on('pm:dragend', () => {
               this.redrawOutput(output);
             });
-      
+
             return marker;
           });
         });
@@ -1453,12 +1498,12 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   openTerms() {
-    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.isMenuOpen = false; // ปิดเมนูเมื่อคลิก
     this.showTerms = true;
   }
 
   openPrivacyPolicy() {
-    this.isMenuOpen = false;  // ปิดเมนูเมื่อคลิก
+    this.isMenuOpen = false; // ปิดเมนูเมื่อคลิก
     this.showPrivacyPolicy = true;
   }
 
@@ -1492,5 +1537,4 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   toggleHelp() {
     this.isHelpVisible = !this.isHelpVisible;
   }
-
 }
