@@ -1469,12 +1469,18 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
                     <p>Predicted Amenity Category:</p>
                     <p>${output.predicted_amenity_category}</p>
                 </div>`;
-          this.marker.bindPopup(output.popupContent, {
-            className: 'custom-popup',
-          });
-          if (output.visible) {
-            this.marker.openPopup();
+
+          if (this.marker) {
+            this.marker.bindPopup(popupContent, {
+              className: 'custom-popup',
+            });
+            if (output.visible) {
+              this.marker.openPopup();
+            }
           }
+
+          output.marker = this.marker;
+          output.popupContent = popupContent;
         });
       }
     });
