@@ -1076,6 +1076,28 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   selectSuggestion(suggestion: any) {
+    if (this.isMarkerLocked) {
+      Swal.fire({
+        title: 'Location Locked',
+        text: 'The location is currently locked. Please unlock it before searching again, or choose to cancel.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Unlock',
+        cancelButtonText: 'Cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.isMarkerLocked = false;
+          this.clearOutputsAndOverlays();
+          this.moveMapToSuggestion(suggestion);
+        }
+      });
+    } else {
+      this.clearOutputsAndOverlays();
+      this.moveMapToSuggestion(suggestion);
+    }
+  }
+
+  moveMapToSuggestion(suggestion: any) {
     const lat = suggestion.lat;
     const lon = suggestion.lon;
     this.latInput.nativeElement.value = lat;
@@ -1090,7 +1112,6 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
           this.map
         );
         (this.marker as any).isOutputLayer = true;
-
         this.marker.on('pm:dragend', () => {
           this.redrawMarker();
         });
