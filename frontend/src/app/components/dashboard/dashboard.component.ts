@@ -8,6 +8,7 @@ import {
   Inject,
   PLATFORM_ID,
   HostListener,
+  ChangeDetectorRef, 
 } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -154,10 +155,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('lonInput') lonInput!: ElementRef<HTMLInputElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('amenitySelect') amenitySelect!: ElementRef<HTMLSelectElement>;
-  @ViewChild('functionDropdownContainer')
-  functionDropdownContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('amenityDropdownContainer')
-  amenityDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('functionDropdownContainer') functionDropdownContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('amenityDropdownContainer') amenityDropdownContainer!: ElementRef<HTMLDivElement>;
 
   dropdownOpen = false;
   dropdownAmenityOpen = false;
@@ -175,6 +174,8 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   historyIcon = HistoryIcon;
   logoutIcon = LogoutIcon;
   isHelpVisible = false;
+  private tempLat: string | null = null;
+  private tempLon: string | null = null;
 
   showHistoryModal = false;
   savedMaps: any[] = [];
@@ -184,6 +185,7 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     private sharedService: SharedService,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -1562,6 +1564,26 @@ export class DashboardComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   toggleHelp() {
-    this.isHelpVisible = !this.isHelpVisible;
+    if (this.isHelpVisible) {
+      // when return to main sidebar
+      this.isHelpVisible = false;
+
+      // force update ViewChild
+      this.cdr.detectChanges();
+
+      // get lat lon values from tmp lat lon
+      if (this.latInput && this.latInput.nativeElement) {
+        this.latInput.nativeElement.value = this.tempLat ?? '';
+      }
+      if (this.lonInput && this.lonInput.nativeElement) {
+        this.lonInput.nativeElement.value = this.tempLon ?? '';
+      }
+    } else {//open Function Details
+      this.isHelpVisible = true;
+
+      // set lat lon in tmp lat lon
+      this.tempLat = this.latInput?.nativeElement.value || '';
+      this.tempLon = this.lonInput?.nativeElement.value || '';
+    }
   }
 }
