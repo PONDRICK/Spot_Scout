@@ -76,7 +76,9 @@ export class SetNewPasswordComponent {
             title: 'Password Reset Successful',
             text: 'You can now login with your new password.',
           }).then(() => {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/login']).then(() => {
+              window.location.reload();
+            });
           });
         },
         (error) => {
