@@ -75,7 +75,9 @@ export class AuthInterceptor implements HttpInterceptor {
       confirmButtonText: 'OK',
     }).then(() => {
       this.authService.logout();
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
     });
   }
 }
