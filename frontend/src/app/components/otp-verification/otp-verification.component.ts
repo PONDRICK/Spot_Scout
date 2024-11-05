@@ -113,7 +113,9 @@ export class OTPVerificationComponent implements OnInit, OnDestroy {
           title: 'OTP Verification Successful',
           text: 'Your OTP has been successfully verified.',
         }).then(() => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login']).then(() => {
+            window.location.reload();
+          });
         });
       },
       (error) => {
