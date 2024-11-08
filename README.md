@@ -1,5 +1,5 @@
-
-# Spot Scout (Under Development)
+![use](https://github.com/user-attachments/assets/077c349f-1cb4-40ee-9870-05ef1ad4ea0f)
+# Spot Scout
 
 Spot Scout is a location analysis and prediction platform designed to help users determine the most suitable type of establishment for a given location based on its latitude and longitude. The platform also offers map analysis tools, allowing users to visualize, save, and edit maps for reference. Secure login and session management ensure a seamless and safe experience for all users.
 
@@ -32,13 +32,16 @@ Spot Scout is a location analysis and prediction platform designed to help users
 # 
 
 ## **Map interface**  
-![image](https://github.com/user-attachments/assets/ac837b50-e848-42b2-a5f8-fce435050450)
+![Map](https://github.com/user-attachments/assets/715b87aa-84a7-43a1-87e0-6edf882ec73c)
 
 ## **Using the predict function**  
-![image](https://github.com/user-attachments/assets/77a3aec3-9759-4644-9964-82beb764f0d7)
+![Predict](https://github.com/user-attachments/assets/b47b12d9-67c5-4955-a118-31432982d033)
+
+## **Tutorial**  
+![tutorail](https://github.com/user-attachments/assets/411c01bc-6202-4788-9f5e-143e683a5547)
 
 ## **Overview**  
-![image](https://github.com/user-attachments/assets/90350cb2-b00f-47fc-8829-a4114603f75f)
+![use](https://github.com/user-attachments/assets/ea10fe2d-c5e7-4d35-95e7-f20a160b5b93)
 
 
 
